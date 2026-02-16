@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Olho Gallery</title>
+    <link rel="stylesheet" href="editor.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div>
+        <p class="eyebrow">Olho</p>
+        <h1>Gallery</h1>
+      </div>
+    </header>
+
+    <main>
+      <section class="card" aria-labelledby="gallery-title">
+        <div class="section-title">
+          <h2 id="gallery-title">Library</h2>
+          <span id="itemCount" class="count">0</span>
+        </div>
+
+        <div class="toolbar">
+          <label for="folderFilter">Folder</label>
+          <select id="folderFilter" aria-label="Filter by folder"></select>
+          <button id="refreshBtn" type="button">Refresh</button>
+        </div>
+
+        <div id="emptyState" class="list-item" hidden>No items found.</div>
+        <div id="galleryGrid" class="gallery-grid" role="list"></div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script type="module" src="gallery.js"></script>
+  </body>
+</html>

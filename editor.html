@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Olho Library</title>
+    <link rel="stylesheet" href="editor.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div>
+        <p class="eyebrow">Olho</p>
+        <h1>Library</h1>
+      </div>
+    </header>
+
+    <main>
+      <section class="card" aria-labelledby="folders-title">
+        <div class="section-title">
+          <h2 id="folders-title">Folders</h2>
+          <span id="folderCount" class="count">0</span>
+        </div>
+        <form id="folderForm" class="inline-form">
+          <label for="folderName">New folder</label>
+          <input id="folderName" name="folderName" type="text" placeholder="Project shots" required />
+          <button type="submit">Create</button>
+        </form>
+        <ul id="folderList" class="list" role="list"></ul>
+      </section>
+
+      <section class="card" aria-labelledby="items-title">
+        <div class="section-title">
+          <h2 id="items-title">Items</h2>
+          <span id="itemCount" class="count">0</span>
+        </div>
+        <div class="toolbar">
+          <label for="defaultFolder">Default folder</label>
+          <select id="defaultFolder"></select>
+          <button id="addDummy" type="button">Add Dummy Item</button>
+        </div>
+        <ul id="itemList" class="list" role="list"></ul>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script type="module" src="editor.js"></script>
+  </body>
+</html>

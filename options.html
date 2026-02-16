@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Olho Options</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div>
+        <p class="eyebrow">Olho</p>
+        <h1>Options</h1>
+      </div>
+    </header>
+
+    <main>
+      <form id="optionsForm" class="card" aria-labelledby="options-heading">
+        <h2 id="options-heading">Capture Preferences</h2>
+        <label class="field">
+          <input type="checkbox" id="autoSave" />
+          <span>Auto-save captures to the library</span>
+        </label>
+        <label class="field">
+          <input type="checkbox" id="soundToggle" />
+          <span>Play a sound after capture</span>
+        </label>
+        <button type="submit">Save Preferences</button>
+      </form>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </main>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

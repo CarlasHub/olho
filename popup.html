@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Olho</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div>
+        <p class="eyebrow">Olho</p>
+        <h1>Capture Studio</h1>
+      </div>
+    </header>
+
+    <main>
+      <section aria-labelledby="capture-actions">
+        <h2 id="capture-actions">Capture</h2>
+        <div class="button-grid">
+          <button type="button" data-action="capture-visible">Capture Visible</button>
+          <button type="button" data-action="capture-region">Capture Region</button>
+          <button type="button" data-action="capture-full">Capture Full Page</button>
+          <button type="button" data-action="start-recording">Start Recording</button>
+        </div>
+      </section>
+
+      <section aria-labelledby="library-actions">
+        <h2 id="library-actions">Library</h2>
+        <div class="button-grid">
+          <button type="button" data-action="open-library">Open Library</button>
+          <button type="button" data-action="open-options">Options</button>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

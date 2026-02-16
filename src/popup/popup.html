@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Olho</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div>
+        <p class="eyebrow">Olho</p>
+        <h1>Quick Actions</h1>
+      </div>
+    </header>
+
+    <main class="stack">
+      <section class="card" aria-labelledby="capture-title">
+        <div class="card-header">
+          <h2 id="capture-title">Capture Screenshot</h2>
+        </div>
+        <div class="button-grid" role="group" aria-label="Capture screenshot actions">
+          <button type="button" data-action="capture-visible">Visible</button>
+          <button type="button" data-action="capture-region">Region</button>
+          <button type="button" data-action="capture-full">Full Page</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="record-title">
+        <div class="card-header">
+          <h2 id="record-title">Record Screen</h2>
+        </div>
+        <div class="button-row" role="group" aria-label="Screen recording actions">
+          <button type="button" data-action="record-start" class="primary">Start Recording</button>
+          <button type="button" data-action="record-stop">Stop</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="folders-title">
+        <div class="card-header">
+          <h2 id="folders-title">Folders</h2>
+          <span id="folderCount" class="pill" aria-live="polite">0</span>
+        </div>
+        <ul id="folderList" class="list" role="list" aria-label="Folders list"></ul>
+      </section>
+
+      <section class="card" aria-labelledby="recent-title">
+        <div class="card-header">
+          <h2 id="recent-title">Recent Items</h2>
+          <span id="itemCount" class="pill" aria-live="polite">0</span>
+        </div>
+        <ul id="recentList" class="list" role="list" aria-label="Recent items list"></ul>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
