@@ -40,6 +40,14 @@
         <div class="library-toolbar">
           <label for="folderFilter">Folder</label>
           <select id="folderFilter" aria-label="Filter by folder"></select>
+          <label for="searchInput">Search</label>
+          <input id="searchInput" type="text" placeholder="Search title" aria-label="Search items" />
+          <label for="sortSelect">Sort</label>
+          <select id="sortSelect" aria-label="Sort items">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="title">Title</option>
+          </select>
           <button id="refreshBtn" type="button">Refresh</button>
         </div>
 

@@ -271,6 +271,11 @@ select {
   padding: 6px 10px;
 }
 
+#itemTitle {
+  flex: 1 1 180px;
+  min-width: 160px;
+}
+
 .resize-grid {
   display: grid;
   grid-template-columns: auto 1fr;

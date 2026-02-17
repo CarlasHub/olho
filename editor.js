@@ -1,6 +1,6 @@
 import { CropTool } from "./src/editor/crop.js";
 import { ResizeTool } from "./src/editor/resize.js";
-import { createItem } from "./src/storage/storage.js";
+import { createItem, getItem, updateItem } from "./src/storage/storage.js";
 
 const TOOL_TYPES = {
   DRAW: "draw",
@@ -34,7 +34,9 @@ const state = {
   baseImageCanvas: null,
   baseImageContext: null,
   pointerId: null,
-  drawing: false
+  drawing: false,
+  currentItemId: null,
+  itemTitle: ""
 };
 
 const canvas = document.getElementById("editorCanvas");
@@ -49,6 +51,8 @@ const colorPicker = document.getElementById("colorPicker");
 const swatches = document.querySelectorAll(".swatch");
 const strokeWidth = document.getElementById("strokeWidth");
 const strokeValue = document.getElementById("strokeValue");
+const itemTitleInput = document.getElementById("itemTitle");
+const applyTitleBtn = document.getElementById("applyTitleBtn");
 const textOptions = document.getElementById("textOptions");
 const textSizeInput = document.getElementById("textSize");
 const fontFamilySelect = document.getElementById("fontFamily");
@@ -103,13 +107,13 @@ const resizeTool = new ResizeTool({
 
 setup();
 
-function setup() {
+async function setup() {
   annotationCanvas.width = canvas.width;
   annotationCanvas.height = canvas.height;
   bindEvents();
   updateToolUI();
   updateZoom();
-  loadPendingCapture();
+  await initLoad();
   render();
 }
 
@@ -137,6 +141,15 @@ function bindEvents() {
   strokeWidth.addEventListener("input", (event) => {
     state.lineWidth = Number(event.target.value);
     strokeValue.textContent = `${state.lineWidth}px`;
+  });
+
+  itemTitleInput?.addEventListener("input", (event) => {
+    state.itemTitle = event.target.value;
+  });
+
+  applyTitleBtn?.addEventListener("click", () => {
+    state.itemTitle = itemTitleInput?.value?.trim() || "";
+    showToast("Title updated.");
   });
 
   textSizeInput.addEventListener("input", (event) => {
@@ -202,7 +215,7 @@ function bindEvents() {
   if (chrome?.runtime?.onMessage) {
     chrome.runtime.onMessage.addListener((message) => {
       if (message?.type === "capture_complete" && message.payload?.dataUrl) {
-        loadFromDataUrl(message.payload.dataUrl);
+        loadNewCapture(message.payload.dataUrl);
       }
     });
   }
@@ -303,6 +316,35 @@ function handlePointerUp(event) {
 }
 
 function handleKeydown(event) {
+  const tag = event.target?.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA") {
+    return;
+  }
+
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
+    event.preventDefault();
+    saveToLibrary();
+    return;
+  }
+
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "c") {
+    event.preventDefault();
+    copyToClipboard();
+    return;
+  }
+
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "d") {
+    event.preventDefault();
+    downloadImage();
+    return;
+  }
+
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "g") {
+    event.preventDefault();
+    openGallery();
+    return;
+  }
+
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
     event.preventDefault();
     if (event.shiftKey) {
@@ -624,6 +666,12 @@ async function loadFromDataUrl(dataUrl, { preserveActions = false } = {}) {
   setBaseImage(bitmap, dataUrl);
 }
 
+async function loadNewCapture(dataUrl) {
+  state.currentItemId = null;
+  setItemTitle(`Olho Capture ${new Date().toLocaleString()}`);
+  await loadFromDataUrl(dataUrl);
+}
+
 function setBaseImage(bitmap, dataUrl = null) {
   state.baseImage = bitmap;
   state.baseImageCanvas = document.createElement("canvas");
@@ -663,12 +711,61 @@ async function restoreState(snapshot) {
   }
 }
 
+function setItemTitle(title) {
+  state.itemTitle = title || "";
+  if (itemTitleInput) {
+    itemTitleInput.value = state.itemTitle;
+  }
+}
+
+async function loadItemById(itemId) {
+  try {
+    const item = await getItem(itemId);
+    if (!item) {
+      showToast("Item not found.", true);
+      return false;
+    }
+
+    state.currentItemId = item.id;
+    setItemTitle(item.metadata?.title || "Untitled");
+
+    if (item.type !== "image") {
+      showToast("Video editing is not supported yet.", true);
+      return false;
+    }
+
+    const response = await fetch(item.blobUrl);
+    if (!response.ok) {
+      showToast("Source missing for this item.", true);
+      return false;
+    }
+    const blob = await response.blob();
+    const dataUrl = await blobToDataUrl(blob);
+    await loadFromDataUrl(dataUrl);
+    return true;
+  } catch (error) {
+    console.error(error);
+    showToast("Failed to load item.", true);
+    return false;
+  }
+}
+
+async function initLoad() {
+  const params = new URLSearchParams(window.location.search);
+  const itemId = params.get("itemId");
+  if (itemId) {
+    const ok = await loadItemById(itemId);
+    if (ok) return;
+  }
+  await loadPendingCapture();
+}
+
 async function loadPendingCapture() {
   try {
     if (chrome?.storage?.session) {
       const { lastCapture } = await chrome.storage.session.get("lastCapture");
       if (lastCapture?.dataUrl) {
-        await loadFromDataUrl(lastCapture.dataUrl);
+        await loadNewCapture(lastCapture.dataUrl);
         await chrome.storage.session.remove("lastCapture");
       }
       return;
@@ -677,7 +774,7 @@ async function loadPendingCapture() {
     if (chrome?.storage?.local) {
       const { lastCapture } = await chrome.storage.local.get("lastCapture");
       if (lastCapture?.dataUrl) {
-        await loadFromDataUrl(lastCapture.dataUrl);
+        await loadNewCapture(lastCapture.dataUrl);
         await chrome.storage.local.remove("lastCapture");
       }
     }
@@ -859,11 +956,23 @@ async function saveToLibrary() {
   try {
     const blob = await exportCompositeBlob();
     const url = URL.createObjectURL(blob);
-    await createItem({
+    const title = (itemTitleInput?.value || state.itemTitle || "").trim();
+    const fallbackTitle = `Olho Capture ${new Date().toLocaleString()}`;
+    if (state.currentItemId) {
+      await updateItem(state.currentItemId, {
+        blobUrl: url,
+        metadata: { title: title || fallbackTitle }
+      });
+      showToast("Library item updated.");
+      return;
+    }
+
+    const created = await createItem({
       type: "image",
       blobUrl: url,
-      metadata: { title: `Olho Capture ${new Date().toLocaleString()}` }
+      metadata: { title: title || fallbackTitle }
     });
+    state.currentItemId = created.id;
     showToast("Saved to library.");
   } catch (error) {
     console.error(error);

@@ -10,6 +10,8 @@ import {
 } from "./src/storage/storage.js";
 
 const folderFilter = document.getElementById("folderFilter");
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
 const galleryGrid = document.getElementById("galleryGrid");
 const itemCount = document.getElementById("itemCount");
 const emptyState = document.getElementById("emptyState");
@@ -202,6 +204,18 @@ function createCard(item, folders) {
     }
   });
 
+  if (item.type === "image") {
+    const editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.className = "action-btn";
+    editBtn.textContent = "Edit";
+    editBtn.addEventListener("click", () => {
+      const url = chrome.runtime.getURL(`editor.html?itemId=${item.id}`);
+      chrome.tabs.create({ url });
+    });
+    actions.append(editBtn);
+  }
+
   const downloadBtn = document.createElement("button");
   downloadBtn.type = "button";
   downloadBtn.className = "action-btn";
@@ -243,7 +257,24 @@ function createCard(item, folders) {
 
 function renderItems(items, folders) {
   const folderId = folderFilter.value || null;
-  const filtered = folderId ? items.filter((item) => item.folderId === folderId) : items;
+  let filtered = folderId ? items.filter((item) => item.folderId === folderId) : items;
+  const query = searchInput?.value?.trim().toLowerCase();
+  if (query) {
+    filtered = filtered.filter((item) =>
+      (item.metadata?.title || "Untitled").toLowerCase().includes(query)
+    );
+  }
+
+  const sortMode = sortSelect?.value || "newest";
+  filtered = [...filtered].sort((a, b) => {
+    if (sortMode === "oldest") {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    }
+    if (sortMode === "title") {
+      return (a.metadata?.title || "").localeCompare(b.metadata?.title || "");
+    }
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
 
   galleryGrid.innerHTML = "";
   itemCount.textContent = String(filtered.length);
@@ -266,6 +297,8 @@ async function refresh() {
 }
 
 folderFilter.addEventListener("change", refresh);
+searchInput?.addEventListener("input", refresh);
+sortSelect?.addEventListener("change", refresh);
 refreshBtn.addEventListener("click", refresh);
 createFolderBtn?.addEventListener("click", async () => {
   if (!newFolderName?.value) return;

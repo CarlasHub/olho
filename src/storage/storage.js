@@ -182,3 +182,31 @@ export async function listItems() {
   const state = await loadState();
   return state.items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
+
+export async function getItem(id) {
+  const state = await loadState();
+  return state.items.find((entry) => entry.id === id) || null;
+}
+
+export async function updateItem(id, { blobUrl, metadata, folderId } = {}) {
+  const state = await loadState();
+  const item = state.items.find((entry) => entry.id === id);
+  if (!item) {
+    throw new Error("Item not found.");
+  }
+
+  if (typeof blobUrl === "string" && blobUrl.length) {
+    item.blobUrl = blobUrl;
+  }
+
+  if (metadata && typeof metadata === "object") {
+    item.metadata = { ...item.metadata, ...metadata };
+  }
+
+  if (folderId !== undefined) {
+    item.folderId = folderId;
+  }
+
+  await saveState(state);
+  return item;
+}

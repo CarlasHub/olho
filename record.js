@@ -103,8 +103,10 @@ pauseBtn?.addEventListener("click", () => {
   try {
     if (isPaused()) {
       resumeRecording();
+      updateStatus("Recording…");
     } else {
       pauseRecording();
+      updateStatus("Paused.");
     }
     updatePauseButton();
   } catch (error) {
@@ -123,6 +125,17 @@ galleryBtn?.addEventListener("click", () => {
 optionsBtn?.addEventListener("click", () => chrome.runtime.openOptionsPage());
 
 closeBtn?.addEventListener("click", () => window.close());
+
+window.addEventListener("keydown", (event) => {
+  if (event.code === "Space") {
+    event.preventDefault();
+    pauseBtn?.click();
+  }
+  if (event.key === "Escape") {
+    event.preventDefault();
+    endRecording();
+  }
+});
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message?.type === "record_stop") {
