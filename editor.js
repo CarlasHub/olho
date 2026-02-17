@@ -2,6 +2,8 @@ import { CropTool } from "./src/editor/crop.js";
 import { ResizeTool } from "./src/editor/resize.js";
 import { createItem, getItem, updateItem } from "./src/storage/storage.js";
 
+const MAX_PERSIST_BYTES = 2_000_000;
+
 const TOOL_TYPES = {
   DRAW: "draw",
   HIGHLIGHT: "highlight",
@@ -36,7 +38,8 @@ const state = {
   pointerId: null,
   drawing: false,
   currentItemId: null,
-  itemTitle: ""
+  itemTitle: "",
+  itemTags: []
 };
 
 const canvas = document.getElementById("editorCanvas");
@@ -53,6 +56,8 @@ const strokeWidth = document.getElementById("strokeWidth");
 const strokeValue = document.getElementById("strokeValue");
 const itemTitleInput = document.getElementById("itemTitle");
 const applyTitleBtn = document.getElementById("applyTitleBtn");
+const itemTagsInput = document.getElementById("itemTags");
+const applyTagsBtn = document.getElementById("applyTagsBtn");
 const textOptions = document.getElementById("textOptions");
 const textSizeInput = document.getElementById("textSize");
 const fontFamilySelect = document.getElementById("fontFamily");
@@ -79,6 +84,9 @@ const zoomValue = document.getElementById("zoomValue");
 const copyBtn = document.getElementById("copyBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 const saveBtn = document.getElementById("saveBtn");
+const exportCopyBtn = document.getElementById("exportCopyBtn");
+const exportDownloadBtn = document.getElementById("exportDownloadBtn");
+const exportSaveBtn = document.getElementById("exportSaveBtn");
 const galleryBtn = document.getElementById("galleryBtn");
 const optionsBtn = document.getElementById("optionsBtn");
 const closeBtn = document.getElementById("closeBtn");
@@ -152,6 +160,15 @@ function bindEvents() {
     showToast("Title updated.");
   });
 
+  itemTagsInput?.addEventListener("input", (event) => {
+    state.itemTags = parseTags(event.target.value);
+  });
+
+  applyTagsBtn?.addEventListener("click", () => {
+    state.itemTags = parseTags(itemTagsInput?.value || "");
+    showToast("Tags updated.");
+  });
+
   textSizeInput.addEventListener("input", (event) => {
     state.textSize = Number(event.target.value);
   });
@@ -201,6 +218,9 @@ function bindEvents() {
   copyBtn.addEventListener("click", copyToClipboard);
   downloadBtn.addEventListener("click", downloadImage);
   saveBtn.addEventListener("click", saveToLibrary);
+  exportCopyBtn?.addEventListener("click", copyToClipboard);
+  exportDownloadBtn?.addEventListener("click", downloadImage);
+  exportSaveBtn?.addEventListener("click", saveToLibrary);
   galleryBtn.addEventListener("click", openGallery);
   optionsBtn.addEventListener("click", openOptions);
   closeBtn.addEventListener("click", () => window.close());
@@ -669,6 +689,7 @@ async function loadFromDataUrl(dataUrl, { preserveActions = false } = {}) {
 async function loadNewCapture(dataUrl) {
   state.currentItemId = null;
   setItemTitle(`Olho Capture ${new Date().toLocaleString()}`);
+  setItemTags([]);
   await loadFromDataUrl(dataUrl);
 }
 
@@ -718,6 +739,22 @@ function setItemTitle(title) {
   }
 }
 
+function parseTags(value) {
+  if (!value) return [];
+  const parts = value
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+  return Array.from(new Set(parts));
+}
+
+function setItemTags(tags = []) {
+  state.itemTags = Array.isArray(tags) ? tags : [];
+  if (itemTagsInput) {
+    itemTagsInput.value = state.itemTags.join(", ");
+  }
+}
+
 async function loadItemById(itemId) {
   try {
     const item = await getItem(itemId);
@@ -728,9 +765,20 @@ async function loadItemById(itemId) {
 
     state.currentItemId = item.id;
     setItemTitle(item.metadata?.title || "Untitled");
+    setItemTags(item.metadata?.tags || []);
 
     if (item.type !== "image") {
       showToast("Video editing is not supported yet.", true);
+      return false;
+    }
+
+    if (item.dataUrl) {
+      await loadFromDataUrl(item.dataUrl);
+      return true;
+    }
+
+    if (!item.blobUrl) {
+      showToast("Source missing for this item.", true);
       return false;
     }
 
@@ -957,23 +1005,38 @@ async function saveToLibrary() {
     const blob = await exportCompositeBlob();
     const url = URL.createObjectURL(blob);
     const title = (itemTitleInput?.value || state.itemTitle || "").trim();
+    const tags = parseTags(itemTagsInput?.value || state.itemTags.join(", "));
     const fallbackTitle = `Olho Capture ${new Date().toLocaleString()}`;
+    const canPersist = blob.size <= MAX_PERSIST_BYTES;
+    const dataUrl = canPersist ? await blobToDataUrl(blob) : null;
     if (state.currentItemId) {
       await updateItem(state.currentItemId, {
         blobUrl: url,
-        metadata: { title: title || fallbackTitle }
+        dataUrl,
+        metadata: {
+          title: title || fallbackTitle,
+          tags,
+          sizeBytes: blob.size,
+          persisted: Boolean(dataUrl)
+        }
       });
-      showToast("Library item updated.");
+      showToast(dataUrl ? "Library item updated." : "Updated (large file may expire).");
       return;
     }
 
     const created = await createItem({
       type: "image",
       blobUrl: url,
-      metadata: { title: title || fallbackTitle }
+      dataUrl,
+      metadata: {
+        title: title || fallbackTitle,
+        tags,
+        sizeBytes: blob.size,
+        persisted: Boolean(dataUrl)
+      }
     });
     state.currentItemId = created.id;
-    showToast("Saved to library.");
+    showToast(dataUrl ? "Saved to library." : "Saved (large file may expire).");
   } catch (error) {
     console.error(error);
     showToast("Save failed.", true);

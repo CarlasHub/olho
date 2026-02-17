@@ -1,6 +1,7 @@
 import { createItem } from "../storage/storage.js";
 
 const DEFAULT_TITLE_PREFIX = "Screen Recording";
+const MAX_PERSIST_BYTES = 2_000_000;
 
 const state = {
   mediaRecorder: null,
@@ -84,6 +85,17 @@ function cleanupStreams() {
   }
   state.stream = null;
   state.micStream = null;
+}
+
+async function blobToDataUrl(blob) {
+  const buffer = await blob.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return `data:${blob.type};base64,${btoa(binary)}`;
 }
 
 export async function startRecording({
@@ -175,15 +187,19 @@ export async function stopRecording() {
 
   const title = `${DEFAULT_TITLE_PREFIX} ${new Date().toLocaleString()}`;
   const blobUrl = URL.createObjectURL(finalBlob);
+  const canPersist = finalBlob.size <= MAX_PERSIST_BYTES;
+  const dataUrl = canPersist ? await blobToDataUrl(finalBlob) : null;
 
   const savedItem = await createItem({
     type: "video",
     blobUrl,
+    dataUrl,
     metadata: {
       title,
       durationMs,
       mimeType: finalMimeType,
-      sizeBytes: finalBlob.size
+      sizeBytes: finalBlob.size,
+      persisted: Boolean(dataUrl)
     }
   });
 

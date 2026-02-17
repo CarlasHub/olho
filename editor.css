@@ -276,6 +276,11 @@ select {
   min-width: 160px;
 }
 
+#itemTags {
+  flex: 1 1 180px;
+  min-width: 160px;
+}
+
 .resize-grid {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -383,6 +388,43 @@ select {
   margin-bottom: 12px;
 }
 
+.tag-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tag-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1 1 auto;
+}
+
+.tag-chip {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tag-chip.active {
+  background: rgba(91, 108, 255, 0.25);
+  border-color: rgba(91, 108, 255, 0.7);
+}
+
 .folder-controls {
   display: flex;
   flex-wrap: wrap;
@@ -455,6 +497,24 @@ select {
   border-radius: 12px;
   object-fit: cover;
   background: #111827;
+}
+
+.gallery-thumb.missing {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(148, 163, 184, 0.2),
+    rgba(148, 163, 184, 0.2) 10px,
+    rgba(15, 23, 42, 0.8) 10px,
+    rgba(15, 23, 42, 0.8) 20px
+  );
+  display: grid;
+  place-items: center;
+}
+
+.gallery-thumb.missing::after {
+  content: "Source missing";
+  color: var(--muted);
+  font-size: 0.75rem;
 }
 
 .gallery-info {

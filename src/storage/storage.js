@@ -111,12 +111,18 @@ export async function deleteFolder(id) {
   await saveState(state);
 }
 
-export async function createItem({ folderId = null, type, blobUrl, metadata = {} } = {}) {
+export async function createItem({
+  folderId = null,
+  type,
+  blobUrl,
+  dataUrl = null,
+  metadata = {}
+} = {}) {
   if (!type || !["image", "video"].includes(type)) {
     throw new Error("Item type must be 'image' or 'video'.");
   }
-  if (!blobUrl) {
-    throw new Error("blobUrl is required.");
+  if (!blobUrl && !dataUrl) {
+    throw new Error("blobUrl or dataUrl is required.");
   }
 
   const state = await loadState();
@@ -125,7 +131,8 @@ export async function createItem({ folderId = null, type, blobUrl, metadata = {}
     id: crypto.randomUUID(),
     folderId: folderId || defaultFolderId,
     type,
-    blobUrl,
+    blobUrl: blobUrl || null,
+    dataUrl: dataUrl || null,
     createdAt: nowIso(),
     metadata: { ...metadata }
   };
@@ -188,7 +195,7 @@ export async function getItem(id) {
   return state.items.find((entry) => entry.id === id) || null;
 }
 
-export async function updateItem(id, { blobUrl, metadata, folderId } = {}) {
+export async function updateItem(id, { blobUrl, dataUrl, metadata, folderId } = {}) {
   const state = await loadState();
   const item = state.items.find((entry) => entry.id === id);
   if (!item) {
@@ -197,6 +204,10 @@ export async function updateItem(id, { blobUrl, metadata, folderId } = {}) {
 
   if (typeof blobUrl === "string" && blobUrl.length) {
     item.blobUrl = blobUrl;
+  }
+
+  if (dataUrl !== undefined) {
+    item.dataUrl = dataUrl;
   }
 
   if (metadata && typeof metadata === "object") {

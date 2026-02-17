@@ -12,6 +12,8 @@ import {
 const folderFilter = document.getElementById("folderFilter");
 const searchInput = document.getElementById("searchInput");
 const sortSelect = document.getElementById("sortSelect");
+const tagFilters = document.getElementById("tagFilters");
+const clearTagBtn = document.getElementById("clearTagBtn");
 const galleryGrid = document.getElementById("galleryGrid");
 const itemCount = document.getElementById("itemCount");
 const emptyState = document.getElementById("emptyState");
@@ -24,6 +26,19 @@ const openOptionsBtn = document.getElementById("openOptionsBtn");
 const closeBtn = document.getElementById("closeBtn");
 const toast = document.getElementById("toast");
 let toastTimer = null;
+let activeTag = "";
+
+function dataUrlToBlob(dataUrl) {
+  const [meta, data] = dataUrl.split(",");
+  const mimeMatch = meta.match(/data:(.*?);base64/);
+  const mime = mimeMatch ? mimeMatch[1] : "application/octet-stream";
+  const binary = atob(data);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new Blob([bytes], { type: mime });
+}
 
 function showToast(message, isError = false) {
   toast.textContent = message;
@@ -121,11 +136,15 @@ function createCard(item, folders) {
 
   const preview = document.createElement(item.type === "video" ? "video" : "img");
   preview.className = "gallery-thumb";
-  preview.src = item.blobUrl;
+  preview.src = item.dataUrl || item.blobUrl || "";
   preview.alt = item.metadata?.title || `${item.type} capture`;
   if (item.type === "video") {
     preview.controls = true;
   }
+  preview.addEventListener("error", () => {
+    preview.removeAttribute("src");
+    preview.classList.add("missing");
+  });
 
   const info = document.createElement("div");
   info.className = "gallery-info";
@@ -137,6 +156,23 @@ function createCard(item, folders) {
   meta.textContent = new Date(item.createdAt).toLocaleString();
 
   info.append(title, meta);
+  if (item.metadata && item.metadata.persisted === false) {
+    const warn = document.createElement("span");
+    warn.textContent = "Session only";
+    warn.style.color = "#facc15";
+    warn.style.fontSize = "0.75rem";
+    info.append(warn);
+  }
+
+  const tagsRow = document.createElement("div");
+  tagsRow.className = "tag-row";
+  const tags = Array.isArray(item.metadata?.tags) ? item.metadata.tags : [];
+  tags.forEach((tag) => {
+    const chip = document.createElement("span");
+    chip.className = "tag-chip";
+    chip.textContent = tag;
+    tagsRow.append(chip);
+  });
 
   const actions = document.createElement("div");
   actions.className = "actions";
@@ -222,8 +258,13 @@ function createCard(item, folders) {
   downloadBtn.textContent = "Download";
   downloadBtn.addEventListener("click", async () => {
     try {
+      const downloadUrl = item.dataUrl || item.blobUrl;
+      if (!downloadUrl) {
+        showToast("Missing source.", true);
+        return;
+      }
       await chrome.downloads.download({
-        url: item.blobUrl,
+        url: downloadUrl,
         filename: `${item.metadata?.title || item.id}.${item.type === "video" ? "webm" : "png"}`,
         saveAs: true
       });
@@ -240,8 +281,17 @@ function createCard(item, folders) {
   copyBtn.textContent = "Copy";
   copyBtn.addEventListener("click", async () => {
     try {
-      const response = await fetch(item.blobUrl);
-      const blob = await response.blob();
+      let blob = null;
+      if (item.dataUrl) {
+        blob = dataUrlToBlob(item.dataUrl);
+      } else if (item.blobUrl) {
+        const response = await fetch(item.blobUrl);
+        blob = await response.blob();
+      }
+      if (!blob) {
+        showToast("Missing source.", true);
+        return;
+      }
       await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
       showToast("Copied to clipboard.");
     } catch (error) {
@@ -251,7 +301,7 @@ function createCard(item, folders) {
   });
 
   actions.append(moveSelect, renameBtn, downloadBtn, copyBtn, deleteBtn);
-  card.append(preview, info, actions);
+  card.append(preview, info, tagsRow, actions);
   return card;
 }
 
@@ -263,6 +313,10 @@ function renderItems(items, folders) {
     filtered = filtered.filter((item) =>
       (item.metadata?.title || "Untitled").toLowerCase().includes(query)
     );
+  }
+
+  if (activeTag) {
+    filtered = filtered.filter((item) => (item.metadata?.tags || []).includes(activeTag));
   }
 
   const sortMode = sortSelect?.value || "newest";
@@ -285,6 +339,45 @@ function renderItems(items, folders) {
   });
 }
 
+function renderTagFilters(items) {
+  if (!tagFilters) return;
+  tagFilters.innerHTML = "";
+  const tagSet = new Set();
+  items.forEach((item) => {
+    (item.metadata?.tags || []).forEach((tag) => tagSet.add(tag));
+  });
+
+  if (!tagSet.size) {
+    const empty = document.createElement("span");
+    empty.className = "tag-chip";
+    empty.textContent = "No tags";
+    empty.style.opacity = "0.6";
+    tagFilters.append(empty);
+    if (clearTagBtn) {
+      clearTagBtn.disabled = true;
+    }
+    return;
+  }
+
+  if (clearTagBtn) {
+    clearTagBtn.disabled = !activeTag;
+  }
+
+  Array.from(tagSet)
+    .sort((a, b) => a.localeCompare(b))
+    .forEach((tag) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = `tag-chip${activeTag === tag ? " active" : ""}`;
+      chip.textContent = tag;
+      chip.addEventListener("click", () => {
+        activeTag = activeTag === tag ? "" : tag;
+        refresh();
+      });
+      tagFilters.append(chip);
+    });
+}
+
 async function refresh() {
   const selectedFolder = folderFilter.value;
   const [items, folders] = await Promise.all([listItems(), listFolders()]);
@@ -293,12 +386,17 @@ async function refresh() {
     folderFilter.value = selectedFolder;
   }
   renderFolderList(folders, items);
+  renderTagFilters(items);
   renderItems(items, folders);
 }
 
 folderFilter.addEventListener("change", refresh);
 searchInput?.addEventListener("input", refresh);
 sortSelect?.addEventListener("change", refresh);
+clearTagBtn?.addEventListener("click", () => {
+  activeTag = "";
+  refresh();
+});
 refreshBtn.addEventListener("click", refresh);
 createFolderBtn?.addEventListener("click", async () => {
   if (!newFolderName?.value) return;
