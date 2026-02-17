@@ -204,3 +204,16 @@ code {
   color: var(--muted);
   border-top: 1px solid rgba(148, 163, 184, 0.2);
 }
+
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eyebrow-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}

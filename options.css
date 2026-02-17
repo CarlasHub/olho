@@ -92,3 +92,16 @@ input:focus-visible {
   margin-top: 16px;
   color: var(--muted);
 }
+
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eyebrow-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}

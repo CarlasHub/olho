@@ -388,3 +388,16 @@ select {
   padding: 8px 10px;
   min-width: 140px;
 }
+
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eyebrow-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
