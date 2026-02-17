@@ -13,6 +13,9 @@
         <h1>Screenshot Editor</h1>
       </div>
       <div class="header-actions">
+        <button type="button" id="galleryBtn" class="ghost">Gallery</button>
+        <button type="button" id="optionsBtn" class="ghost">Options</button>
+        <button type="button" id="closeBtn" class="ghost">Close</button>
         <button type="button" id="copyBtn" class="ghost">Copy</button>
         <button type="button" id="downloadBtn" class="ghost">Download</button>
         <button type="button" id="saveBtn" class="primary">Done</button>
@@ -201,12 +204,16 @@
               </div>
             </div>
 
-            <div class="option-group" id="cropOptions" hidden>
-              <div class="option-row">
-                <button type="button" id="applyCropBtn" class="primary">Apply Crop</button>
-                <button type="button" id="cancelCropBtn" class="ghost">Cancel</button>
-              </div>
+          <div class="option-group" id="cropOptions" hidden>
+            <div class="crop-metrics">
+              <span>Width: <strong id="cropWidth">0</strong></span>
+              <span>Height: <strong id="cropHeight">0</strong></span>
             </div>
+            <div class="option-row">
+              <button type="button" id="applyCropBtn" class="primary">Apply Crop</button>
+              <button type="button" id="cancelCropBtn" class="ghost">Cancel</button>
+            </div>
+          </div>
 
             <div class="option-group" id="resizePanel" hidden>
               <label class="option-label">Resize</label>

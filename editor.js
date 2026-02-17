@@ -58,6 +58,8 @@ const blurValue = document.getElementById("blurValue");
 const cropOptions = document.getElementById("cropOptions");
 const applyCropBtn = document.getElementById("applyCropBtn");
 const cancelCropBtn = document.getElementById("cancelCropBtn");
+const cropWidthValue = document.getElementById("cropWidth");
+const cropHeightValue = document.getElementById("cropHeight");
 const resizePanel = document.getElementById("resizePanel");
 const resizeWidth = document.getElementById("resizeWidth");
 const resizeHeight = document.getElementById("resizeHeight");
@@ -73,6 +75,9 @@ const zoomValue = document.getElementById("zoomValue");
 const copyBtn = document.getElementById("copyBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 const saveBtn = document.getElementById("saveBtn");
+const galleryBtn = document.getElementById("galleryBtn");
+const optionsBtn = document.getElementById("optionsBtn");
+const closeBtn = document.getElementById("closeBtn");
 const toolOptions = document.querySelector(".tool-options");
 const optionsToggle = document.getElementById("optionsToggle");
 
@@ -84,7 +89,10 @@ const cropTool = new CropTool({
     state.actions = [];
     state.redoStack = [];
   },
-  onChange: () => render()
+  onChange: (rect) => {
+    updateCropMetrics(rect);
+    render();
+  }
 });
 
 const resizeTool = new ResizeTool({
@@ -180,6 +188,9 @@ function bindEvents() {
   copyBtn.addEventListener("click", copyToClipboard);
   downloadBtn.addEventListener("click", downloadImage);
   saveBtn.addEventListener("click", saveToLibrary);
+  galleryBtn.addEventListener("click", openGallery);
+  optionsBtn.addEventListener("click", openOptions);
+  closeBtn.addEventListener("click", () => window.close());
 
   canvas.addEventListener("pointerdown", handlePointerDown);
   canvas.addEventListener("pointermove", handlePointerMove);
@@ -195,6 +206,15 @@ function bindEvents() {
       }
     });
   }
+}
+
+async function openGallery() {
+  const url = chrome.runtime.getURL("gallery.html");
+  await chrome.tabs.create({ url });
+}
+
+function openOptions() {
+  chrome.runtime.openOptionsPage();
 }
 
 function setTool(tool) {
@@ -684,6 +704,7 @@ function updateZoom() {
   canvas.style.transform = `scale(${state.zoom})`;
   zoomValue.textContent = `${Math.round(state.zoom * 100)}%`;
   resizeTool.setZoom(state.zoom);
+  cropTool.setZoom(state.zoom);
 }
 
 function openResizePanel() {
@@ -763,6 +784,17 @@ async function applyCrop() {
   cropTool.disable();
   setTool(TOOL_TYPES.DRAW);
   showToast("Cropped.");
+}
+
+function updateCropMetrics(rect) {
+  if (!cropWidthValue || !cropHeightValue) return;
+  if (!rect) {
+    cropWidthValue.textContent = "0";
+    cropHeightValue.textContent = "0";
+    return;
+  }
+  cropWidthValue.textContent = String(Math.round(rect.width));
+  cropHeightValue.textContent = String(Math.round(rect.height));
 }
 
 async function canvasToDataUrl() {

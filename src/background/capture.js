@@ -1,4 +1,5 @@
 const CAPTURE_FORMAT = "png";
+const OVERLAY_ID = "__olho_capture_progress__";
 
 function executeInTab(tabId, func, args = []) {
   return chrome.scripting
@@ -43,6 +44,23 @@ async function blobToDataUrl(blob) {
   return `data:${blob.type};base64,${btoa(binary)}`;
 }
 
+async function cropDataUrl(dataUrl, rect, devicePixelRatio = 1) {
+  const blob = await dataUrlToBlob(dataUrl);
+  const bitmap = await createImageBitmap(blob);
+  const sx = Math.round(rect.x * devicePixelRatio);
+  const sy = Math.round(rect.y * devicePixelRatio);
+  const sw = Math.round(rect.width * devicePixelRatio);
+  const sh = Math.round(rect.height * devicePixelRatio);
+
+  const canvas = new OffscreenCanvas(sw, sh);
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(bitmap, sx, sy, sw, sh, 0, 0, sw, sh);
+  bitmap.close();
+
+  const outputBlob = await canvas.convertToBlob({ type: "image/png" });
+  return blobToDataUrl(outputBlob);
+}
+
 async function getPageMetrics(tabId) {
   return executeInTab(tabId, () => {
     const doc = document.documentElement;
@@ -78,6 +96,153 @@ async function scrollTo(tabId, x, y) {
   }, [x, y]);
 }
 
+async function showProgressOverlay(tabId) {
+  return executeInTab(tabId, () => {
+    if (document.getElementById("__olho_capture_progress__")) {
+      return;
+    }
+    const overlay = document.createElement("div");
+    overlay.id = "__olho_capture_progress__";
+    overlay.style.position = "fixed";
+    overlay.style.top = "16px";
+    overlay.style.right = "16px";
+    overlay.style.zIndex = "2147483647";
+    overlay.style.padding = "10px 14px";
+    overlay.style.borderRadius = "12px";
+    overlay.style.background = "rgba(15, 23, 42, 0.92)";
+    overlay.style.border = "1px solid rgba(148, 163, 184, 0.3)";
+    overlay.style.color = "#f8fafc";
+    overlay.style.font = "600 13px system-ui, sans-serif";
+    overlay.style.boxShadow = "0 12px 24px rgba(15, 23, 42, 0.35)";
+    overlay.textContent = "Capturing…";
+    document.body.appendChild(overlay);
+  });
+}
+
+async function updateProgressOverlay(tabId, { current, total }) {
+  return executeInTab(tabId, (progress) => {
+    const overlay = document.getElementById("__olho_capture_progress__");
+    if (!overlay) return;
+    overlay.textContent = `Capturing ${progress.current}/${progress.total}`;
+  }, [{ current, total }]);
+}
+
+async function setOverlayVisible(tabId, visible) {
+  return executeInTab(tabId, (nextVisible) => {
+    const overlay = document.getElementById("__olho_capture_progress__");
+    if (!overlay) return;
+    overlay.style.opacity = nextVisible ? "1" : "0";
+  }, [visible]);
+}
+
+async function removeProgressOverlay(tabId) {
+  return executeInTab(tabId, () => {
+    const overlay = document.getElementById("__olho_capture_progress__");
+    if (overlay) overlay.remove();
+  });
+}
+
+async function selectRegion(tabId) {
+  return executeInTab(tabId, () => {
+    if (window.__olhoRegionSelectActive) return null;
+    window.__olhoRegionSelectActive = true;
+
+    return new Promise((resolve) => {
+      const overlay = document.createElement("div");
+      overlay.style.position = "fixed";
+      overlay.style.inset = "0";
+      overlay.style.cursor = "crosshair";
+      overlay.style.zIndex = "2147483647";
+      overlay.style.background = "rgba(10, 14, 24, 0.35)";
+
+      const box = document.createElement("div");
+      box.style.position = "absolute";
+      box.style.border = "2px dashed rgba(59, 130, 246, 0.9)";
+      box.style.background = "rgba(59, 130, 246, 0.15)";
+      box.style.pointerEvents = "none";
+
+      const hint = document.createElement("div");
+      hint.style.position = "fixed";
+      hint.style.top = "16px";
+      hint.style.left = "50%";
+      hint.style.transform = "translateX(-50%)";
+      hint.style.padding = "6px 12px";
+      hint.style.borderRadius = "999px";
+      hint.style.background = "rgba(15, 23, 42, 0.9)";
+      hint.style.border = "1px solid rgba(148, 163, 184, 0.3)";
+      hint.style.color = "#f8fafc";
+      hint.style.font = "600 12px system-ui, sans-serif";
+      hint.textContent = "Drag to select region · Esc to cancel";
+
+      overlay.appendChild(box);
+      overlay.appendChild(hint);
+      document.body.appendChild(overlay);
+
+      let startX = 0;
+      let startY = 0;
+      let dragging = false;
+
+      function cleanup(result) {
+        window.__olhoRegionSelectActive = false;
+        overlay.remove();
+        window.removeEventListener("keydown", onKeyDown);
+        resolve(result);
+      }
+
+      function onKeyDown(event) {
+        if (event.key === "Escape") {
+          cleanup(null);
+        }
+      }
+
+      function onPointerDown(event) {
+        dragging = true;
+        startX = event.clientX;
+        startY = event.clientY;
+        box.style.left = `${startX}px`;
+        box.style.top = `${startY}px`;
+        box.style.width = "0px";
+        box.style.height = "0px";
+      }
+
+      function onPointerMove(event) {
+        if (!dragging) return;
+        const currentX = event.clientX;
+        const currentY = event.clientY;
+        const x = Math.min(startX, currentX);
+        const y = Math.min(startY, currentY);
+        const width = Math.abs(currentX - startX);
+        const height = Math.abs(currentY - startY);
+        box.style.left = `${x}px`;
+        box.style.top = `${y}px`;
+        box.style.width = `${width}px`;
+        box.style.height = `${height}px`;
+      }
+
+      function onPointerUp(event) {
+        if (!dragging) return;
+        dragging = false;
+        const endX = event.clientX;
+        const endY = event.clientY;
+        const x = Math.min(startX, endX);
+        const y = Math.min(startY, endY);
+        const width = Math.abs(endX - startX);
+        const height = Math.abs(endY - startY);
+        if (width < 4 || height < 4) {
+          cleanup(null);
+          return;
+        }
+        cleanup({ x, y, width, height, devicePixelRatio: window.devicePixelRatio || 1 });
+      }
+
+      overlay.addEventListener("pointerdown", onPointerDown);
+      overlay.addEventListener("pointermove", onPointerMove);
+      overlay.addEventListener("pointerup", onPointerUp);
+      window.addEventListener("keydown", onKeyDown);
+    });
+  });
+}
+
 async function notifyEditor(payload) {
   try {
     await chrome.runtime.sendMessage({
@@ -106,6 +271,27 @@ export async function captureVisibleArea(tabId) {
   return payload;
 }
 
+export async function captureRegion(tabId) {
+  const tab = await chrome.tabs.get(tabId);
+  const selection = await selectRegion(tabId);
+  if (!selection) {
+    return { mode: "region", cancelled: true };
+  }
+  const dataUrl = await captureVisible(tab.windowId);
+  const cropped = await cropDataUrl(dataUrl, selection, selection.devicePixelRatio || 1);
+
+  const payload = {
+    mode: "region",
+    dataUrl: cropped,
+    width: selection.width,
+    height: selection.height,
+    devicePixelRatio: selection.devicePixelRatio || 1
+  };
+
+  await notifyEditor(payload);
+  return payload;
+}
+
 export async function captureFullPage(tabId) {
   const tab = await chrome.tabs.get(tabId);
   const metrics = await getPageMetrics(tabId);
@@ -127,11 +313,16 @@ export async function captureFullPage(tabId) {
   }
 
   try {
-    for (const y of positions) {
+    await showProgressOverlay(tabId);
+    for (let i = 0; i < positions.length; i += 1) {
+      const y = positions[i];
+      await updateProgressOverlay(tabId, { current: i + 1, total: positions.length });
       const actual = await scrollTo(tabId, 0, y);
       await delay(120);
 
+      await setOverlayVisible(tabId, false);
       const dataUrl = await captureVisible(tab.windowId);
+      await setOverlayVisible(tabId, true);
       const blob = await dataUrlToBlob(dataUrl);
       const bitmap = await createImageBitmap(blob);
 
@@ -156,6 +347,7 @@ export async function captureFullPage(tabId) {
   } finally {
     await scrollTo(tabId, originalScroll.x, originalScroll.y);
     await setScrollBehavior(tabId, originalScrollBehavior || "");
+    await removeProgressOverlay(tabId);
   }
 
   const outputBlob = await canvas.convertToBlob({ type: "image/png" });

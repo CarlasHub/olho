@@ -93,6 +93,7 @@ canvas:focus-visible {
   grid-template-columns: 72px 1fr;
   gap: 18px;
   align-items: start;
+  overflow: visible;
 }
 
 @media (max-width: 960px) {
@@ -119,6 +120,9 @@ canvas:focus-visible {
   box-shadow: var(--shadow);
   width: 72px;
   align-items: center;
+  position: relative;
+  overflow: visible;
+  z-index: 120;
 }
 
 .tool-btn {
@@ -149,7 +153,7 @@ canvas:focus-visible {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s ease, transform 0.15s ease;
-  z-index: 20;
+  z-index: 1200;
 }
 
 .tool-btn:hover .tool-label,
@@ -223,6 +227,18 @@ canvas:focus-visible {
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.crop-metrics {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.crop-metrics strong {
+  color: var(--text);
+  font-weight: 600;
 }
 
 .color-row {
@@ -397,7 +413,7 @@ select {
 }
 
 .eyebrow-icon {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   display: inline-block;
 }

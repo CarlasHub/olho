@@ -1,5 +1,5 @@
 import { createResponse, isMessage, MESSAGE_TYPES } from "./extension/models.js";
-import { captureVisibleArea, captureFullPage } from "./src/background/capture.js";
+import { captureVisibleArea, captureFullPage, captureRegion } from "./src/background/capture.js";
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Olho service worker installed");
@@ -58,7 +58,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return createResponse(message, payload);
       }
       case MESSAGE_TYPES.CAPTURE_REGION: {
-        return createResponse(message, null, "Region capture not wired yet.");
+        const tab = await getActiveTab();
+        const payload = await captureRegion(tab.id);
+        if (payload?.cancelled) {
+          return createResponse(message, { cancelled: true });
+        }
+        await storeLastCapture(payload);
+        await openEditorTab();
+        return createResponse(message, payload);
       }
       case MESSAGE_TYPES.START_RECORDING:
       case "record_start": {
