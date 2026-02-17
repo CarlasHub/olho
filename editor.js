@@ -3,6 +3,8 @@ import { ResizeTool } from "./src/editor/resize.js";
 import { createItem, getItem, updateItem } from "./src/storage/storage.js";
 
 const MAX_PERSIST_BYTES = 2_000_000;
+const DRAFT_KEY = "olho_editor_drafts";
+const DRAFT_MAX_BYTES = 2_000_000;
 
 const TOOL_TYPES = {
   DRAW: "draw",
@@ -48,6 +50,9 @@ const annotationCanvas = document.createElement("canvas");
 const annotationCtx = annotationCanvas.getContext("2d");
 const toast = document.getElementById("toast");
 const canvasShell = document.querySelector(".canvas-shell");
+
+let draftSaveTimer = null;
+let draftSkipNotice = false;
 
 const toolButtons = document.querySelectorAll(".tool-btn[data-tool]");
 const colorPicker = document.getElementById("colorPicker");
@@ -158,6 +163,7 @@ function bindEvents() {
   applyTitleBtn?.addEventListener("click", () => {
     state.itemTitle = itemTitleInput?.value?.trim() || "";
     showToast("Title updated.");
+    scheduleDraftSave();
   });
 
   itemTagsInput?.addEventListener("input", (event) => {
@@ -167,6 +173,7 @@ function bindEvents() {
   applyTagsBtn?.addEventListener("click", () => {
     state.itemTags = parseTags(itemTagsInput?.value || "");
     showToast("Tags updated.");
+    scheduleDraftSave();
   });
 
   textSizeInput.addEventListener("input", (event) => {
@@ -429,6 +436,7 @@ function finalizeCurrentAction() {
   state.redoStack = [];
   state.currentAction = null;
   render();
+  scheduleDraftSave();
 }
 
 async function undo() {
@@ -436,6 +444,7 @@ async function undo() {
     const action = state.actions.pop();
     state.redoStack.push(action);
     render();
+    scheduleDraftSave();
     return;
   }
 
@@ -443,6 +452,7 @@ async function undo() {
     const snapshot = state.snapshots.pop();
     state.snapshotRedo.push(captureState());
     await restoreState(snapshot);
+    scheduleDraftSave();
   }
 }
 
@@ -451,6 +461,7 @@ async function redo() {
     const action = state.redoStack.pop();
     state.actions.push(action);
     render();
+    scheduleDraftSave();
     return;
   }
 
@@ -458,6 +469,7 @@ async function redo() {
     const snapshot = state.snapshotRedo.pop();
     state.snapshots.push(captureState());
     await restoreState(snapshot);
+    scheduleDraftSave();
   }
 }
 
@@ -467,6 +479,7 @@ function clearCanvas() {
   state.snapshotRedo = [];
   state.actions = [];
   render();
+  scheduleDraftSave();
 }
 
 function render() {
@@ -688,9 +701,11 @@ async function loadFromDataUrl(dataUrl, { preserveActions = false } = {}) {
 
 async function loadNewCapture(dataUrl) {
   state.currentItemId = null;
+  await clearDraft("unsaved");
   setItemTitle(`Olho Capture ${new Date().toLocaleString()}`);
   setItemTags([]);
   await loadFromDataUrl(dataUrl);
+  scheduleDraftSave();
 }
 
 function setBaseImage(bitmap, dataUrl = null) {
@@ -755,6 +770,79 @@ function setItemTags(tags = []) {
   }
 }
 
+function getDraftKey() {
+  return state.currentItemId || "unsaved";
+}
+
+async function saveDraftNow() {
+  if (!state.baseDataUrl || !chrome?.storage?.local) return;
+  const approxBytes = Math.round(state.baseDataUrl.length * 0.75);
+  if (approxBytes > DRAFT_MAX_BYTES) {
+    if (!draftSkipNotice) {
+      draftSkipNotice = true;
+      showToast("Draft skipped (file too large).", true);
+    }
+    return;
+  }
+
+  const snapshot = captureState();
+  const { [DRAFT_KEY]: drafts } = await chrome.storage.local.get({ [DRAFT_KEY]: {} });
+  const nextDrafts = { ...(drafts || {}) };
+  nextDrafts[getDraftKey()] = {
+    ...snapshot,
+    title: state.itemTitle,
+    tags: state.itemTags,
+    updatedAt: Date.now()
+  };
+  await chrome.storage.local.set({ [DRAFT_KEY]: nextDrafts });
+}
+
+function scheduleDraftSave() {
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer = setTimeout(() => {
+    saveDraftNow().catch((error) => console.warn("Draft save failed", error));
+  }, 800);
+}
+
+async function clearDraft(key = getDraftKey()) {
+  if (!chrome?.storage?.local) return;
+  const { [DRAFT_KEY]: drafts } = await chrome.storage.local.get({ [DRAFT_KEY]: {} });
+  if (!drafts || !drafts[key]) return;
+  const nextDrafts = { ...drafts };
+  delete nextDrafts[key];
+  await chrome.storage.local.set({ [DRAFT_KEY]: nextDrafts });
+}
+
+async function loadDraft(key) {
+  if (!chrome?.storage?.local) return false;
+  const { [DRAFT_KEY]: drafts } = await chrome.storage.local.get({ [DRAFT_KEY]: {} });
+  const draft = drafts?.[key];
+  if (!draft?.baseDataUrl) return false;
+  await restoreState(draft);
+  setItemTitle(draft.title || state.itemTitle);
+  setItemTags(draft.tags || []);
+  showToast("Draft restored.");
+  return true;
+}
+
+function sanitizeFilename(value) {
+  return String(value || "capture")
+    .replace(/[^a-z0-9-_]+/gi, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 60) || "capture";
+}
+
+async function downloadBackup(blobUrl, title, extension) {
+  if (!chrome?.downloads?.download) return null;
+  const filename = `Olho/${sanitizeFilename(title)}.${extension}`;
+  const downloadId = await chrome.downloads.download({
+    url: blobUrl,
+    filename,
+    saveAs: false
+  });
+  return { downloadId, filename };
+}
+
 async function loadItemById(itemId) {
   try {
     const item = await getItem(itemId);
@@ -767,6 +855,10 @@ async function loadItemById(itemId) {
     setItemTitle(item.metadata?.title || "Untitled");
     setItemTags(item.metadata?.tags || []);
 
+    if (await loadDraft(item.id)) {
+      return true;
+    }
+
     if (item.type !== "image") {
       showToast("Video editing is not supported yet.", true);
       return false;
@@ -778,7 +870,11 @@ async function loadItemById(itemId) {
     }
 
     if (!item.blobUrl) {
-      showToast("Source missing for this item.", true);
+      if (item.metadata?.downloadId) {
+        showToast("Item stored in Downloads. Re-import to edit.", true);
+      } else {
+        showToast("Source missing for this item.", true);
+      }
       return false;
     }
 
@@ -805,7 +901,10 @@ async function initLoad() {
     const ok = await loadItemById(itemId);
     if (ok) return;
   }
-  await loadPendingCapture();
+  const pending = await loadPendingCapture();
+  if (!pending) {
+    await loadDraft("unsaved");
+  }
 }
 
 async function loadPendingCapture() {
@@ -815,8 +914,9 @@ async function loadPendingCapture() {
       if (lastCapture?.dataUrl) {
         await loadNewCapture(lastCapture.dataUrl);
         await chrome.storage.session.remove("lastCapture");
+        return true;
       }
-      return;
+      return false;
     }
 
     if (chrome?.storage?.local) {
@@ -824,11 +924,13 @@ async function loadPendingCapture() {
       if (lastCapture?.dataUrl) {
         await loadNewCapture(lastCapture.dataUrl);
         await chrome.storage.local.remove("lastCapture");
+        return true;
       }
     }
   } catch (error) {
     console.warn("Failed to load pending capture", error);
   }
+  return false;
 }
 
 function showToast(message, isError = false) {
@@ -916,6 +1018,7 @@ async function applyResize() {
   resizeTool.disable();
   setTool(TOOL_TYPES.DRAW);
   showToast("Resized.");
+  scheduleDraftSave();
 }
 
 async function applyCrop() {
@@ -929,6 +1032,7 @@ async function applyCrop() {
   cropTool.disable();
   setTool(TOOL_TYPES.DRAW);
   showToast("Cropped.");
+  scheduleDraftSave();
 }
 
 function updateCropMetrics(rect) {
@@ -1020,7 +1124,19 @@ async function saveToLibrary() {
           persisted: Boolean(dataUrl)
         }
       });
-      showToast(dataUrl ? "Library item updated." : "Updated (large file may expire).");
+      if (!dataUrl) {
+        const downloadMeta = await downloadBackup(url, title || fallbackTitle, "png");
+        if (downloadMeta?.downloadId) {
+          await updateItem(state.currentItemId, {
+            metadata: {
+              downloadId: downloadMeta.downloadId,
+              downloadFilename: downloadMeta.filename
+            }
+          });
+        }
+      }
+      await clearDraft();
+      showToast(dataUrl ? "Library item updated." : "Updated (stored in Downloads).");
       return;
     }
 
@@ -1036,7 +1152,19 @@ async function saveToLibrary() {
       }
     });
     state.currentItemId = created.id;
-    showToast(dataUrl ? "Saved to library." : "Saved (large file may expire).");
+    if (!dataUrl) {
+      const downloadMeta = await downloadBackup(url, title || fallbackTitle, "png");
+      if (downloadMeta?.downloadId) {
+        await updateItem(created.id, {
+          metadata: {
+            downloadId: downloadMeta.downloadId,
+            downloadFilename: downloadMeta.filename
+          }
+        });
+      }
+    }
+    await clearDraft();
+    showToast(dataUrl ? "Saved to library." : "Saved (stored in Downloads).");
   } catch (error) {
     console.error(error);
     showToast("Save failed.", true);
@@ -1084,6 +1212,7 @@ function createTextInput(point) {
     }
     input.remove();
     render();
+    scheduleDraftSave();
   };
 
   input.addEventListener("blur", commit, { once: true });

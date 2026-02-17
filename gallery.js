@@ -163,6 +163,20 @@ function createCard(item, folders) {
     warn.style.fontSize = "0.75rem";
     info.append(warn);
   }
+  if (!item.dataUrl && !item.blobUrl) {
+    const warn = document.createElement("span");
+    warn.textContent = "Source missing";
+    warn.style.color = "#f87171";
+    warn.style.fontSize = "0.75rem";
+    info.append(warn);
+  }
+  if (item.metadata?.downloadId) {
+    const hint = document.createElement("span");
+    hint.textContent = "Stored in Downloads";
+    hint.style.color = "#38bdf8";
+    hint.style.fontSize = "0.75rem";
+    info.append(hint);
+  }
 
   const tagsRow = document.createElement("div");
   tagsRow.className = "tag-row";
@@ -252,6 +266,37 @@ function createCard(item, folders) {
     actions.append(editBtn);
   }
 
+  if (item.metadata?.downloadId) {
+    const openBtn = document.createElement("button");
+    openBtn.type = "button";
+    openBtn.className = "action-btn";
+    openBtn.textContent = "Open File";
+    openBtn.addEventListener("click", async () => {
+      try {
+        await chrome.downloads.open(item.metadata.downloadId);
+        showToast("Opening download.");
+      } catch (error) {
+        console.error(error);
+        showToast("Open failed.", true);
+      }
+    });
+
+    const showBtn = document.createElement("button");
+    showBtn.type = "button";
+    showBtn.className = "action-btn secondary";
+    showBtn.textContent = "Show in Folder";
+    showBtn.addEventListener("click", async () => {
+      try {
+        await chrome.downloads.show(item.metadata.downloadId);
+      } catch (error) {
+        console.error(error);
+        showToast("Show failed.", true);
+      }
+    });
+
+    actions.append(openBtn, showBtn);
+  }
+
   const downloadBtn = document.createElement("button");
   downloadBtn.type = "button";
   downloadBtn.className = "action-btn";
@@ -274,6 +319,9 @@ function createCard(item, folders) {
       showToast("Download failed.", true);
     }
   });
+  if (!item.dataUrl && !item.blobUrl) {
+    downloadBtn.disabled = true;
+  }
 
   const copyBtn = document.createElement("button");
   copyBtn.type = "button";
@@ -299,6 +347,9 @@ function createCard(item, folders) {
       showToast("Copy failed.", true);
     }
   });
+  if (!item.dataUrl && !item.blobUrl) {
+    copyBtn.disabled = true;
+  }
 
   actions.append(moveSelect, renameBtn, downloadBtn, copyBtn, deleteBtn);
   card.append(preview, info, tagsRow, actions);

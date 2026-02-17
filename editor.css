@@ -545,6 +545,12 @@ select {
   cursor: pointer;
 }
 
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .action-btn.secondary {
   background: #1f2937;
   color: var(--text);

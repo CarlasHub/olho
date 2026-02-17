@@ -1,7 +1,8 @@
-import { createItem } from "../storage/storage.js";
+import { createItem, updateItem } from "../storage/storage.js";
 
 const DEFAULT_TITLE_PREFIX = "Screen Recording";
 const MAX_PERSIST_BYTES = 2_000_000;
+const DOWNLOAD_DIR = "Olho";
 
 const state = {
   mediaRecorder: null,
@@ -85,6 +86,24 @@ function cleanupStreams() {
   }
   state.stream = null;
   state.micStream = null;
+}
+
+function sanitizeFilename(value) {
+  return String(value || "recording")
+    .replace(/[^a-z0-9-_]+/gi, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 60) || "recording";
+}
+
+async function downloadBackup(blobUrl, title, extension) {
+  if (!chrome?.downloads?.download) return null;
+  const filename = `${DOWNLOAD_DIR}/${sanitizeFilename(title)}.${extension}`;
+  const downloadId = await chrome.downloads.download({
+    url: blobUrl,
+    filename,
+    saveAs: false
+  });
+  return { downloadId, filename };
 }
 
 async function blobToDataUrl(blob) {
@@ -189,6 +208,10 @@ export async function stopRecording() {
   const blobUrl = URL.createObjectURL(finalBlob);
   const canPersist = finalBlob.size <= MAX_PERSIST_BYTES;
   const dataUrl = canPersist ? await blobToDataUrl(finalBlob) : null;
+  let downloadMeta = null;
+  if (!dataUrl) {
+    downloadMeta = await downloadBackup(blobUrl, title, "webm");
+  }
 
   const savedItem = await createItem({
     type: "video",
@@ -199,9 +222,20 @@ export async function stopRecording() {
       durationMs,
       mimeType: finalMimeType,
       sizeBytes: finalBlob.size,
-      persisted: Boolean(dataUrl)
+      persisted: Boolean(dataUrl),
+      downloadId: downloadMeta?.downloadId || null,
+      downloadFilename: downloadMeta?.filename || null
     }
   });
+
+  if (downloadMeta?.downloadId) {
+    await updateItem(savedItem.id, {
+      metadata: {
+        downloadId: downloadMeta.downloadId,
+        downloadFilename: downloadMeta.filename
+      }
+    });
+  }
 
   const result = {
     recordingId: state.recordingId,
