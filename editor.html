@@ -3,42 +3,232 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Olho Library</title>
+    <title>Olho Editor</title>
     <link rel="stylesheet" href="editor.css" />
   </head>
   <body>
-    <header class="header">
+    <header class="editor-header">
       <div>
         <p class="eyebrow">Olho</p>
-        <h1>Library</h1>
+        <h1>Screenshot Editor</h1>
+      </div>
+      <div class="header-actions">
+        <button type="button" id="copyBtn" class="ghost">Copy</button>
+        <button type="button" id="downloadBtn" class="ghost">Download</button>
+        <button type="button" id="saveBtn" class="primary">Done</button>
       </div>
     </header>
 
-    <main>
-      <section class="card" aria-labelledby="folders-title">
-        <div class="section-title">
-          <h2 id="folders-title">Folders</h2>
-          <span id="folderCount" class="count">0</span>
-        </div>
-        <form id="folderForm" class="inline-form">
-          <label for="folderName">New folder</label>
-          <input id="folderName" name="folderName" type="text" placeholder="Project shots" required />
-          <button type="submit">Create</button>
-        </form>
-        <ul id="folderList" class="list" role="list"></ul>
-      </section>
+    <main class="editor-layout">
+      <aside class="toolbar" aria-label="Annotation tools">
+        <button type="button" class="tool-btn active" data-tool="draw" aria-label="Pen">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 20l4.5-1 10-10-3.5-3.5-10 10L4 20z" fill="none" stroke="currentColor" stroke-width="1.5" />
+            <path d="M14 5l3.5 3.5" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Pen</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="highlight" aria-label="Highlight">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="5" y="6" width="14" height="8" rx="2" fill="currentColor" opacity="0.35" />
+            <path d="M7 18h10" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Highlight</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="rect" aria-label="Rectangle">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="5" y="6" width="14" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Rectangle</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="ellipse" aria-label="Ellipse">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <ellipse cx="12" cy="12" rx="7" ry="5" fill="none" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Ellipse</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="arrow" aria-label="Arrow">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h12" stroke="currentColor" stroke-width="1.5" />
+            <path d="M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Arrow</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="line" aria-label="Line">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 19L19 5" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Line</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="text" aria-label="Text">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6h12" stroke="currentColor" stroke-width="1.5" />
+            <path d="M12 6v12" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Text</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="blur" aria-label="Blur">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="5" fill="currentColor" opacity="0.25" />
+            <circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Blur</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="erase" aria-label="Eraser">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 15l6-6 5 5-4 4H8l-3-3z" fill="none" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Eraser</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="crop" aria-label="Crop">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 4v10a3 3 0 003 3h8" stroke="currentColor" stroke-width="1.5" fill="none" />
+            <path d="M4 7h10" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Crop</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="resize" aria-label="Resize">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 10V4h6" stroke="currentColor" stroke-width="1.5" fill="none" />
+            <path d="M20 14v6h-6" stroke="currentColor" stroke-width="1.5" fill="none" />
+            <path d="M4 4l6 6" stroke="currentColor" stroke-width="1.5" />
+            <path d="M20 20l-6-6" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Resize</span>
+        </button>
 
-      <section class="card" aria-labelledby="items-title">
-        <div class="section-title">
-          <h2 id="items-title">Items</h2>
-          <span id="itemCount" class="count">0</span>
+        <button type="button" class="tool-btn" id="optionsToggle" aria-label="Tool options">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h10" stroke="currentColor" stroke-width="1.5" />
+            <circle cx="16" cy="7" r="2" stroke="currentColor" stroke-width="1.5" fill="none" />
+            <path d="M4 17h6" stroke="currentColor" stroke-width="1.5" />
+            <circle cx="14" cy="17" r="2" stroke="currentColor" stroke-width="1.5" fill="none" />
+          </svg>
+          <span class="tool-label">Options</span>
+        </button>
+
+        <div class="toolbar-divider"></div>
+
+        <button type="button" id="undoBtn" class="tool-btn" aria-label="Undo">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 7l-4 4 4 4" stroke="currentColor" stroke-width="1.5" fill="none" />
+            <path d="M20 12H5" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Undo</span>
+        </button>
+        <button type="button" id="redoBtn" class="tool-btn" aria-label="Redo">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M16 7l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" />
+            <path d="M4 12h15" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Redo</span>
+        </button>
+        <button type="button" id="clearBtn" class="tool-btn" aria-label="Clear">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 7h14" stroke="currentColor" stroke-width="1.5" />
+            <path d="M7 7l1 12h8l1-12" stroke="currentColor" stroke-width="1.5" fill="none" />
+            <path d="M9 7V5h6v2" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span class="tool-label">Clear</span>
+        </button>
+
+        <div class="toolbar-divider"></div>
+
+        <div class="zoom-controls" aria-label="Zoom controls">
+          <button type="button" id="zoomOutBtn" class="tool-btn" aria-label="Zoom out">
+            <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+            <span class="tool-label">Zoom out</span>
+          </button>
+          <div id="zoomValue" class="zoom-value">100%</div>
+          <button type="button" id="zoomInBtn" class="tool-btn" aria-label="Zoom in">
+            <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14" stroke="currentColor" stroke-width="1.5" />
+              <path d="M12 5v14" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+            <span class="tool-label">Zoom in</span>
+          </button>
         </div>
-        <div class="toolbar">
-          <label for="defaultFolder">Default folder</label>
-          <select id="defaultFolder"></select>
-          <button id="addDummy" type="button">Add Dummy Item</button>
+      </aside>
+
+      <section class="workspace">
+        <div class="canvas-shell">
+          <div class="tool-options collapsed" aria-label="Tool options">
+            <div class="option-group">
+              <label class="option-label" for="colorPicker">Color</label>
+              <div class="color-row">
+                <button class="swatch" data-color="#ff4d4f" aria-label="Red"></button>
+                <button class="swatch" data-color="#ff7a45" aria-label="Orange"></button>
+                <button class="swatch" data-color="#fadb14" aria-label="Yellow"></button>
+                <button class="swatch" data-color="#73d13d" aria-label="Green"></button>
+                <button class="swatch" data-color="#36cfc9" aria-label="Teal"></button>
+                <button class="swatch" data-color="#4096ff" aria-label="Blue"></button>
+                <button class="swatch" data-color="#9254de" aria-label="Purple"></button>
+                <button class="swatch" data-color="#f5222d" aria-label="Magenta"></button>
+                <button class="swatch" data-color="#ffffff" aria-label="White"></button>
+                <button class="swatch" data-color="#000000" aria-label="Black"></button>
+                <input type="color" id="colorPicker" aria-label="Custom color" />
+              </div>
+            </div>
+
+            <div class="option-group">
+              <label class="option-label" for="strokeWidth">Stroke</label>
+              <div class="option-row">
+                <input type="range" id="strokeWidth" min="1" max="24" value="4" />
+                <span id="strokeValue">4px</span>
+              </div>
+            </div>
+
+            <div class="option-group" id="textOptions" hidden>
+              <label class="option-label" for="textSize">Text</label>
+              <div class="option-row">
+                <input type="number" id="textSize" min="10" max="120" value="28" />
+                <select id="fontFamily">
+                  <option value="Space Grotesk, system-ui, sans-serif">Space Grotesk</option>
+                  <option value="Inter, system-ui, sans-serif">Inter</option>
+                  <option value="Arial, sans-serif">Arial</option>
+                  <option value="Georgia, serif">Georgia</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="option-group" id="blurOptions" hidden>
+              <label class="option-label" for="blurRadius">Blur</label>
+              <div class="option-row">
+                <input type="range" id="blurRadius" min="2" max="40" value="10" />
+                <span id="blurValue">10px</span>
+              </div>
+            </div>
+
+            <div class="option-group" id="cropOptions" hidden>
+              <div class="option-row">
+                <button type="button" id="applyCropBtn" class="primary">Apply Crop</button>
+                <button type="button" id="cancelCropBtn" class="ghost">Cancel</button>
+              </div>
+            </div>
+
+            <div class="option-group" id="resizePanel" hidden>
+              <label class="option-label">Resize</label>
+              <div class="resize-grid">
+                <label for="resizeWidth">Width</label>
+                <input type="number" id="resizeWidth" min="1" max="8000" />
+                <label for="resizeHeight">Height</label>
+                <input type="number" id="resizeHeight" min="1" max="8000" />
+                <label class="checkbox-row">
+                  <input type="checkbox" id="resizeLock" checked />
+                  <span>Proportional</span>
+                </label>
+              </div>
+              <div class="option-row">
+                <button type="button" id="applyResizeBtn" class="primary">Resize</button>
+                <button type="button" id="cancelResizeBtn" class="ghost">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <canvas id="editorCanvas" width="1200" height="720" aria-label="Annotation canvas" tabindex="0"></canvas>
         </div>
-        <ul id="itemList" class="list" role="list"></ul>
       </section>
     </main>
 

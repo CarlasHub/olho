@@ -1,8 +1,35 @@
-import { createResponse, isMessage } from "./extension/models.js";
+import { createResponse, isMessage, MESSAGE_TYPES } from "./extension/models.js";
+import { captureVisibleArea, captureFullPage } from "./src/background/capture.js";
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Olho service worker installed");
 });
+
+async function getActiveTab() {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (!tab?.id) {
+    throw new Error("No active tab found.");
+  }
+  return tab;
+}
+
+async function storeLastCapture(payload) {
+  if (!chrome.storage?.session) {
+    await chrome.storage.local.set({ lastCapture: payload });
+    return;
+  }
+  await chrome.storage.session.set({ lastCapture: payload });
+}
+
+async function openEditorTab() {
+  const url = chrome.runtime.getURL("editor.html");
+  await chrome.tabs.create({ url });
+}
+
+async function openRecordTab({ mode = "tab", mic = false } = {}) {
+  const url = chrome.runtime.getURL(`record.html?mode=${mode}&mic=${mic ? 1 : 0}`);
+  await chrome.tabs.create({ url });
+}
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!isMessage(message)) {
@@ -14,5 +41,45 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sender: sender?.id || "popup"
   });
 
-  sendResponse(createResponse(message, { receivedAt: new Date().toISOString() }));
+  const handle = async () => {
+    switch (message.type) {
+      case MESSAGE_TYPES.CAPTURE_VISIBLE: {
+        const tab = await getActiveTab();
+        const payload = await captureVisibleArea(tab.id);
+        await storeLastCapture(payload);
+        await openEditorTab();
+        return createResponse(message, payload);
+      }
+      case MESSAGE_TYPES.CAPTURE_FULL_PAGE: {
+        const tab = await getActiveTab();
+        const payload = await captureFullPage(tab.id);
+        await storeLastCapture(payload);
+        await openEditorTab();
+        return createResponse(message, payload);
+      }
+      case MESSAGE_TYPES.CAPTURE_REGION: {
+        return createResponse(message, null, "Region capture not wired yet.");
+      }
+      case MESSAGE_TYPES.START_RECORDING:
+      case "record_start": {
+        await openRecordTab({ mode: "tab", mic: false });
+        return createResponse(message, { started: true });
+      }
+      case "record_stop": {
+        await chrome.runtime.sendMessage({ type: "record_stop" });
+        return createResponse(message, { stopped: true });
+      }
+      default:
+        return createResponse(message, { receivedAt: new Date().toISOString() });
+    }
+  };
+
+  handle()
+    .then((response) => sendResponse(response))
+    .catch((error) => {
+      console.error("Olho handler error", error);
+      sendResponse(createResponse(message, null, String(error?.message || error)));
+    });
+
+  return true;
 });

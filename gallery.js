@@ -36,7 +36,7 @@ async function loadFolders() {
 
 async function loadItems() {
   const folderId = folderFilter.value || null;
-  const items = await listItems();
+  const [items, folders] = await Promise.all([listItems(), listFolders()]);
   const filtered = folderId ? items.filter((item) => item.folderId === folderId) : items;
 
   galleryGrid.innerHTML = "";
@@ -44,11 +44,11 @@ async function loadItems() {
   emptyState.hidden = filtered.length > 0;
 
   filtered.forEach((item) => {
-    galleryGrid.append(createCard(item));
+    galleryGrid.append(createCard(item, folders));
   });
 }
 
-function createCard(item) {
+function createCard(item, folders) {
   const card = document.createElement("article");
   card.className = "gallery-card";
   card.setAttribute("role", "listitem");
@@ -74,6 +74,36 @@ function createCard(item) {
 
   const actions = document.createElement("div");
   actions.className = "actions";
+
+  const moveSelect = document.createElement("select");
+  moveSelect.className = "action-select";
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "Move to…";
+  moveSelect.append(defaultOption);
+
+  folders.forEach((folder) => {
+    const option = document.createElement("option");
+    option.value = folder.id;
+    option.textContent = folder.name;
+    if (folder.id === item.folderId) {
+      option.selected = true;
+    }
+    moveSelect.append(option);
+  });
+
+  moveSelect.addEventListener("change", async (event) => {
+    const next = event.target.value;
+    if (!next || next === item.folderId) return;
+    try {
+      await moveItem(item.id, next);
+      showToast("Item moved.");
+      refresh();
+    } catch (error) {
+      console.error(error);
+      showToast("Move failed.", true);
+    }
+  });
 
   const renameBtn = document.createElement("button");
   renameBtn.type = "button";
@@ -142,7 +172,7 @@ function createCard(item) {
     }
   });
 
-  actions.append(renameBtn, downloadBtn, copyBtn, deleteBtn);
+  actions.append(moveSelect, renameBtn, downloadBtn, copyBtn, deleteBtn);
   card.append(preview, info, actions);
   return card;
 }

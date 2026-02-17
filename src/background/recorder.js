@@ -1,5 +1,4 @@
-import { saveItemWithBlob } from "../../storage/db.js";
-import { ITEM_TYPES } from "../../storage/models.js";
+import { createItem } from "../storage/storage.js";
 
 const DEFAULT_TITLE_PREFIX = "Screen Recording";
 
@@ -165,7 +164,6 @@ export async function stopRecording() {
 
   const blob = new Blob(state.chunks, { type: state.mimeType || recorder.mimeType || "video/webm" });
   const durationMs = Date.now() - state.startTime;
-  const url = URL.createObjectURL(blob);
 
   let finalBlob = blob;
   let finalMimeType = blob.type || "video/webm";
@@ -176,21 +174,22 @@ export async function stopRecording() {
   }
 
   const title = `${DEFAULT_TITLE_PREFIX} ${new Date().toLocaleString()}`;
+  const blobUrl = URL.createObjectURL(finalBlob);
 
-  const savedItem = await saveItemWithBlob(
-    {
-      type: ITEM_TYPES.VIDEO,
+  const savedItem = await createItem({
+    type: "video",
+    blobUrl,
+    metadata: {
       title,
       durationMs,
       mimeType: finalMimeType,
       sizeBytes: finalBlob.size
-    },
-    finalBlob
-  );
+    }
+  });
 
   const result = {
     recordingId: state.recordingId,
-    blobUrl: url,
+    blobUrl: blobUrl,
     blob: finalBlob,
     item: savedItem,
     durationMs
