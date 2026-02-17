@@ -7,21 +7,37 @@
     <link rel="stylesheet" href="editor.css" />
   </head>
   <body>
-    <header class="header">
+    <header class="editor-header">
       <div>
         <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
         <h1>Gallery</h1>
       </div>
+      <div class="header-actions">
+        <button type="button" id="openCaptureBtn" class="ghost">Open Capture</button>
+        <button type="button" id="openOptionsBtn" class="ghost">Options</button>
+        <button type="button" id="closeBtn" class="ghost">Close</button>
+      </div>
     </header>
 
-    <main>
+    <main class="workspace">
+      <section class="card" aria-labelledby="folders-title">
+        <div class="section-title">
+          <h2 id="folders-title">Folders</h2>
+        </div>
+        <div class="folder-controls">
+          <input id="newFolderName" type="text" placeholder="New folder name" aria-label="New folder name" />
+          <button id="createFolderBtn" type="button" class="primary">Create</button>
+        </div>
+        <div id="folderList" class="folder-list"></div>
+      </section>
+
       <section class="card" aria-labelledby="gallery-title">
         <div class="section-title">
           <h2 id="gallery-title">Library</h2>
           <span id="itemCount" class="count">0</span>
         </div>
 
-        <div class="toolbar">
+        <div class="library-toolbar">
           <label for="folderFilter">Folder</label>
           <select id="folderFilter" aria-label="Filter by folder"></select>
           <button id="refreshBtn" type="button">Refresh</button>

@@ -26,8 +26,13 @@ async function openEditorTab() {
   await chrome.tabs.create({ url });
 }
 
-async function openRecordTab({ mode = "tab", mic = false } = {}) {
-  const url = chrome.runtime.getURL(`record.html?mode=${mode}&mic=${mic ? 1 : 0}`);
+async function openRecordTab({ mode = "tab", mic = false, systemAudio = true } = {}) {
+  const params = new URLSearchParams({
+    mode,
+    mic: mic ? "1" : "0",
+    system: systemAudio ? "1" : "0"
+  });
+  const url = chrome.runtime.getURL(`record.html?${params.toString()}`);
   await chrome.tabs.create({ url });
 }
 
@@ -69,7 +74,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
       case MESSAGE_TYPES.START_RECORDING:
       case "record_start": {
-        await openRecordTab({ mode: "tab", mic: false });
+        const payload = message.payload || {};
+        await openRecordTab({
+          mode: payload.mode === "screen" ? "screen" : "tab",
+          mic: Boolean(payload.mic),
+          systemAudio: payload.systemAudio !== false
+        });
         return createResponse(message, { started: true });
       }
       case "record_stop": {

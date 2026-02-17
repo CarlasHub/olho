@@ -212,6 +212,29 @@ export function getRecordingState() {
     active: isRecording(),
     recordingId: state.recordingId,
     mimeType: state.mimeType,
-    startedAt: state.startTime
+    startedAt: state.startTime,
+    status: state.mediaRecorder?.state || "inactive"
   };
+}
+
+export function pauseRecording() {
+  if (!state.mediaRecorder) {
+    throw new Error("No active recording.");
+  }
+  if (state.mediaRecorder.state === "recording") {
+    state.mediaRecorder.pause();
+  }
+}
+
+export function resumeRecording() {
+  if (!state.mediaRecorder) {
+    throw new Error("No active recording.");
+  }
+  if (state.mediaRecorder.state === "paused") {
+    state.mediaRecorder.resume();
+  }
+}
+
+export function isPaused() {
+  return state.mediaRecorder?.state === "paused";
 }

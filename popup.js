@@ -2,6 +2,9 @@ import { MESSAGE_TYPES, createMessage } from "./extension/models.js";
 
 const toast = document.getElementById("toast");
 let toastTimer = null;
+const recordMode = document.getElementById("recordMode");
+const recordMic = document.getElementById("recordMic");
+const recordSystem = document.getElementById("recordSystem");
 
 const actionMap = {
   "capture-visible": MESSAGE_TYPES.CAPTURE_VISIBLE,
@@ -41,15 +44,21 @@ async function handleAction(action) {
   if (!type) return;
 
   try {
-    await sendBusMessage(type, { action });
-    showToast(`Queued: ${labelFromAction(action)}`);
+    const payload = { action };
+    if (action === "start-recording") {
+      payload.mode = recordMode?.value || "tab";
+      payload.mic = Boolean(recordMic?.checked);
+      payload.systemAudio = recordSystem?.checked !== false;
+    }
+    await sendBusMessage(type, payload);
+    showToast(action === "start-recording" ? "Recording starting…" : `Queued: ${labelFromAction(action)}`);
   } catch (error) {
     showToast(`Failed: ${labelFromAction(action)}`, true);
     console.error("Olho message error", error);
   }
 
   if (action === "open-library") {
-    const url = chrome.runtime.getURL("editor.html");
+    const url = chrome.runtime.getURL("gallery.html");
     chrome.tabs.create({ url });
   }
 

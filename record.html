@@ -7,13 +7,44 @@
     <link rel="stylesheet" href="record.css" />
   </head>
   <body>
-    <main class="record-card" aria-live="polite">
-      <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
-      <h1>Recording</h1>
-      <p id="status" class="status">Starting capture…</p>
-      <div class="actions">
-        <button type="button" id="stopBtn" class="primary">Stop Recording</button>
+    <header class="record-header">
+      <div>
+        <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
+        <h1>Recording</h1>
       </div>
+      <div class="header-actions">
+        <button type="button" id="galleryBtn" class="ghost">Gallery</button>
+        <button type="button" id="optionsBtn" class="ghost">Options</button>
+        <button type="button" id="closeBtn" class="ghost">Close</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="record-card" aria-live="polite">
+        <p id="status" class="status">Starting capture…</p>
+        <div class="meta-grid" aria-label="Recording details">
+          <div>
+            <span class="meta-label">Mode</span>
+            <strong id="modeValue">Tab</strong>
+          </div>
+          <div>
+            <span class="meta-label">Microphone</span>
+            <strong id="micValue">Off</strong>
+          </div>
+          <div>
+            <span class="meta-label">System audio</span>
+            <strong id="systemValue">On</strong>
+          </div>
+          <div>
+            <span class="meta-label">Elapsed</span>
+            <strong id="elapsedValue">00:00</strong>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" id="pauseBtn" class="ghost">Pause</button>
+          <button type="button" id="stopBtn" class="primary">Stop Recording</button>
+        </div>
+      </section>
     </main>
 
     <script type="module" src="record.js"></script>

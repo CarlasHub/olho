@@ -21,8 +21,29 @@
           <button type="button" data-action="capture-visible">Capture Visible</button>
           <button type="button" data-action="capture-region">Capture Region</button>
           <button type="button" data-action="capture-full">Capture Full Page</button>
-          <button type="button" data-action="start-recording">Start Recording</button>
         </div>
+      </section>
+
+      <section aria-labelledby="record-actions">
+        <h2 id="record-actions">Record</h2>
+        <div class="record-controls">
+          <label class="control">
+            <span>Mode</span>
+            <select id="recordMode">
+              <option value="tab">Current Tab</option>
+              <option value="screen">Entire Screen</option>
+            </select>
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" id="recordMic" />
+            <span>Microphone</span>
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" id="recordSystem" checked />
+            <span>System audio</span>
+          </label>
+        </div>
+        <button type="button" class="primary" data-action="start-recording">Start Recording</button>
       </section>
 
       <section aria-labelledby="library-actions">

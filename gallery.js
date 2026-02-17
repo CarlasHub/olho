@@ -1,10 +1,25 @@
-import { listFolders, listItems, deleteItem, renameItem, moveItem } from "./src/storage/storage.js";
+import {
+  listFolders,
+  listItems,
+  createFolder,
+  renameFolder,
+  deleteFolder,
+  deleteItem,
+  renameItem,
+  moveItem
+} from "./src/storage/storage.js";
 
 const folderFilter = document.getElementById("folderFilter");
 const galleryGrid = document.getElementById("galleryGrid");
 const itemCount = document.getElementById("itemCount");
 const emptyState = document.getElementById("emptyState");
 const refreshBtn = document.getElementById("refreshBtn");
+const folderList = document.getElementById("folderList");
+const newFolderName = document.getElementById("newFolderName");
+const createFolderBtn = document.getElementById("createFolderBtn");
+const openCaptureBtn = document.getElementById("openCaptureBtn");
+const openOptionsBtn = document.getElementById("openOptionsBtn");
+const closeBtn = document.getElementById("closeBtn");
 const toast = document.getElementById("toast");
 let toastTimer = null;
 
@@ -17,8 +32,7 @@ function showToast(message, isError = false) {
   toastTimer = setTimeout(() => toast.classList.remove("show"), 2000);
 }
 
-async function loadFolders() {
-  const folders = await listFolders();
+function renderFolderFilter(folders) {
   folderFilter.innerHTML = "";
 
   const allOption = document.createElement("option");
@@ -34,17 +48,67 @@ async function loadFolders() {
   });
 }
 
-async function loadItems() {
-  const folderId = folderFilter.value || null;
-  const [items, folders] = await Promise.all([listItems(), listFolders()]);
-  const filtered = folderId ? items.filter((item) => item.folderId === folderId) : items;
+function renderFolderList(folders, items) {
+  folderList.innerHTML = "";
 
-  galleryGrid.innerHTML = "";
-  itemCount.textContent = String(filtered.length);
-  emptyState.hidden = filtered.length > 0;
+  const counts = new Map();
+  items.forEach((item) => {
+    counts.set(item.folderId, (counts.get(item.folderId) || 0) + 1);
+  });
 
-  filtered.forEach((item) => {
-    galleryGrid.append(createCard(item, folders));
+  folders.forEach((folder) => {
+    const row = document.createElement("div");
+    row.className = "folder-row";
+
+    const meta = document.createElement("div");
+    meta.className = "folder-meta";
+    const name = document.createElement("strong");
+    name.textContent = folder.name;
+    const count = document.createElement("span");
+    count.textContent = `${counts.get(folder.id) || 0} item(s)`;
+    meta.append(name, count);
+
+    const actions = document.createElement("div");
+    actions.className = "folder-actions";
+
+    const renameBtn = document.createElement("button");
+    renameBtn.type = "button";
+    renameBtn.className = "action-btn secondary";
+    renameBtn.textContent = "Rename";
+    renameBtn.disabled = Boolean(folder.isDefault);
+    renameBtn.addEventListener("click", async () => {
+      const next = prompt("Rename folder", folder.name);
+      if (!next) return;
+      try {
+        await renameFolder(folder.id, next);
+        showToast("Folder renamed.");
+        refresh();
+      } catch (error) {
+        console.error(error);
+        showToast("Rename failed.", true);
+      }
+    });
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.className = "action-btn secondary";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.disabled = Boolean(folder.isDefault);
+    deleteBtn.addEventListener("click", async () => {
+      if (!confirm(`Delete folder "${folder.name}"? Items will move to Unsorted.`)) return;
+      try {
+        await deleteFolder(folder.id);
+        showToast("Folder deleted.");
+        refresh();
+      } catch (error) {
+        console.error(error);
+        showToast("Delete failed.", true);
+      }
+    });
+
+    actions.append(renameBtn, deleteBtn);
+    row.append(meta, actions);
+    folderList.append(row);
   });
 }
 
@@ -177,12 +241,52 @@ function createCard(item, folders) {
   return card;
 }
 
-async function refresh() {
-  await loadFolders();
-  await loadItems();
+function renderItems(items, folders) {
+  const folderId = folderFilter.value || null;
+  const filtered = folderId ? items.filter((item) => item.folderId === folderId) : items;
+
+  galleryGrid.innerHTML = "";
+  itemCount.textContent = String(filtered.length);
+  emptyState.hidden = filtered.length > 0;
+
+  filtered.forEach((item) => {
+    galleryGrid.append(createCard(item, folders));
+  });
 }
 
-folderFilter.addEventListener("change", loadItems);
+async function refresh() {
+  const selectedFolder = folderFilter.value;
+  const [items, folders] = await Promise.all([listItems(), listFolders()]);
+  renderFolderFilter(folders);
+  if (selectedFolder) {
+    folderFilter.value = selectedFolder;
+  }
+  renderFolderList(folders, items);
+  renderItems(items, folders);
+}
+
+folderFilter.addEventListener("change", refresh);
 refreshBtn.addEventListener("click", refresh);
+createFolderBtn?.addEventListener("click", async () => {
+  if (!newFolderName?.value) return;
+  try {
+    await createFolder(newFolderName.value);
+    newFolderName.value = "";
+    showToast("Folder created.");
+    refresh();
+  } catch (error) {
+    console.error(error);
+    showToast("Create failed.", true);
+  }
+});
+
+openCaptureBtn?.addEventListener("click", () => {
+  const url = chrome.runtime.getURL("popup.html");
+  chrome.tabs.create({ url });
+});
+
+openOptionsBtn?.addEventListener("click", () => chrome.runtime.openOptionsPage());
+
+closeBtn?.addEventListener("click", () => window.close());
 
 refresh();
