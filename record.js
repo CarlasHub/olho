@@ -8,6 +8,7 @@ import {
 } from "./src/background/recorder.js";
 
 const status = document.getElementById("status");
+const startBtn = document.getElementById("startBtn");
 const stopBtn = document.getElementById("stopBtn");
 const pauseBtn = document.getElementById("pauseBtn");
 const modeValue = document.getElementById("modeValue");
@@ -21,6 +22,18 @@ const closeBtn = document.getElementById("closeBtn");
 let started = false;
 let timerId = null;
 let startTime = 0;
+let lastToast = null;
+
+function showToast(message) {
+  if (!status) return;
+  status.textContent = message;
+  lastToast = message;
+  setTimeout(() => {
+    if (status.textContent === message) {
+      status.textContent = message;
+    }
+  }, 1200);
+}
 
 function updateStatus(message) {
   status.textContent = message;
@@ -81,14 +94,22 @@ async function begin() {
     startTimer();
     updatePauseButton();
     await injectOverlay(options.tabId);
+    startBtn?.setAttribute("disabled", "true");
+    pauseBtn?.removeAttribute("disabled");
+    stopBtn?.removeAttribute("disabled");
   } catch (error) {
     console.error(error);
     updateStatus("Failed to start recording.");
+    started = false;
   }
 }
 
 async function endRecording() {
   try {
+    if (!getRecordingState().active) {
+      showToast("No active recording.");
+      return;
+    }
     updateStatus("Stopping…");
     const result = await stopRecording();
     updateStatus("Saved to library.");
@@ -104,6 +125,10 @@ async function endRecording() {
 
 pauseBtn?.addEventListener("click", () => {
   try {
+    if (!getRecordingState().active) {
+      showToast("No active recording.");
+      return;
+    }
     if (isPaused()) {
       resumeRecording();
       updateStatus("Recording…");
@@ -119,6 +144,7 @@ pauseBtn?.addEventListener("click", () => {
   }
 });
 
+startBtn?.addEventListener("click", begin);
 stopBtn?.addEventListener("click", endRecording);
 
 galleryBtn?.addEventListener("click", () => {
@@ -133,6 +159,10 @@ closeBtn?.addEventListener("click", () => window.close());
 window.addEventListener("keydown", (event) => {
   if (event.code === "Space") {
     event.preventDefault();
+    if (!started) {
+      begin();
+      return;
+    }
     pauseBtn?.click();
   }
   if (event.key === "Escape") {
@@ -153,9 +183,7 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 });
 
-if (!getRecordingState().active) {
-  begin();
-}
+updateStatus("Ready to record.");
 
 async function injectOverlay(tabId) {
   if (!tabId || !chrome?.scripting) return;

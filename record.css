@@ -112,6 +112,10 @@ button:hover {
   flex-wrap: wrap;
 }
 
+#startBtn {
+  flex: 1 1 160px;
+}
+
 
 .eyebrow {
   display: inline-flex;
