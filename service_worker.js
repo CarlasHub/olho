@@ -26,12 +26,15 @@ async function openEditorTab() {
   await chrome.tabs.create({ url });
 }
 
-async function openRecordTab({ mode = "tab", mic = false, systemAudio = true } = {}) {
+async function openRecordTab({ mode = "tab", mic = false, systemAudio = true, tabId = null } = {}) {
   const params = new URLSearchParams({
     mode,
     mic: mic ? "1" : "0",
     system: systemAudio ? "1" : "0"
   });
+  if (tabId) {
+    params.set("tabId", String(tabId));
+  }
   const url = chrome.runtime.getURL(`record.html?${params.toString()}`);
   await chrome.tabs.create({ url });
 }
@@ -72,13 +75,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         await openEditorTab();
         return createResponse(message, payload);
       }
+      case MESSAGE_TYPES.OPEN_LIBRARY:
+      case "open_library": {
+        const url = chrome.runtime.getURL("gallery.html");
+        await chrome.tabs.create({ url });
+        return createResponse(message, { opened: true });
+      }
+      case MESSAGE_TYPES.OPEN_OPTIONS:
+      case "open_options": {
+        await chrome.runtime.openOptionsPage();
+        return createResponse(message, { opened: true });
+      }
       case MESSAGE_TYPES.START_RECORDING:
       case "record_start": {
         const payload = message.payload || {};
+        const tab = await getActiveTab();
         await openRecordTab({
           mode: payload.mode === "screen" ? "screen" : "tab",
           mic: Boolean(payload.mic),
-          systemAudio: payload.systemAudio !== false
+          systemAudio: payload.systemAudio !== false,
+          tabId: tab?.id
         });
         return createResponse(message, { started: true });
       }

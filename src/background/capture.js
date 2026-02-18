@@ -65,8 +65,20 @@ async function getPageMetrics(tabId) {
   return executeInTab(tabId, () => {
     const doc = document.documentElement;
     const body = document.body;
-    const pageWidth = Math.max(doc.scrollWidth, doc.clientWidth, body?.scrollWidth || 0);
-    const pageHeight = Math.max(doc.scrollHeight, doc.clientHeight, body?.scrollHeight || 0);
+    const pageWidth = Math.max(
+      doc.scrollWidth,
+      doc.clientWidth,
+      doc.offsetWidth,
+      body?.scrollWidth || 0,
+      body?.offsetWidth || 0
+    );
+    const pageHeight = Math.max(
+      doc.scrollHeight,
+      doc.clientHeight,
+      doc.offsetHeight,
+      body?.scrollHeight || 0,
+      body?.offsetHeight || 0
+    );
     return {
       pageWidth,
       pageHeight,
@@ -297,6 +309,10 @@ export async function captureFullPage(tabId) {
   const metrics = await getPageMetrics(tabId);
   const dpr = metrics.devicePixelRatio || 1;
 
+  if (metrics.pageHeight <= metrics.viewportHeight && metrics.pageWidth <= metrics.viewportWidth) {
+    return captureVisibleArea(tabId);
+  }
+
   const canvas = new OffscreenCanvas(
     Math.round(metrics.pageWidth * dpr),
     Math.round(metrics.pageHeight * dpr)
@@ -311,14 +327,19 @@ export async function captureFullPage(tabId) {
   for (let y = 0; y < metrics.pageHeight; y += metrics.viewportHeight) {
     positions.push(y);
   }
+  if (!positions.length) {
+    positions.push(0);
+  }
 
   try {
+    await scrollTo(tabId, 0, 0);
+    await delay(180);
     await showProgressOverlay(tabId);
     for (let i = 0; i < positions.length; i += 1) {
       const y = positions[i];
       await updateProgressOverlay(tabId, { current: i + 1, total: positions.length });
       const actual = await scrollTo(tabId, 0, y);
-      await delay(120);
+      await delay(240);
 
       await setOverlayVisible(tabId, false);
       const dataUrl = await captureVisible(tab.windowId);
