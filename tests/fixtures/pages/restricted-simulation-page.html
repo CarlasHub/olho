@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Olho Fixture: Restricted Simulation</title>
+    <style>
+      body { margin: 0; padding: 20px; font: 16px/1.5 system-ui, sans-serif; background: #111827; color: #f9fafb; }
+      .note { max-width: 720px; border: 1px solid #ef4444; border-radius: 12px; padding: 16px; background: rgba(127, 29, 29, 0.25); }
+      code { background: rgba(0, 0, 0, 0.35); padding: 2px 6px; border-radius: 6px; }
+    </style>
+  </head>
+  <body>
+    <div class="note">
+      <h1>Restricted Capture Simulation</h1>
+      <p id="restrictedMarker">Use this page with test harness forcing script injection failure to validate protected-page messaging.</p>
+      <p>Set <code>window.__olhoForceInjectionFailure = true</code> in tests where needed.</p>
+    </div>
+  </body>
+</html>

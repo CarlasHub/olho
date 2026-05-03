@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Olho Fixture: Iframe Page</title>
+    <style>
+      body { margin: 0; font: 16px/1.5 system-ui, sans-serif; padding: 18px; background: #f8fafc; }
+      iframe { width: 100%; min-height: 220px; border: 2px solid #94a3b8; border-radius: 10px; }
+      .cross-origin-placeholder { margin-top: 16px; border: 2px dashed #cbd5e1; border-radius: 10px; padding: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>Iframe Fixture</h1>
+    <p>Same-origin iframe and cross-origin limitation placeholder.</p>
+    <iframe src="/iframe-child.html" title="Same-origin fixture iframe"></iframe>
+    <div class="cross-origin-placeholder">
+      <h2>Cross-origin placeholder</h2>
+      <p id="crossOriginIframeNote">Cross-origin iframe capture behaviour depends on browser capture API limits.</p>
+    </div>
+  </body>
+</html>

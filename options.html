@@ -3,33 +3,166 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Olho Options</title>
+    <title>Olho Settings</title>
+    <link rel="stylesheet" href="src/shared/renaissance-theme.css" />
     <link rel="stylesheet" href="options.css" />
   </head>
   <body>
-    <header class="header">
-      <div>
-        <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
-        <h1>Options</h1>
+    <div class="olho-app-shell options-shell">
+      <div class="olho-main-shell">
+        <header class="header olho-topbar">
+          <div>
+            <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
+            <h1>Settings</h1>
+          </div>
+          <nav class="olho-nav olho-header-nav" aria-label="Olho sections">
+            <a class="olho-nav-link" href="popup.html">Capture</a>
+            <a class="olho-nav-link" href="record.html">Record</a>
+            <a class="olho-nav-link" href="gallery.html">Memory</a>
+            <a class="olho-nav-link" href="export-report.html">Export</a>
+            <a class="olho-nav-link" href="options.html" aria-current="page">Settings</a>
+            <a class="olho-nav-link" href="privacy.html">Privacy</a>
+          </nav>
+          <span class="status-pill" data-state="info">Local Configuration</span>
+        </header>
+
+        <main class="layout">
+          <form id="optionsForm" class="card" aria-labelledby="options-heading">
+            <h2 id="options-heading">Settings Groups</h2>
+
+            <details class="section-disclosure" open>
+              <summary>General</summary>
+              <label class="field">
+                <span>Default after-capture action</span>
+                <select id="defaultAfterCaptureAction">
+                  <option value="editor">Open editor</option>
+                  <option value="library">Save to Memory</option>
+                  <option value="download">Download file</option>
+                  <option value="clipboard">Copy to clipboard</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Skip editor</span>
+                <select id="skipEditorMode">
+                  <option value="never">Never</option>
+                  <option value="always">Always</option>
+                  <option value="fullPageOnly">Only for full-page captures</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Default save location</span>
+                <select id="defaultSaveLocation" disabled>
+                  <option value="local_library">Local library (required)</option>
+                </select>
+              </label>
+              <label class="field">
+                <input type="checkbox" id="autoSave" />
+                <span>Auto-save captures to the local library</span>
+              </label>
+              <label class="field">
+                <input type="checkbox" id="soundToggle" />
+                <span>Play a sound after capture</span>
+              </label>
+            </details>
+
+            <details class="section-disclosure" open>
+              <summary>Capture</summary>
+              <label class="field">
+                <span>Capture delay</span>
+                <select id="captureDelaySeconds">
+                  <option value="0">Off</option>
+                  <option value="3">3 seconds</option>
+                  <option value="5">5 seconds</option>
+                  <option value="10">10 seconds</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Thumbnail size</span>
+                <select id="thumbnailSize">
+                  <option value="160">160 px</option>
+                  <option value="240">240 px</option>
+                  <option value="320">320 px</option>
+                  <option value="480">480 px</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Default export format</span>
+                <select id="defaultExportFormat">
+                  <option value="png">PNG</option>
+                  <option value="jpg">JPG</option>
+                  <option value="webp">WebP</option>
+                  <option value="pdf">PDF</option>
+                </select>
+              </label>
+              <label class="field">
+                <input type="checkbox" id="autoDownload" />
+                <span>Auto-download after capture</span>
+              </label>
+            </details>
+
+            <details class="section-disclosure" open>
+              <summary>Privacy</summary>
+              <label class="field">
+                <input type="checkbox" id="privacyLocalOnlyMode" checked disabled />
+                <span>Privacy local-only mode (locked on)</span>
+              </label>
+              <label class="field">
+                <input type="checkbox" id="storeSourceUrl" />
+                <span>Store source URL in capture metadata (optional and potentially sensitive)</span>
+              </label>
+              <label class="field">
+                <input type="checkbox" id="askBeforeDeleting" />
+                <span>Ask before moving items to trash</span>
+              </label>
+            </details>
+
+            <button type="submit" class="primary">Save Settings</button>
+          </form>
+
+          <section class="card" aria-labelledby="privacy-heading">
+            <h2 id="privacy-heading">Privacy</h2>
+            <p>Olho runs locally in your browser. Captures and recordings are stored in local IndexedDB and stay under your control.</p>
+            <ul class="list">
+              <li>No analytics</li>
+              <li>No cloud sync</li>
+              <li>No accounts</li>
+              <li>No remote logging</li>
+            </ul>
+          </section>
+
+          <section class="card" aria-labelledby="permissions-heading">
+            <h2 id="permissions-heading">Permission Explanations</h2>
+            <ul class="list">
+              <li><strong>activeTab</strong>: capture the current tab when you click capture actions.</li>
+              <li><strong>tabs</strong>: open Olho pages (editor, gallery, recorder, reports).</li>
+              <li><strong>scripting</strong>: draw capture overlays and full-page progress on target pages.</li>
+              <li><strong>clipboardWrite</strong>: copy local files to clipboard when you explicitly choose copy actions.</li>
+              <li><strong>storage</strong>: save settings and local media metadata.</li>
+              <li><strong>desktopCapture</strong>: start screen/tab/window recording through browser picker.</li>
+              <li><strong>downloads</strong>: export files to your Downloads folder when you choose export.</li>
+              <li><strong>offscreen</strong>: run local offscreen DOM processing for video poster thumbnails.</li>
+            </ul>
+          </section>
+
+          <section class="card" aria-labelledby="storage-heading">
+            <h2 id="storage-heading">Storage</h2>
+            <div id="storageStats" class="storage-stats"></div>
+            <div id="pressureSummary" class="hint">Storage pressure: calculating...</div>
+            <div class="actions">
+              <button type="button" id="refreshUsageBtn">Refresh Usage</button>
+              <button type="button" id="emptyTrashBtn" class="ghost">Empty Trash</button>
+              <button type="button" id="deleteLargeBtn" class="ghost">Delete Largest 10</button>
+              <button type="button" id="deleteAllBtn" class="danger">Delete All Local Data</button>
+            </div>
+            <p class="hint">
+              Export first if you need backups. Delete removes captures, recordings, folders, and blobs from this browser profile.
+            </p>
+          </section>
+
+          <p id="status" class="status" role="status" aria-live="polite"></p>
+        </main>
       </div>
-    </header>
-
-    <main>
-      <form id="optionsForm" class="card" aria-labelledby="options-heading">
-        <h2 id="options-heading">Capture Preferences</h2>
-        <label class="field">
-          <input type="checkbox" id="autoSave" />
-          <span>Auto-save captures to the library</span>
-        </label>
-        <label class="field">
-          <input type="checkbox" id="soundToggle" />
-          <span>Play a sound after capture</span>
-        </label>
-        <button type="submit">Save Preferences</button>
-      </form>
-
-      <p id="status" class="status" role="status" aria-live="polite"></p>
-    </main>
+    </div>
 
     <script type="module" src="options.js"></script>
   </body>

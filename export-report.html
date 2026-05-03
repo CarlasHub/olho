@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Olho Export</title>
+    <link rel="stylesheet" href="src/shared/renaissance-theme.css" />
+    <link rel="stylesheet" href="export-report.css" />
+  </head>
+  <body>
+    <div class="olho-app-shell export-shell">
+      <div class="olho-main-shell">
+        <header class="header olho-topbar">
+          <div class="header-copy">
+            <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
+            <h1>Export</h1>
+            <p class="page-subtitle">Create a local export bundle and prepare manual share drafts.</p>
+          </div>
+          <nav class="olho-nav olho-header-nav" aria-label="Olho sections">
+            <a class="olho-nav-link" href="popup.html">Capture</a>
+            <a class="olho-nav-link" href="record.html">Record</a>
+            <a class="olho-nav-link" href="gallery.html">Memory</a>
+            <a class="olho-nav-link" href="export-report.html" aria-current="page">Export</a>
+            <a class="olho-nav-link" href="options.html">Settings</a>
+            <a class="olho-nav-link" href="privacy.html">Privacy</a>
+          </nav>
+        </header>
+
+        <main class="layout">
+          <section class="card summary-card" aria-labelledby="summaryHeading">
+            <div class="section-title">
+              <h2 id="summaryHeading">Export Summary</h2>
+              <button type="button" id="refreshBtn" class="ghost">Refresh</button>
+            </div>
+            <p id="filterSummary" class="muted"></p>
+            <div class="stats" id="stats"></div>
+            <div class="toggle-row" aria-label="Report options">
+              <label class="toggle-option" for="includeSourceUrlInReport">
+                <input id="includeSourceUrlInReport" type="checkbox" />
+                <span>Include source URL in report output when available</span>
+              </label>
+              <label class="toggle-option" for="includeBrowserInfoInReport">
+                <input id="includeBrowserInfoInReport" type="checkbox" />
+                <span>Include browser info in report output</span>
+              </label>
+            </div>
+            <p class="muted">Privacy note: this report is generated locally and does not upload files.</p>
+          </section>
+
+          <section class="card actions-card" aria-labelledby="exportHeading">
+            <h2 id="exportHeading">Export Actions</h2>
+            <p class="muted actions-intro">Use ZIP bundle as the default handoff. Other actions are optional per destination.</p>
+
+            <div class="primary-actions">
+              <button type="button" id="downloadZipBtn" class="primary cta">Download ZIP Bundle</button>
+              <button type="button" id="copySummaryBtn" class="ghost">Copy Markdown Summary</button>
+            </div>
+
+            <details class="disclosure">
+              <summary>Download</summary>
+              <div class="button-row">
+                <button type="button" id="downloadPngBtn" class="ghost">PNG</button>
+                <button type="button" id="downloadJpgBtn" class="ghost">JPG</button>
+                <button type="button" id="downloadWebpBtn" class="ghost">WebP</button>
+                <button type="button" id="downloadPdfBtn" class="ghost">PDF</button>
+                <button type="button" id="printBtn" class="ghost">Print</button>
+              </div>
+            </details>
+
+            <details class="disclosure" open>
+              <summary>Bundle</summary>
+              <div class="button-row">
+                <button type="button" id="downloadHtmlBtn" class="ghost">HTML report</button>
+                <button type="button" id="downloadHtmlSummaryBtn" class="ghost">HTML summary</button>
+                <button type="button" id="downloadJsonBtn" class="ghost">JSON metadata</button>
+                <button type="button" id="downloadMarkdownBtn" class="ghost">Markdown summary</button>
+                <button type="button" id="downloadTextBtn" class="ghost">Text summary</button>
+              </div>
+            </details>
+
+            <details class="disclosure">
+              <summary>Copy</summary>
+              <div class="button-row">
+                <button type="button" id="copyImageBtn" class="ghost">Copy Image</button>
+                <button type="button" id="copyHtmlBtn" class="ghost">Copy HTML</button>
+              </div>
+            </details>
+            <details class="disclosure">
+              <summary>Draft</summary>
+              <p class="muted">Olho does not upload your files. Export them and attach manually.</p>
+              <div class="form-grid">
+                <label class="form-field" for="jiraUrl">
+                  <span>Jira issue URL (optional)</span>
+                  <input id="jiraUrl" type="url" placeholder="your-company.atlassian.net" />
+                </label>
+                <label class="form-field" for="githubIssueUrl">
+                  <span>GitHub issue URL (optional)</span>
+                  <input id="githubIssueUrl" type="url" placeholder="github.com/org/repo/issues/new" />
+                </label>
+                <label class="form-field" for="trelloCardUrl">
+                  <span>Trello card URL (optional)</span>
+                  <input id="trelloCardUrl" type="url" placeholder="trello.com/add-card" />
+                </label>
+                <label class="form-field" for="shareSubject">
+                  <span>Subject</span>
+                  <input id="shareSubject" type="text" placeholder="Olho Export Report" />
+                </label>
+                <label class="form-field form-field-wide" for="shareNotes">
+                  <span>Notes</span>
+                  <textarea id="shareNotes" rows="4" placeholder="Context for this report"></textarea>
+                </label>
+              </div>
+              <div class="button-row">
+                <button type="button" id="openJiraBtn" class="ghost">Jira issue draft</button>
+                <button type="button" id="openGithubBtn" class="ghost">GitHub issue draft</button>
+                <button type="button" id="openTrelloBtn" class="ghost">Trello card draft</button>
+                <button type="button" id="openMailBtn" class="ghost">Email draft</button>
+              </div>
+            </details>
+          </section>
+
+          <section class="card items-card" aria-labelledby="itemsHeading">
+            <h2 id="itemsHeading">Items for Manual Attachment</h2>
+            <p class="muted">Export files locally, then attach them manually to your destination tool.</p>
+            <div id="itemsContainer" class="items" role="list"></div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+
+    <script type="module" src="export-report.js"></script>
+  </body>
+</html>

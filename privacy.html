@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Olho Privacy</title>
+    <link rel="stylesheet" href="src/shared/renaissance-theme.css" />
+    <link rel="stylesheet" href="privacy.css" />
+  </head>
+  <body>
+    <div class="olho-app-shell privacy-shell">
+      <div class="olho-main-shell">
+        <header class="header olho-topbar">
+          <div>
+            <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
+            <h1>Privacy View</h1>
+            <p class="subtitle">Local-first and manual export only.</p>
+          </div>
+          <nav class="olho-nav olho-header-nav" aria-label="Olho sections">
+            <a class="olho-nav-link" href="popup.html">Capture</a>
+            <a class="olho-nav-link" href="record.html">Record</a>
+            <a class="olho-nav-link" href="gallery.html">Memory</a>
+            <a class="olho-nav-link" href="export-report.html">Export</a>
+            <a class="olho-nav-link" href="options.html">Settings</a>
+            <a class="olho-nav-link" href="privacy.html" aria-current="page">Privacy</a>
+          </nav>
+        </header>
+
+        <main class="layout">
+          <section class="card" aria-labelledby="localTitle">
+            <h2 id="localTitle">What Olho stores</h2>
+            <ul>
+              <li>Screenshots and recordings are saved in local IndexedDB Blob storage.</li>
+              <li>Settings are saved locally in your browser profile.</li>
+              <li>Media is never uploaded by Olho.</li>
+              <li>Olho does not upload screenshots or recordings to any server.</li>
+              <li>No cloud upload or hosted share links are provided.</li>
+              <li>You can export before delete and remove all local data at any time.</li>
+            </ul>
+          </section>
+
+          <section class="card" aria-labelledby="networkTitle">
+            <h2 id="networkTitle">What Olho does not do</h2>
+            <ul>
+              <li>No telemetry.</li>
+              <li>No analytics.</li>
+              <li>No remote logging.</li>
+              <li>No account system.</li>
+              <li>No background upload jobs.</li>
+            </ul>
+          </section>
+
+          <section class="card" aria-labelledby="permissionsTitle">
+            <h2 id="permissionsTitle">Permission use in plain language</h2>
+            <ul>
+              <li><strong>activeTab</strong>: capture the page you explicitly choose.</li>
+              <li><strong>tabs</strong>: open Olho pages like Mark View, Memory, and Export.</li>
+              <li><strong>scripting</strong>: draw focus overlays for region and element capture.</li>
+              <li><strong>clipboardWrite</strong>: copy files when you click copy actions.</li>
+              <li><strong>desktopCapture</strong>: open the browser picker for recording.</li>
+              <li><strong>downloads</strong>: save exported files to your local disk.</li>
+            </ul>
+          </section>
+
+          <section class="card" aria-labelledby="warningTitle">
+            <h2 id="warningTitle">Data lifecycle reminders</h2>
+            <p>Clearing browser profile data can remove your local Olho library.</p>
+            <p>Export files before cleanup if you need backups.</p>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script type="module" src="privacy.js"></script>
+  </body>
+</html>

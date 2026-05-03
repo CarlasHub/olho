@@ -1,0 +1,542 @@
+:root {
+  color-scheme: dark;
+  font-family: "Segoe UI", "Avenir Next", "Inter", "Noto Sans", sans-serif;
+  line-height: 1.45;
+
+  --olho-bg-page: #050609;
+  --olho-bg-app: #080a10;
+  --olho-bg-shell: #0b0e16;
+  --olho-bg-sidebar: #0d111a;
+  --olho-bg-panel: #111722;
+  --olho-bg-panel-raised: #151d2b;
+  --olho-bg-card: #141b28;
+  --olho-bg-card-hover: #182235;
+  --olho-bg-canvas: #0a0c12;
+  --olho-bg-hover: #182235;
+  --olho-bg-active: #1e2a3f;
+  --olho-bg-selected: #1c2440;
+  --olho-bg-disabled: #10141d;
+  --olho-bg-overlay: rgba(5, 6, 9, 0.84);
+
+  --olho-gradient-page: radial-gradient(circle at 20% 0%, rgba(91, 63, 214, 0.22), transparent 34%),
+    radial-gradient(circle at 85% 15%, rgba(62, 199, 255, 0.1), transparent 30%), linear-gradient(180deg, #080a10 0%, #050609 100%);
+  --olho-gradient-panel: linear-gradient(145deg, rgba(21, 29, 43, 0.96), rgba(10, 12, 18, 0.98));
+  --olho-gradient-card: linear-gradient(180deg, rgba(24, 34, 53, 0.82), rgba(13, 17, 26, 0.96));
+  --olho-gradient-glow: radial-gradient(circle, rgba(139, 124, 255, 0.2), rgba(139, 124, 255, 0));
+
+  --olho-border-hairline: rgba(203, 210, 225, 0.06);
+  --olho-border-subtle: rgba(203, 210, 225, 0.1);
+  --olho-border-medium: #7f8da5;
+  --olho-border-strong: rgba(203, 210, 225, 0.38);
+  --olho-border-dark: #1c2534;
+  --olho-border-focus: #ffffff;
+  --olho-border-active: #8b7cff;
+  --olho-border-accent: rgba(139, 124, 255, 0.48);
+
+  --olho-shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.48);
+  --olho-shadow-panel: 0 24px 80px rgba(0, 0, 0, 0.62);
+  --olho-shadow-violet-glow: 0 0 0 1px rgba(139, 124, 255, 0.2), 0 16px 48px rgba(43, 33, 120, 0.2);
+  --olho-shadow-gold-glow: var(--olho-shadow-violet-glow);
+
+  --olho-text-primary: #f7f7fb;
+  --olho-text-secondary: #cbd2e1;
+  --olho-text-muted: #8e99ae;
+  --olho-text-faint: #6f7a8e;
+  --olho-text-disabled: #7c8598;
+  --olho-text-inverse: #050609;
+  --olho-text-link: #b9c7ff;
+
+  --olho-brand-primary: #8b7cff;
+  --olho-brand-primary-soft: #a094ff;
+  --olho-brand-primary-strong: #7164e8;
+  --olho-brand-violet: #5b3fd6;
+  --olho-brand-indigo: #2b3362;
+  --olho-brand-lavender: #d9e0f2;
+  --olho-brand-white: #ffffff;
+  --olho-accent-primary: #8b7cff;
+  --olho-accent-primary-hover: #a094ff;
+  --olho-accent-primary-active: #7164e8;
+  --olho-accent-soft: rgba(139, 124, 255, 0.14);
+  --olho-accent-border: rgba(139, 124, 255, 0.42);
+  --olho-accent-cyan: #77d7ff;
+  --olho-accent-blue: #6ea8ff;
+
+  /* Compatibility aliases for existing component styles/tests */
+  --olho-brand-ink: var(--olho-brand-lavender);
+  --olho-brand-sepia: var(--olho-brand-violet);
+  --olho-brand-walnut: var(--olho-brand-indigo);
+  --olho-brand-parchment: var(--olho-brand-lavender);
+  --olho-brand-gold: var(--olho-accent-primary);
+  --olho-brand-gold-soft: var(--olho-accent-primary-hover);
+  --olho-brand-antique-gold: var(--olho-accent-primary-active);
+  --olho-brand-copper: var(--olho-accent-primary-active);
+
+  --olho-success-bg: #0d241d;
+  --olho-success-border: #3dce8a;
+  --olho-success-text: #c9fbe2;
+  --olho-warning-bg: #2a1e08;
+  --olho-warning-border: #f1b84b;
+  --olho-warning-text: #ffe8b0;
+  --olho-danger-bg: #2a0b16;
+  --olho-danger-border: #ff6b93;
+  --olho-danger-text: #ffd3df;
+  --olho-info-bg: #0b1d2a;
+  --olho-info-border: #62c7ff;
+  --olho-info-text: #d4f1ff;
+  --olho-recording-bg: #2c0710;
+  --olho-recording-border: #ff4d6d;
+  --olho-recording-text: #ffd6de;
+  --olho-selected-bg: #2a3150;
+  --olho-selected-border: #8b7cff;
+  --olho-selected-text: #ffffff;
+  --olho-disabled-bg: #10141d;
+  --olho-disabled-border: rgba(203, 210, 225, 0.12);
+  --olho-disabled-text: #7c8598;
+  --olho-focus-ring: #ffffff;
+  --olho-focus-glow: rgba(139, 124, 255, 0.55);
+
+  /* Backward-compatible aliases used by existing styles/tests */
+  --olho-state-success: var(--olho-success-border);
+  --olho-state-warning: var(--olho-warning-border);
+  --olho-state-danger: var(--olho-danger-border);
+  --olho-state-info: var(--olho-info-border);
+  --olho-state-selected: var(--olho-selected-border);
+  --olho-state-recording: var(--olho-recording-border);
+  --olho-state-disabled: var(--olho-text-disabled);
+  --olho-state-focus: var(--olho-focus-ring);
+  --olho-state-focus-glow: var(--olho-focus-glow);
+
+  --olho-radius-sm: 10px;
+  --olho-radius-md: 14px;
+  --olho-radius-lg: 18px;
+  --olho-transition-fast: 120ms ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  color: var(--olho-text-primary);
+  background: var(--olho-gradient-page);
+}
+
+.olho-app-shell {
+  display: block;
+  min-height: calc(100vh - 24px);
+}
+
+.olho-main-shell {
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.olho-sidebar {
+  background: var(--olho-gradient-panel);
+  border: 1px solid var(--olho-border-subtle);
+  border-radius: var(--olho-radius-lg);
+  box-shadow: var(--olho-shadow-panel);
+  padding: 14px;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  position: sticky;
+  top: 12px;
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+}
+
+.olho-side-brand {
+  display: grid;
+  gap: 4px;
+}
+
+.olho-eyebrow {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--olho-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+}
+
+.olho-eyebrow-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.olho-side-title {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--olho-brand-ink);
+}
+
+.olho-side-caption {
+  margin: 0;
+  color: var(--olho-text-secondary);
+  font-size: 0.83rem;
+}
+
+.olho-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.olho-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  border: 1px solid transparent;
+  border-radius: var(--olho-radius-sm);
+  padding: 8px 10px;
+  background: transparent;
+  color: var(--olho-text-secondary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: background var(--olho-transition-fast), border-color var(--olho-transition-fast), color var(--olho-transition-fast);
+}
+
+.olho-nav-link:hover {
+  background: var(--olho-bg-hover);
+  border-color: var(--olho-border-subtle);
+}
+
+.olho-nav-link[aria-current="page"] {
+  background: var(--olho-bg-selected);
+  border-color: var(--olho-selected-border);
+  color: var(--olho-selected-text);
+}
+
+.olho-nav-link:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible,
+canvas:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--olho-focus-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px var(--olho-focus-glow);
+}
+
+.olho-card,
+.olho-panel,
+.panel,
+.card,
+.record-card {
+  background: var(--olho-gradient-card);
+  border: 1px solid var(--olho-border-subtle);
+  border-radius: var(--olho-radius-md);
+  box-shadow: var(--olho-shadow-soft);
+}
+
+.olho-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.olho-topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.olho-header-nav {
+  flex: 1 1 100%;
+  order: 3;
+  padding-top: 4px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  min-height: 40px;
+  border: 1px solid var(--olho-border-subtle);
+  border-radius: var(--olho-radius-sm);
+  padding: 8px 12px;
+  cursor: pointer;
+  background: var(--olho-bg-card);
+  color: var(--olho-text-primary);
+  transition:
+    border-color var(--olho-transition-fast),
+    background var(--olho-transition-fast),
+    transform var(--olho-transition-fast);
+}
+
+button:hover {
+  border-color: var(--olho-border-strong);
+  background: var(--olho-bg-hover);
+  transform: translateY(-1px);
+}
+
+button.primary {
+  background: linear-gradient(180deg, var(--olho-accent-primary-hover) 0%, var(--olho-accent-primary-active) 100%);
+  border-color: var(--olho-accent-primary-active);
+  color: var(--olho-text-inverse);
+}
+
+button.secondary {
+  background: var(--olho-bg-panel);
+  border-color: var(--olho-border-medium);
+}
+
+button.ghost {
+  background: transparent;
+}
+
+button.danger {
+  background: var(--olho-danger-bg);
+  border-color: var(--olho-danger-border);
+  color: var(--olho-danger-text);
+}
+
+button.success {
+  background: var(--olho-success-bg);
+  border-color: var(--olho-success-border);
+  color: var(--olho-success-text);
+}
+
+button.warning {
+  background: var(--olho-warning-bg);
+  border-color: var(--olho-warning-border);
+  color: var(--olho-warning-text);
+}
+
+button.info {
+  background: var(--olho-info-bg);
+  border-color: var(--olho-info-border);
+  color: var(--olho-info-text);
+}
+
+button.recording {
+  background: var(--olho-recording-bg);
+  border-color: var(--olho-recording-border);
+  color: var(--olho-recording-text);
+}
+
+button:disabled {
+  background: var(--olho-disabled-bg);
+  border-color: var(--olho-disabled-border);
+  color: var(--olho-disabled-text);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-with-icon.align-left {
+  justify-content: flex-start;
+}
+
+.btn-with-icon .btn-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.btn-with-icon .btn-label {
+  line-height: 1.1;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border-radius: var(--olho-radius-sm);
+  border: 1px solid var(--olho-border-subtle);
+  background: var(--olho-bg-panel-raised);
+  color: var(--olho-text-primary);
+  padding: 9px 10px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--olho-text-faint);
+}
+
+.olho-field {
+  display: grid;
+  gap: 6px;
+}
+
+.olho-field > span,
+.field > span {
+  font-size: 0.82rem;
+  color: var(--olho-text-secondary);
+}
+
+.olho-disclosure,
+details.disclosure,
+details.section-disclosure {
+  border: 1px solid var(--olho-border-subtle);
+  border-radius: var(--olho-radius-sm);
+  background: rgba(17, 23, 34, 0.78);
+  overflow: clip;
+}
+
+.olho-disclosure > summary,
+details.disclosure > summary,
+details.section-disclosure > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 10px 12px;
+  font-weight: 650;
+  color: var(--olho-brand-ink);
+  border-bottom: 1px solid transparent;
+  background: rgba(21, 29, 43, 0.88);
+}
+
+.olho-disclosure > summary::-webkit-details-marker,
+details.disclosure > summary::-webkit-details-marker,
+details.section-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.olho-disclosure[open] > summary,
+details.disclosure[open] > summary,
+details.section-disclosure[open] > summary {
+  border-bottom-color: var(--olho-border-subtle);
+}
+
+.olho-disclosure-content,
+details.disclosure > *:not(summary),
+details.section-disclosure > *:not(summary) {
+  padding: 10px 12px;
+}
+
+.olho-badge,
+.pill,
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--olho-border-subtle);
+  background: var(--olho-bg-panel-raised);
+  color: var(--olho-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.status-pill[data-state="recording"] {
+  border-color: var(--olho-recording-border);
+  color: var(--olho-recording-text);
+  background: var(--olho-recording-bg);
+}
+
+.status-pill[data-state="success"] {
+  border-color: var(--olho-success-border);
+  color: var(--olho-success-text);
+  background: var(--olho-success-bg);
+}
+
+.status-pill[data-state="warning"] {
+  border-color: var(--olho-warning-border);
+  color: var(--olho-warning-text);
+  background: var(--olho-warning-bg);
+}
+
+.status-pill[data-state="info"] {
+  border-color: var(--olho-info-border);
+  color: var(--olho-info-text);
+  background: var(--olho-info-bg);
+}
+
+.status-pill[data-state="danger"] {
+  border-color: var(--olho-danger-border);
+  color: var(--olho-danger-text);
+  background: var(--olho-danger-bg);
+}
+
+.olho-empty,
+.empty-state {
+  border: 1px dashed var(--olho-border-subtle);
+  border-radius: var(--olho-radius-md);
+  background: rgba(13, 17, 26, 0.86);
+  padding: 16px;
+  color: var(--olho-text-secondary);
+}
+
+dialog {
+  border: 1px solid var(--olho-border-strong);
+  border-radius: var(--olho-radius-md);
+  background: var(--olho-bg-panel-raised);
+  color: var(--olho-text-primary);
+}
+
+dialog::backdrop {
+  background: var(--olho-bg-overlay);
+}
+
+.olho-inspector {
+  display: grid;
+  gap: 10px;
+}
+
+.olho-surface-note {
+  color: var(--olho-text-secondary);
+  font-size: 0.86rem;
+}
+
+.olho-side-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--olho-border-subtle);
+  padding-top: 10px;
+  display: grid;
+  gap: 8px;
+  color: var(--olho-text-muted);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 1120px) {
+  .olho-topbar {
+    align-items: stretch;
+  }
+
+  .olho-header-nav {
+    order: 2;
+  }
+
+  .olho-topbar-actions {
+    order: 3;
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Olho Fixture: Sticky Header Page</title>
+    <style>
+      body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #111827; background: #f3f4f6; }
+      header { position: sticky; top: 0; z-index: 40; background: #111827; color: #f9fafb; padding: 14px 18px; border-bottom: 2px solid #22d3ee; }
+      #fixed-help { position: fixed; right: 16px; bottom: 16px; z-index: 45; background: #7c3aed; color: #fff; padding: 10px 12px; border-radius: 999px; }
+      section { min-height: 520px; padding: 22px; border-bottom: 1px solid #d1d5db; }
+      .marker { font-weight: 700; color: #1d4ed8; }
+    </style>
+  </head>
+  <body>
+    <header>Sticky Header Marker</header>
+    <div id="fixed-help">Fixed Widget</div>
+    <section><p class="marker">STICKY_REPEAT_MARKER_1</p><p>Scroll content block 1.</p></section>
+    <section><p class="marker">STICKY_REPEAT_MARKER_2</p><p>Scroll content block 2.</p></section>
+    <section><p class="marker">STICKY_REPEAT_MARKER_3</p><p>Scroll content block 3.</p></section>
+    <section><p class="marker">STICKY_REPEAT_MARKER_4</p><p>Scroll content block 4.</p></section>
+    <section><p class="marker">STICKY_REPEAT_MARKER_5</p><p>Scroll content block 5.</p></section>
+    <section><p class="marker">STICKY_REPEAT_MARKER_6</p><p>Scroll content block 6.</p></section>
+  </body>
+</html>

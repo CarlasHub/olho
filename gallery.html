@@ -3,63 +3,243 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Olho Gallery</title>
-    <link rel="stylesheet" href="editor.css" />
+    <title>Olho Memory</title>
+    <link rel="stylesheet" href="src/shared/renaissance-theme.css" />
+    <link rel="stylesheet" href="gallery.css" />
   </head>
   <body>
-    <header class="editor-header">
-      <div>
-        <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
-        <h1>Gallery</h1>
-      </div>
-      <div class="header-actions">
-        <button type="button" id="openCaptureBtn" class="ghost">Open Capture</button>
-        <button type="button" id="openOptionsBtn" class="ghost">Options</button>
-        <button type="button" id="closeBtn" class="ghost">Close</button>
-      </div>
-    </header>
+    <div class="olho-app-shell gallery-shell">
+      <div class="olho-main-shell">
+        <header class="gallery-header">
+          <div>
+            <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
+            <h1>Memory</h1>
+          </div>
+          <nav class="olho-nav olho-header-nav" aria-label="Olho sections">
+            <a class="olho-nav-link" href="popup.html">Capture</a>
+            <a class="olho-nav-link" href="record.html">Record</a>
+            <a class="olho-nav-link" href="gallery.html" aria-current="page">Memory</a>
+            <a class="olho-nav-link" href="export-report.html">Export</a>
+            <a class="olho-nav-link" href="options.html">Settings</a>
+            <a class="olho-nav-link" href="privacy.html">Privacy</a>
+          </nav>
+          <div class="header-actions"></div>
+        </header>
 
-    <main class="workspace">
-      <section class="card" aria-labelledby="folders-title">
-        <div class="section-title">
-          <h2 id="folders-title">Folders</h2>
+        <main class="layout">
+      <section class="panel content-panel" aria-labelledby="libraryTitle">
+        <div class="section-head">
+          <h2 id="libraryTitle">Memory Library</h2>
+          <span id="itemCount" class="pill" aria-live="polite">0</span>
         </div>
-        <div class="folder-controls">
-          <input id="newFolderName" type="text" placeholder="New folder name" aria-label="New folder name" />
-          <button id="createFolderBtn" type="button" class="primary">Create</button>
+
+        <section class="memory-controls" aria-labelledby="viewsTitle">
+          <h3 id="viewsTitle">Views</h3>
+          <nav class="view-nav view-nav-row" aria-label="Memory views">
+            <button type="button" class="view-btn active" data-view="all">All Captures</button>
+            <button type="button" class="view-btn" data-view="screenshots">Screenshots</button>
+            <button type="button" class="view-btn" data-view="imports">Imports</button>
+            <button type="button" class="view-btn" data-view="edited">Edited Images</button>
+            <button type="button" class="view-btn" data-view="recordings">Recordings</button>
+            <button type="button" class="view-btn" data-view="favourites">Kept in Sight</button>
+            <button type="button" class="view-btn" data-view="recent">Recent</button>
+            <button type="button" class="view-btn" data-view="folders">Folders</button>
+            <button type="button" class="view-btn" data-view="tags">Tags</button>
+            <button type="button" class="view-btn" data-view="trash">Out of Sight</button>
+            <button type="button" class="view-btn" data-view="storage">Storage Usage</button>
+          </nav>
+
+          <details class="sub-panel section-disclosure">
+            <summary>Manage folders and tags</summary>
+            <div class="folder-create">
+              <input id="newFolderName" type="text" placeholder="New folder" aria-label="New folder name" />
+              <button id="createFolderBtn" type="button" class="primary">Create</button>
+            </div>
+            <details class="sub-panel section-disclosure nested-disclosure">
+              <summary id="foldersTitle">Folders</summary>
+              <div id="folderList" class="folder-list" role="list"></div>
+            </details>
+            <details class="sub-panel section-disclosure nested-disclosure">
+              <summary id="tagsTitle">Tags</summary>
+              <div id="tagList" class="tag-list" role="list"></div>
+            </details>
+          </details>
+        </section>
+
+        <div id="filterToolbar" class="toolbar" aria-label="Search and filter controls">
+          <label class="field">
+            <span>Search</span>
+            <input id="searchInput" type="text" placeholder="Search by title" />
+          </label>
+          <label class="field">
+            <span>Type</span>
+            <select id="typeFilter">
+              <option value="all">All</option>
+              <option value="image">Screenshots</option>
+              <option value="video">Recordings</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Folder</span>
+            <select id="folderFilter"></select>
+          </label>
+          <label class="field">
+            <span>Tag</span>
+            <select id="tagFilter"></select>
+          </label>
+          <label class="field">
+            <span>Kept in Sight</span>
+            <select id="favouriteFilter">
+              <option value="all">All</option>
+              <option value="only">Only Kept in Sight</option>
+              <option value="none">Not Kept in Sight</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Sort</span>
+            <select id="sortSelect">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="name">Name</option>
+              <option value="size">Size</option>
+              <option value="type">Type</option>
+            </select>
+          </label>
+          <button id="refreshBtn" type="button" class="ghost">Refresh</button>
         </div>
-        <div id="folderList" class="folder-list"></div>
+
+        <div id="bulkToolbar" class="bulk-toolbar" hidden>
+          <label class="checkbox-wrap">
+            <input type="checkbox" id="selectAllToggle" />
+            <span>Select all visible</span>
+          </label>
+          <span id="selectionCount" class="selection-count" aria-live="polite">0 selected</span>
+
+          <button type="button" id="bulkZipBtn" class="ghost">Export ZIP</button>
+          <button type="button" id="bulkDeleteBtn" class="danger">Move Out of Sight</button>
+          <button type="button" id="bulkRestoreBtn" class="ghost" hidden>Restore to Sight</button>
+          <button type="button" id="bulkPermanentDeleteBtn" class="danger" hidden>Delete Permanently</button>
+          <button type="button" id="bulkClearSelectionBtn" class="ghost">Clear Selection</button>
+
+          <details id="bulkMoreActions" class="bulk-more section-disclosure">
+            <summary>More actions</summary>
+            <div class="bulk-more-actions">
+              <div id="bulkMoveGroup" class="bulk-inline-group">
+                <label class="field inline-field">
+                  <span>Move selected</span>
+                  <select id="bulkFolderSelect"></select>
+                </label>
+                <button type="button" id="bulkMoveBtn" class="ghost">Move</button>
+              </div>
+
+              <div id="bulkTagGroup" class="bulk-inline-group">
+                <label class="field inline-field">
+                  <span>Tag selected</span>
+                  <input id="bulkTagInput" type="text" placeholder="tag1, tag2" />
+                </label>
+                <button type="button" id="bulkTagBtn" class="ghost">Apply Tags</button>
+              </div>
+              <button type="button" id="bulkFavouriteBtn" class="ghost">Keep in Sight</button>
+              <button type="button" id="bulkUnfavouriteBtn" class="ghost">Remove Sight Mark</button>
+              <button type="button" id="bulkMetadataBtn" class="ghost">Metadata JSON</button>
+            </div>
+          </details>
+        </div>
+
+        <p id="selectionLive" class="sr-only" role="status" aria-live="polite"></p>
+
+        <section id="libraryView" aria-label="Library items">
+          <div id="emptyState" class="empty-state" hidden>
+            <h3>Nothing captured yet.</h3>
+            <p>Use Capture to add screenshots or recordings.</p>
+            <p>Your local library lives only on this browser.</p>
+          </div>
+          <div id="galleryGrid" class="gallery-grid" role="grid" aria-label="Local media library"></div>
+        </section>
+
+        <section id="storageView" class="hidden" aria-labelledby="storageTitle">
+          <h3 id="storageTitle">Storage Usage</h3>
+          <p class="muted">Data is stored locally in this browser profile. Clearing browser data may remove your library.</p>
+          <div id="usageStats" class="stats-grid"></div>
+          <div class="largest-section">
+            <h4>Largest Files</h4>
+            <div id="largestList" class="largest-list"></div>
+          </div>
+          <div class="storage-actions">
+            <button type="button" id="exportBeforeDeleteBtn" class="ghost btn-with-icon">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v10M8 11l4 4 4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+              <span class="btn-label">Export Metadata Before Delete</span>
+            </button>
+            <button type="button" id="deleteAllBtn" class="danger btn-with-icon">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12M9 7V5h6v2M8 7l1 12h6l1-12" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+              <span class="btn-label">Delete All Local Data</span>
+            </button>
+          </div>
+        </section>
+
       </section>
 
-      <section class="card" aria-labelledby="gallery-title">
-        <div class="section-title">
-          <h2 id="gallery-title">Library</h2>
-          <span id="itemCount" class="count">0</span>
+      <aside class="panel inspector-panel" id="selectionInspector" aria-labelledby="inspectorTitle">
+        <h2 id="inspectorTitle">Inspector</h2>
+        <p id="inspectorEmpty" class="muted">Select an item to see details.</p>
+        <div id="inspectorBody" hidden>
+          <div class="inspector-preview-wrap">
+            <img id="inspectorPreviewImage" class="inspector-preview" alt="" hidden />
+            <video id="inspectorPreviewVideo" class="inspector-preview" controls playsinline hidden></video>
+          </div>
+          <dl class="inspector-meta">
+            <div><dt>Title</dt><dd id="inspectorTitleValue">-</dd></div>
+            <div><dt>Type</dt><dd id="inspectorTypeValue">-</dd></div>
+            <div><dt>Date</dt><dd id="inspectorDateValue">-</dd></div>
+            <div><dt>Size</dt><dd id="inspectorSizeValue">-</dd></div>
+            <div><dt>Tags</dt><dd id="inspectorTagsValue">-</dd></div>
+            <div><dt>Folder</dt><dd id="inspectorFolderValue">-</dd></div>
+          </dl>
+          <div class="inspector-actions" id="inspectorActions">
+            <button type="button" id="inspectorOpenBtn" class="ghost">Open</button>
+            <button type="button" id="inspectorRenameBtn" class="ghost">Rename</button>
+            <button type="button" id="inspectorFavouriteBtn" class="ghost">Keep in Sight</button>
+            <button type="button" id="inspectorTagsBtn" class="ghost">Edit Tags</button>
+            <button type="button" id="inspectorMoveBtn" class="ghost">Move Folder</button>
+            <button type="button" id="inspectorDeleteBtn" class="danger">Move Out of Sight</button>
+            <button type="button" id="inspectorRestoreBtn" class="ghost" hidden>Restore</button>
+            <button type="button" id="inspectorPermanentDeleteBtn" class="danger" hidden>Delete Permanently</button>
+          </div>
         </div>
-
-        <div class="library-toolbar">
-          <label for="folderFilter">Folder</label>
-          <select id="folderFilter" aria-label="Filter by folder"></select>
-          <label for="searchInput">Search</label>
-          <input id="searchInput" type="text" placeholder="Search title" aria-label="Search items" />
-          <label for="sortSelect">Sort</label>
-          <select id="sortSelect" aria-label="Sort items">
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="title">Title</option>
-          </select>
-          <button id="refreshBtn" type="button">Refresh</button>
-        </div>
-        <div class="tag-filters">
-          <span class="tag-label">Tags</span>
-          <div id="tagFilters" class="tag-row"></div>
-          <button id="clearTagBtn" type="button" class="ghost">Clear</button>
-        </div>
-
-        <div id="emptyState" class="list-item" hidden>No items found.</div>
-        <div id="galleryGrid" class="gallery-grid" role="list"></div>
-      </section>
+      </aside>
     </main>
+      </div>
+    </div>
+
+    <dialog id="confirmDialog" aria-labelledby="confirmTitle" aria-describedby="confirmBody">
+      <h2 id="confirmTitle">Confirm action</h2>
+      <p id="confirmBody"></p>
+      <div class="dialog-actions">
+        <button type="button" id="confirmCancelBtn" class="ghost">Cancel</button>
+        <button type="button" id="confirmAcceptBtn" class="primary">Confirm</button>
+      </div>
+    </dialog>
+
+    <dialog id="inputDialog" aria-labelledby="inputDialogTitle" aria-describedby="inputDialogBody">
+      <h2 id="inputDialogTitle">Update value</h2>
+      <p id="inputDialogBody"></p>
+      <label class="field" for="inputDialogField">
+        <span>Value</span>
+        <input id="inputDialogField" type="text" />
+      </label>
+      <div class="dialog-actions">
+        <button type="button" id="inputDialogCancelBtn" class="ghost">Cancel</button>
+        <button type="button" id="inputDialogAcceptBtn" class="primary">Apply</button>
+      </div>
+    </dialog>
+
+    <dialog id="previewDialog" aria-labelledby="previewTitle">
+      <h2 id="previewTitle">Recording Preview</h2>
+      <video id="previewVideo" controls playsinline></video>
+      <div class="dialog-actions">
+        <button type="button" id="previewCloseBtn" class="primary">Close</button>
+      </div>
+    </dialog>
 
     <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 

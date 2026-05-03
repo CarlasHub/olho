@@ -1,53 +1,175 @@
 # Olho
 
-## Project Overview
-Olho is a Chrome Extension (Manifest V3) for capturing screenshots, recording the screen, and managing a local media library. The extension is local-first and stores data on-device without a backend.
+Olho is a local-first Chrome Manifest V3 extension for screenshot capture, screen recording, annotation, and local export workflows.
 
-## Features
-- Screenshot capture: visible area, region (planned), full page.
-- Screen recording with optional microphone.
-- Minimal editor with annotations, crop, resize, and export.
-- Local gallery with folders, rename, delete, download, copy.
-- Local storage via `chrome.storage.local` for items and folders.
+## Local-First Guarantees
+- No backend services.
+- No cloud storage.
+- No analytics or telemetry.
+- No accounts.
+- Media persistence uses IndexedDB (`olho_local_library`) with Blob-backed `media` and `thumbnails` stores.
+- `chrome.storage.local` is used only for lightweight migration state.
+- Video thumbnails use local DOM decoding with an offscreen-document fallback path (no remote processing).
 
-## Architecture
-- **Popup UI** dispatches typed messages to the service worker.
-- **Background service worker** runs capture/record workflows.
-- **Editor** renders the current capture and applies annotations.
-- **Gallery** renders local items and supports CRUD operations.
-- **Storage** uses `chrome.storage.local` for item metadata and blob URLs.
+## App Surfaces
+- Popup: `popup.html`
+- Capture overlay and full-page controller: `src/background/capture.js`
+- Editor page: `editor.html`
+- Recorder page: `record.html`
+- Recording control overlay: injected from `record.js`
+- Gallery page: `gallery.html`
+- Lens Settings page: `options.html`
+- Privacy page: `privacy.html`
+- Send View report page: `export-report.html`
 
-See `architecture.md` for details.
+## Build And Verification
+### Prerequisites
+- Node.js 20+
+- npm
+- `zip` and `unzip` available on PATH (used by packaging and e2e smoke test)
 
-## Installation
-1. Clone or download this repository.
-2. Open Chrome and go to `chrome://extensions`.
-3. Enable **Developer Mode**.
-4. Click **Load unpacked** and select the project folder.
+### Commands
+1. `npm install`
+2. `npm run lint`
+3. `npm run typecheck`
+4. `npm run test`
+5. `npm run test:accessibility`
+6. `npm run test:privacy`
+7. `npm run test:no-remote-services`
+8. `npm run test:no-competitor-references`
+9. `npm run build`
+10. `npm run test:e2e`
+11. `npm run package`
+12. `npm run package:source`
+13. `npm run verify:release`
 
-## Local Development
-- Edit files in the project folder.
-- Reload the extension from `chrome://extensions` after changes.
-- Open the service worker console from the extension card for logs.
+`npm run test:e2e` runs real browser automation against the built unpacked extension in `dist/build` (not mocked storage/unit-only checks).
 
-## Packaging
-1. Ensure all assets are included.
-2. Remove test-only pages if not intended for release.
-3. In `chrome://extensions`, click **Pack extension** and choose the project folder.
+Default test architecture note:
+- Olho real-browser tests run on Node test + Puppeteer.
+- Playwright is not part of the default test path in this repository.
+- See [Browser Test Architecture](docs/testing/browser-test-architecture.md) and [Playwright Root-Cause Report](docs/engineering/playwright-root-cause-report.md).
 
-## Publishing Notes
-- Manifest V3 requires a service worker for background tasks.
-- Use minimal permissions and document their purpose.
-- Provide clear privacy statements since media capture is sensitive.
+### Headless And Debug Browser Runs
+- Default browser e2e runs are headless (no visible Chromium window):
+  - `npm run test:e2e`
+  - `npm run test:operability`
+- Use headed mode only for a single failing test:
+  - `npm run test:e2e:debug -- --file tests/e2e-real-capture-recorder.test.mjs --test "exact failing test name"`
 
-## Limitations
-- Full-page capture depends on scrolling and can be slow on long pages.
-- MP4 output is not guaranteed; WebM is the default.
-- `blob:` URLs are session-scoped; persistent storage should use IndexedDB blobs.
+Debug order (enforced by `test:e2e:debug`):
+1. Run the single failing test headless first (`--test-concurrency=1`).
+2. Run the same single test headed only if headless fails.
+3. Rerun the same single test headless for verification.
 
-## Future Roadmap
-- Region capture with on-page crop overlay.
-- Thumbnail generation and caching.
-- Persisted binary storage via IndexedDB.
-- Advanced export workflows (PDF, GIF).
-- Optional sync and sharing.
+When running the headed debug step, window placement is required through environment variables so Chromium opens on your external monitor instead of your primary workspace:
+
+```bash
+PLAYWRIGHT_WINDOW_X=2000 \
+PLAYWRIGHT_WINDOW_Y=0 \
+PLAYWRIGHT_WINDOW_WIDTH=1280 \
+PLAYWRIGHT_WINDOW_HEIGHT=900 \
+npm run test:e2e:debug -- --file tests/e2e-real-capture-recorder.test.mjs --test "exact failing test name"
+```
+
+Where these values come from:
+- `PLAYWRIGHT_WINDOW_X` / `PLAYWRIGHT_WINDOW_Y`: top-left desktop coordinates of your external monitor in OS display arrangement coordinates.
+- `PLAYWRIGHT_WINDOW_WIDTH` / `PLAYWRIGHT_WINDOW_HEIGHT`: debug window size to keep Chromium out of your normal working area.
+
+To disable headed mode again, run normal verification commands:
+- `npm run test:release-gate`
+- `npm run verify:release`
+
+## Keyboard Shortcuts
+Configure or rebind in `chrome://extensions/shortcuts`.
+
+- `Capture current tab view` (`capture-view`)
+- `Open screen/window capture flow` (`capture-screen-window`)
+- `Open record view` (`record-screen`)
+- `Open Memory` (`open-memory`)
+
+Note: the `capture-screen-window` shortcut opens Olho's local screen/window flow (browser picker path). It does not claim a separate direct screenshot API outside the picker flow.
+
+### Outputs
+- Build folder: `dist/build`
+- Packaged extension zip: `dist/olho-extension.zip`
+- Source package zip: `dist/olho-source.zip` (excludes `.git`, `node_modules`, `dist`, `test-results`, `__MACOSX`, `.DS_Store`)
+- Release gate report: `RELEASE_CHECK.md`
+
+## Chrome Loading Instructions
+1. Run `npm run build`.
+2. Open `chrome://extensions`.
+3. Enable **Developer mode**.
+4. Click **Load unpacked**.
+5. Select `dist/build`.
+
+## Release Checklist
+See `RELEASE_CHECKLIST.md`.
+
+## Documentation Index
+- Architecture: `architecture.md`
+- Privacy policy: `PRIVACY.md`
+- Permission explanations: `PERMISSIONS.md`
+- Chrome Web Store listing copy: `CHROME_WEB_STORE_LISTING.md`
+- Release checklist: `RELEASE_CHECKLIST.md`
+- Release report output: `RELEASE_CHECK.md` (generated by `npm run verify:release`)
+
+## Feature Matrix
+Status legend: `Implemented`, `Partial`, `Not Implemented`.
+
+| Capability | Status | Notes |
+|---|---|---|
+| Capture visible area | Implemented | Popup + service worker flow. |
+| Capture selected area | Implemented | On-page region overlay and crop. |
+| Capture full page | Implemented | Scroll-and-stitch with scroll restore, progress overlay, and canvas safety limits. |
+| Capture element | Implemented | Hover outline + click selection, with full-page fallback crop if element exceeds viewport. |
+| Annotate screenshot | Implemented | Select/move/resize annotations, pen, highlighter, line, arrow, rectangle, rounded rectangle, ellipse, text, numbered marker, and callout label. |
+| Redact sensitive information | Implemented | Blur, pixelate, and solid redaction block tools. Secure masking requires flattened export. |
+| Crop and resize | Implemented | Dedicated crop/resize tools in editor. |
+| Undo and redo | Implemented | Action undo/redo and snapshot undo/redo. |
+| Save to local library | Implemented | IndexedDB metadata + Blob persistence. |
+| Copy image to clipboard | Implemented | Clipboard write runs from Olho extension pages (popup/editor) on user click, with PNG download + editor fallback when blocked. |
+| Download PNG | Implemented | Editor and gallery download actions. |
+| Download JPG | Implemented | Editor export supports JPG download. |
+| Download WebP | Implemented | Editor export supports WebP download. |
+| Export PDF locally | Implemented | Editor export supports local single-page PDF generation. |
+| Record screen | Implemented | Browser picker capture with local composition and save preview. |
+| Record tab | Implemented | Tab mode hints browser picker and persists through local pipeline. |
+| Record selected window | Implemented | Window mode uses browser picker and maps source type from display surface. |
+| Record microphone | Implemented | Optional microphone stream is mixed locally before encoding. |
+| Record system audio | Implemented | Requested through browser picker when enabled; disabled automatically in camera-only mode. |
+| Webcam overlay | Implemented | Camera stream is composited locally into final recording with position, size, and shape controls. |
+| Pause and resume recording | Implemented | Keyboard and button controls on recording overlay. |
+| Countdown before recording | Implemented | 0/3/5 second countdown before capture starts. |
+| Recording timer | Implemented | Live timer based on paused and active durations. |
+| Stop recording safely | Implemented | Stop handles explicit user action and external source-ended events. |
+| Save recording progress | Implemented | Unsaved preview draft persists in IndexedDB and can be restored after close/reopen. |
+| Save recording to IndexedDB | Implemented | Save-to-library flow stores final Blob and metadata via MediaRepository. |
+| Export WebM | Implemented | Preview offers direct WebM download plus save-to-library. |
+| Export GIF | Not Implemented | No local GIF transcoder yet. |
+| Export MP4 | Partial | Uses browser-supported MIME when available; no local transcoding pipeline. |
+| Local gallery with search | Implemented | View-based local library with title search, type/folder/tag/favourite filters, and sort modes. |
+| Folders | Implemented | Create, rename, delete folders and move media between folders. |
+| Tags | Implemented | Add/replace/remove tags, tag filters, and tag usage list. |
+| Favourites | Implemented | Per-item and bulk favourite/unfavourite in gallery. |
+| Duplicate | Implemented | Duplicate captures locally from gallery context menu. |
+| Delete and restore | Implemented | Active/Trash views support restore and permanent delete controls. |
+| Bulk actions | Implemented | Select-all visible, bulk move, tags, favourite, trash/restore/permanent-delete, ZIP, and metadata export. |
+| Local HTML report export | Implemented | Dedicated export report page. |
+| Local ZIP export | Implemented | ZIP bundle generated locally in browser (report + media). |
+| User initiated share helpers | Implemented | Jira, GitHub, Trello, and mailto prefill helpers with manual file attachment guidance. |
+| Jira issue URL prefill | Implemented | User-provided Jira base URL. |
+| GitHub issue URL prefill | Implemented | User-provided repo issue URL. |
+| Trello card URL prefill | Implemented | User-provided Trello card URL. |
+| mailto helper | Implemented | Subject/body prefill only. |
+| Copy Markdown summary | Implemented | Export report action. |
+| Copy HTML summary | Implemented | Export report action. |
+| Copy image/video file where browser allows | Implemented | Export report item actions attempt clipboard file copy and fall back to local download when blocked. |
+| Privacy page | Implemented | `privacy.html`, `PRIVACY.md`, and privacy section in Lens Settings. |
+| Permission explanations | Implemented | `PERMISSIONS.md` and settings page explanations. |
+
+## Current Known Limitations
+- No GIF or dedicated MP4 conversion pipeline.
+- Redaction safety depends on exporting flattened output. In-editor obfuscation remains editable until export.
+- Clipboard writes can still be blocked by OS/browser policy in locked-down environments (for example RDP, enterprise-managed devices, or Linux/Wayland restrictions); Olho falls back to PNG download and editor copy flow.
+- Real browser e2e now validates built-extension loading and critical extension-page flows. Additional mocked/static tests remain and are labeled as non-e2e coverage.

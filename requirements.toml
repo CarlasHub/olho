@@ -1,0 +1,54 @@
+[project]
+name = "Olho"
+type = "chrome-extension-mv3"
+local_first = true
+
+[constraints]
+no_backend = true
+no_cloud = true
+no_owner_running_cost = true
+no_analytics_or_telemetry = true
+no_remote_assets = true
+all_media_local_indexeddb_blob = true
+chrome_storage_local_settings_only = true
+
+[ui_review]
+required_surfaces = [
+  "popup",
+  "capture-preview",
+  "editor",
+  "memory",
+  "export",
+  "recorder",
+  "settings",
+  "privacy"
+]
+required_states = [
+  "default",
+  "empty",
+  "error",
+  "loading",
+  "long-content",
+  "narrow-screen",
+  "overflow-check"
+]
+pass_when = "Rendered UI evidence exists and no structural blockers are present."
+
+[release]
+required_commands = [
+  "npm run lint",
+  "npm run typecheck",
+  "npm run test",
+  "npm run test:e2e",
+  "npm run test:operability",
+  "npm run test:claims",
+  "npm run test:feature-health",
+  "npm run test:output-validation",
+  "npm run test:accessibility",
+  "npm run test:privacy",
+  "npm run test:no-remote-services",
+  "npm run test:no-competitor-references",
+  "npm run build",
+  "npm run package",
+  "npm run verify:release"
+]

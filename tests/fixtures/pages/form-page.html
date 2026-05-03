@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Olho Fixture: Form Page</title>
+    <style>
+      body { margin: 0; padding: 20px; font: 16px/1.5 system-ui, sans-serif; background: #f1f5f9; }
+      form { max-width: 480px; display: grid; gap: 12px; background: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 16px; }
+      label { display: grid; gap: 6px; font-weight: 600; }
+      input, select, textarea { padding: 8px; border-radius: 8px; border: 1px solid #94a3b8; font: inherit; }
+      fieldset { border: 1px solid #cbd5e1; border-radius: 8px; }
+      button { width: fit-content; border: 0; border-radius: 8px; background: #4338ca; color: #fff; padding: 10px 14px; }
+    </style>
+  </head>
+  <body>
+    <form>
+      <h1>Form Fixture</h1>
+      <label>Text input <input type="text" value="Olho form" /></label>
+      <label><input type="checkbox" checked /> Checkbox</label>
+      <fieldset>
+        <legend>Radio group</legend>
+        <label><input type="radio" name="level" checked /> Option A</label>
+        <label><input type="radio" name="level" /> Option B</label>
+      </fieldset>
+      <label>Select <select><option>First</option><option>Second</option></select></label>
+      <label>Textarea <textarea rows="4">OLHO_FORM_MARKER</textarea></label>
+      <button type="button">Submit</button>
+    </form>
+  </body>
+</html>

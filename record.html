@@ -3,50 +3,273 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Olho Recording</title>
+    <title>Olho Record View</title>
+    <link rel="stylesheet" href="src/shared/renaissance-theme.css" />
     <link rel="stylesheet" href="record.css" />
   </head>
   <body>
-    <header class="record-header">
-      <div>
-        <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
-        <h1>Recording</h1>
-      </div>
-      <div class="header-actions">
-        <button type="button" id="galleryBtn" class="ghost">Gallery</button>
-        <button type="button" id="optionsBtn" class="ghost">Options</button>
-        <button type="button" id="closeBtn" class="ghost">Close</button>
-      </div>
-    </header>
+    <div class="olho-app-shell record-shell">
+      <div class="olho-main-shell">
+        <header class="record-header olho-topbar">
+          <div>
+            <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
+            <h1>Record View</h1>
+            <p class="header-subtitle">Record and save locally.</p>
+          </div>
+          <nav class="olho-nav olho-header-nav" aria-label="Olho sections">
+            <a class="olho-nav-link" href="popup.html">Capture</a>
+            <a class="olho-nav-link" href="record.html" aria-current="page">Record</a>
+            <a class="olho-nav-link" href="gallery.html">Memory</a>
+            <a class="olho-nav-link" href="export-report.html">Export</a>
+            <a class="olho-nav-link" href="options.html">Settings</a>
+            <a class="olho-nav-link" href="privacy.html">Privacy</a>
+          </nav>
+          <div class="header-actions olho-topbar-actions">
+            <span id="recordingStatePill" class="status-pill" data-state="info">Idle</span>
+          </div>
+        </header>
 
-    <main>
-      <section class="record-card" aria-live="polite">
-        <p id="status" class="status">Starting capture…</p>
-        <div class="meta-grid" aria-label="Recording details">
-          <div>
-            <span class="meta-label">Mode</span>
-            <strong id="modeValue">Tab</strong>
-          </div>
-          <div>
-            <span class="meta-label">Microphone</span>
-            <strong id="micValue">Off</strong>
-          </div>
-          <div>
-            <span class="meta-label">System audio</span>
-            <strong id="systemValue">On</strong>
-          </div>
-          <div>
-            <span class="meta-label">Elapsed</span>
-            <strong id="elapsedValue">00:00</strong>
-          </div>
-        </div>
-        <div class="actions">
-          <button type="button" id="startBtn" class="primary">Start Recording</button>
-          <button type="button" id="pauseBtn" class="ghost" disabled>Pause</button>
-          <button type="button" id="stopBtn" class="primary" disabled>Stop Recording</button>
-        </div>
-      </section>
-    </main>
+        <main class="record-layout">
+          <section id="setupPanel" class="record-card" aria-labelledby="setupHeading">
+            <div class="section-head">
+              <h2 id="setupHeading">Record Setup</h2>
+              <p id="setupHint" class="hint">Choose source, audio, and webcam overlay. Everything stays local.</p>
+            </div>
+
+            <details class="disclosure" open>
+              <summary>Source</summary>
+              <div class="field-grid">
+                <label class="field">
+                  <span>Source</span>
+                  <select id="sourceMode">
+                    <option value="tab">Current Tab</option>
+                    <option value="window">Window</option>
+                    <option value="screen">Entire Screen</option>
+                    <option value="camera">Camera Only</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Countdown</span>
+                  <select id="countdownSeconds">
+                    <option value="0">None</option>
+                    <option value="3" selected>3 seconds</option>
+                    <option value="5">5 seconds</option>
+                  </select>
+                </label>
+              </div>
+            </details>
+
+            <details class="disclosure">
+              <summary>Audio</summary>
+              <div class="field-grid">
+                <label class="field checkbox">
+                  <input type="checkbox" id="micToggle" />
+                  <span>Include microphone</span>
+                </label>
+                <label class="field checkbox">
+                  <input type="checkbox" id="systemAudioToggle" checked />
+                  <span>Include system audio (when browser allows)</span>
+                </label>
+                <label class="field">
+                  <span>Microphone device</span>
+                  <select id="micDeviceSelect">
+                    <option value="">Default microphone</option>
+                  </select>
+                </label>
+              </div>
+            </details>
+
+            <details class="disclosure">
+              <summary>Camera</summary>
+              <div class="field-grid">
+                <label class="field checkbox">
+                  <input type="checkbox" id="cameraToggle" />
+                  <span>Webcam overlay in final video</span>
+                </label>
+                <label class="field">
+                  <span>Camera device</span>
+                  <select id="cameraDeviceSelect">
+                    <option value="">Default camera</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Overlay position</span>
+                  <select id="overlayPosition">
+                    <option value="bottom-right" selected>Bottom right</option>
+                    <option value="bottom-left">Bottom left</option>
+                    <option value="top-right">Top right</option>
+                    <option value="top-left">Top left</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Overlay shape</span>
+                  <select id="overlayShape">
+                    <option value="circle" selected>Circle</option>
+                    <option value="rounded">Rounded rectangle</option>
+                  </select>
+                </label>
+                <label class="field field-range" for="overlaySize">
+                  <span>Overlay size</span>
+                  <div>
+                    <input id="overlaySize" type="range" min="14" max="45" step="1" value="24" />
+                    <output id="overlaySizeValue" for="overlaySize">24%</output>
+                  </div>
+                </label>
+              </div>
+            </details>
+
+            <details class="disclosure">
+              <summary>Save</summary>
+              <div class="field-grid">
+                <label class="field">
+                  <span>Save folder</span>
+                  <select id="folderSelect"></select>
+                </label>
+                <label class="field">
+                  <span>Tags (comma separated)</span>
+                  <input id="tagsInput" type="text" placeholder="demo, release" />
+                </label>
+              </div>
+            </details>
+
+            <div class="actions">
+              <button type="button" id="refreshDevicesBtn" class="ghost btn-with-icon">
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7H4v4M4 11a8 8 0 1 0 2.3-5.7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                <span class="btn-label">Refresh Devices</span>
+              </button>
+              <button type="button" id="startBtn" class="recording btn-with-icon">
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7l8 5-8 5z" fill="currentColor"/></svg>
+                <span class="btn-label">Start Recording</span>
+              </button>
+            </div>
+
+            <p id="permissionsStatus" class="hint" aria-live="polite">
+              Olho uses browser pickers for screen, window, and tab permissions.
+            </p>
+            <p id="formatStatus" class="hint" aria-live="polite"></p>
+          </section>
+
+          <section id="recordingPanel" class="record-card" hidden aria-labelledby="recordingHeading">
+            <div class="section-head">
+              <h2 id="recordingHeading">Recording Live</h2>
+              <p class="hint">Keyboard: <kbd>Space</kbd> pause or resume, <kbd>Escape</kbd> stop.</p>
+            </div>
+
+            <div id="countdownDisplay" class="countdown" hidden aria-live="assertive"></div>
+
+            <div id="recordingOverlay" class="recording-overlay" role="group" aria-label="Recording controls">
+              <div class="recording-meta">
+                <p id="recordingStateText" class="state-text">Recording...</p>
+                <strong id="timerValue">00:00</strong>
+              </div>
+              <div class="actions">
+                <button type="button" id="pauseBtn" class="ghost btn-with-icon" disabled>
+                  <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h3v12H8zM13 6h3v12h-3z" fill="currentColor"/></svg>
+                  <span class="btn-label">Pause</span>
+                </button>
+                <button type="button" id="stopBtn" class="recording btn-with-icon" disabled>
+                  <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" fill="currentColor"/></svg>
+                  <span class="btn-label">Stop</span>
+                </button>
+                <button type="button" id="cancelBtn" class="danger btn-with-icon" disabled>
+                  <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                  <span class="btn-label">Cancel and Discard</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section id="previewPanel" class="record-card" hidden aria-labelledby="previewHeading">
+            <div class="section-head">
+              <h2 id="previewHeading">Review and Save</h2>
+              <p class="hint">Rename, retag, and save to Memory.</p>
+            </div>
+
+            <video id="previewVideo" controls playsinline></video>
+
+            <div class="meta-grid" aria-label="Recording details">
+              <div>
+                <span class="meta-label">Duration</span>
+                <strong id="previewDuration">00:00</strong>
+              </div>
+              <div>
+                <span class="meta-label">Format</span>
+                <strong id="previewMime">video/webm</strong>
+              </div>
+              <div>
+                <span class="meta-label">Size</span>
+                <strong id="previewSize">0 B</strong>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <label class="field">
+                <span>Title</span>
+                <input id="titleInput" type="text" />
+              </label>
+
+              <label class="field">
+                <span>Folder</span>
+                <select id="saveFolderSelect"></select>
+              </label>
+
+              <label class="field">
+                <span>Tags (comma separated)</span>
+                <input id="saveTagsInput" type="text" placeholder="demo, release" />
+              </label>
+            </div>
+
+            <div class="actions preview-actions-primary">
+              <button type="button" id="saveBtn" class="primary btn-with-icon">
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10l2 2v14H6z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 14l3 3 5-6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                <span class="btn-label">Save to Memory</span>
+              </button>
+              <button type="button" id="downloadBtn" class="ghost btn-with-icon">
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v10M8 11l4 4 4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                <span class="btn-label">Download WebM</span>
+              </button>
+              <button type="button" id="recordAgainBtn" class="ghost btn-with-icon">
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7H4v4M4 11a8 8 0 1 0 2.3-5.7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                <span class="btn-label">Record Again</span>
+              </button>
+            </div>
+            <div class="actions preview-actions-danger">
+              <button type="button" id="discardPreviewBtn" class="danger btn-with-icon">
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                <span class="btn-label">Discard</span>
+              </button>
+            </div>
+
+            <details class="disclosure preview-more-actions">
+              <summary>More actions</summary>
+              <div class="actions">
+                <button type="button" id="saveDraftBtn" class="ghost btn-with-icon">
+                  <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10l2 2v14H6z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 4v6h6V4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+                  <span class="btn-label">Save Draft Progress</span>
+                </button>
+                <button type="button" id="openGalleryBtn" class="ghost btn-with-icon">
+                  <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="6" width="14" height="12" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 10h8M8 14h8" stroke="currentColor" stroke-width="1.4"/></svg>
+                  <span class="btn-label">Open Memory</span>
+                </button>
+              </div>
+            </details>
+
+            <p class="hint">MP4/GIF export is not available locally in this version. WebM is supported.</p>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <dialog id="confirmDialog" aria-labelledby="confirmTitle" aria-describedby="confirmBody">
+      <h2 id="confirmTitle">Discard recording?</h2>
+      <p id="confirmBody">This removes the current unsaved recording.</p>
+      <div class="dialog-actions">
+        <button type="button" id="confirmCancelBtn" class="ghost">Keep</button>
+        <button type="button" id="confirmAcceptBtn" class="danger">Discard</button>
+      </div>
+    </dialog>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
 
     <script type="module" src="record.js"></script>
   </body>

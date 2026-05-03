@@ -1,0 +1,26 @@
+# Never publish development/runtime local artifacts
+.git/
+node_modules/
+dist/
+test-results/
+e2e-artifacts/
+coverage/
+__MACOSX/
+.DS_Store
+tmp/
+temp/
+.tmp/
+screenshots/
+*.log
+*.tmp
+*.swp
+*.zip
+
+# Internal project material not required for package consumers
+tests/
+scripts/
+RELEASE_CHECK.md
+RELEASE_CHECKLIST.md
+MANUAL_DEVICE_CAPTURE_QA.md
+MANUAL_QA_CHECKLIST.md
+CHROME_WEB_STORE_LISTING.md

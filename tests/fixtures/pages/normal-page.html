@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Olho Fixture: Normal Page</title>
+    <style>
+      body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #111827; background: #f8fafc; }
+      header { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff; padding: 24px; }
+      main { max-width: 960px; margin: 0 auto; padding: 24px; display: grid; gap: 18px; }
+      .card { background: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 16px; }
+      .visual { height: 180px; border-radius: 12px; background: linear-gradient(135deg, #22d3ee, #2563eb); }
+      .row { display: flex; gap: 12px; flex-wrap: wrap; }
+      button, a, input, select, textarea { font: inherit; }
+      button { border: 0; border-radius: 8px; background: #1d4ed8; color: #fff; padding: 10px 14px; cursor: pointer; }
+      a { color: #1d4ed8; }
+      label { font-weight: 600; display: grid; gap: 8px; max-width: 300px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Normal Fixture Page</h1>
+      <p>Used for visible tab capture and region overlay tests.</p>
+    </header>
+    <main>
+      <section class="card">
+        <h2>Controls</h2>
+        <div class="row">
+          <button type="button">Primary Action</button>
+          <button type="button">Secondary Action</button>
+          <a href="#details">Jump to details</a>
+        </div>
+      </section>
+      <section class="card">
+        <h2>Image Placeholder</h2>
+        <div class="visual" role="img" aria-label="Decorative gradient placeholder"></div>
+      </section>
+      <section id="details" class="card">
+        <h2>Form</h2>
+        <label>Project
+          <input type="text" value="Olho Fixture" />
+        </label>
+      </section>
+    </main>
+  </body>
+</html>

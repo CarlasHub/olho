@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Olho Fixture: Hostile CSS Page</title>
+    <style>
+      * { box-sizing: content-box !important; }
+      button { all: unset !important; }
+      input { all: unset !important; }
+      img, canvas, svg { max-width: 12px !important; max-height: 12px !important; }
+      body {
+        margin: 0 !important;
+        transform: scale(1) !important;
+        overflow-x: hidden !important;
+        font-family: "Comic Sans MS", cursive !important;
+        background: #f4f4f5 !important;
+      }
+      .modal {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 2147483000 !important;
+        background: rgba(17, 24, 39, 0.88) !important;
+        color: #fff !important;
+        display: grid !important;
+        place-items: center !important;
+      }
+      .modal strong { font-size: 22px !important; }
+      .body-content { min-height: 2400px; padding: 30px; }
+      .body-content p { color: #27272a !important; }
+      [class*="overlay"] { border: 20px solid magenta !important; }
+    </style>
+  </head>
+  <body>
+    <div class="modal"><strong>Hostile Modal Z-Index Layer</strong></div>
+    <main class="body-content">
+      <h1>Hostile CSS Fixture</h1>
+      <p>Used to verify Olho injected capture UI is isolated from page styles.</p>
+      <p id="hostileMarker">HOSTILE_CSS_MARKER</p>
+    </main>
+  </body>
+</html>

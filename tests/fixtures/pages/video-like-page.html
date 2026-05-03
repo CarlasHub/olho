@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Olho Fixture: Video-Like Page</title>
+    <style>
+      body { margin: 0; font: 16px/1.5 system-ui, sans-serif; background: #020617; color: #e2e8f0; }
+      main { padding: 24px; display: grid; gap: 18px; }
+      .anim {
+        width: 180px;
+        height: 180px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #0ea5e9, #6366f1);
+        animation: pulse 1.6s infinite alternate ease-in-out;
+      }
+      .bar { width: min(580px, 90vw); height: 18px; background: #1e293b; border-radius: 999px; overflow: hidden; }
+      .fill { height: 100%; width: 10%; background: #22c55e; animation: progress 2.4s infinite linear; }
+      @keyframes pulse { from { transform: translateX(0px); } to { transform: translateX(120px); } }
+      @keyframes progress { from { width: 5%; } to { width: 92%; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Animated Fixture</h1>
+      <div class="anim" aria-hidden="true"></div>
+      <div class="bar"><div class="fill"></div></div>
+      <p id="videoLikeMarker">OLHO_VIDEO_LIKE_MARKER</p>
+    </main>
+  </body>
+</html>

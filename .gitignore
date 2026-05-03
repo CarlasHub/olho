@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build and package outputs
+dist/
+test-results/
+coverage/
+e2e-artifacts/
+RELEASE_CHECK.md
+
+# Local system artifacts
+.DS_Store
+__MACOSX/
+
+# Env and local overrides
+.env
+.env.*
+!.env.example
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.pid
+tmp/
+temp/
+.tmp/
+debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local screenshots and archives
+screenshots/
+*.png.tmp
+*.zip

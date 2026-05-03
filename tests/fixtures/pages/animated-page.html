@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Olho Animated Fixture</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: linear-gradient(180deg, #0e1025 0%, #1a1f3a 100%);
+        color: #f6f8ff;
+        min-height: 2400px;
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: rgba(9, 10, 24, 0.88);
+        backdrop-filter: blur(2px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+        padding: 16px 24px;
+      }
+      .container {
+        padding: 24px;
+        display: grid;
+        gap: 24px;
+      }
+      .card {
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        background: rgba(255, 255, 255, 0.08);
+        padding: 20px;
+      }
+      .pulse {
+        width: min(360px, 80vw);
+        height: 26px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .pulse > span {
+        display: block;
+        height: 100%;
+        width: 30%;
+        background: linear-gradient(90deg, #8f67ff, #5bc0ff);
+        animation: run 1.8s ease-in-out infinite alternate;
+      }
+      .orb {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #a98eff 0%, #5e43db 55%, #2a1f62 100%);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25), 0 16px 32px rgba(0, 0, 0, 0.44);
+        animation: float 2.6s ease-in-out infinite;
+      }
+      @keyframes run {
+        from {
+          transform: translateX(-15%);
+        }
+        to {
+          transform: translateX(220%);
+        }
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Animated Fixture</h1>
+      <p>Used to validate capture behavior on changing visuals.</p>
+    </header>
+    <main class="container">
+      <section class="card">
+        <h2>Progress-like animation</h2>
+        <div class="pulse" aria-hidden="true"><span></span></div>
+      </section>
+      <section class="card">
+        <h2>Floating object</h2>
+        <div class="orb" aria-hidden="true"></div>
+      </section>
+      <section class="card">
+        <h2>Long scrolling content</h2>
+        <p>OLHO_ANIMATED_PAGE_MARKER</p>
+      </section>
+    </main>
+  </body>
+</html>

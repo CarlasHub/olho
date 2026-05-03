@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Olho",
-  "version": "0.1.0",
-  "description": "Capture and manage snapshots and recordings.",
+  "version": "0.2.0",
+  "description": "Local-first screenshots, recording, annotation, and export.",
   "action": {
     "default_popup": "popup.html",
     "default_title": "Olho"
@@ -16,20 +16,61 @@
     "activeTab",
     "tabs",
     "scripting",
+    "clipboardWrite",
     "storage",
     "desktopCapture",
-    "downloads"
+    "downloads",
+    "offscreen"
   ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "commands": {
+    "capture-view": {
+      "suggested_key": {
+        "default": "Alt+Shift+V",
+        "mac": "Option+Shift+V"
+      },
+      "description": "Capture current tab view"
+    },
+    "capture-full-page": {
+      "description": "Capture full page"
+    },
+    "select-area": {
+      "description": "Capture selected area in tab"
+    },
+    "capture-screen-window": {
+      "suggested_key": {
+        "default": "Alt+Shift+W",
+        "mac": "Option+Shift+W"
+      },
+      "description": "Open screen/window capture flow"
+    },
+    "record-screen": {
+      "suggested_key": {
+        "default": "Alt+Shift+R",
+        "mac": "Option+Shift+R"
+      },
+      "description": "Open record view"
+    },
+    "open-memory": {
+      "suggested_key": {
+        "default": "Alt+Shift+M",
+        "mac": "Option+Shift+M"
+      },
+      "description": "Open Memory"
+    },
+    "annotate-local-image": {
+      "description": "Open editor to annotate a local image"
+    }
+  },
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
   },
-  "web_accessible_resources": [
-    {
-      "resources": ["editor.html", "editor.css", "editor.js"],
-      "matches": ["<all_urls>"]
-    }
-  ]
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; base-uri 'self'"
+  }
 }
