@@ -140,3 +140,21 @@ test("settings page includes capture defaults and delay controls", async () => {
   assert.equal(html.includes('id="captureDelaySeconds"'), true);
   assert.equal(html.includes('id="autoDownload"'), true);
 });
+
+test("settings page uses category navigation layout", async () => {
+  const html = await fs.readFile(path.join(root, "options.html"), "utf8");
+  assert.equal(html.includes('class="settings-nav"'), true);
+  assert.equal(html.includes('data-settings-target="generalSettings"'), true);
+  assert.equal(html.includes('data-settings-target="captureSettings"'), true);
+  assert.equal(html.includes('data-settings-target="permissionsSettings"'), true);
+  assert.equal(html.includes('data-settings-target="advancedSettings"'), true);
+});
+
+test("privacy page includes trust summary cards and structured permission rows", async () => {
+  const html = await fs.readFile(path.join(root, "privacy.html"), "utf8");
+  assert.equal(html.includes('class="trust-summary"'), true);
+  assert.equal(html.includes("Stored Locally"), true);
+  assert.equal(html.includes("Never Uploaded"), true);
+  assert.equal(html.includes('class="permission-table"'), true);
+  assert.equal(html.includes('class="permission-row"'), true);
+});

@@ -45,8 +45,11 @@ test(
       assertNoPageErrors(sendView.telemetry, "export-report-smoke");
 
       const settings = await openPage("options.html", "options");
-      await settings.page.waitForSelector("#deleteAllBtn", { timeout: 15_000 });
+      await settings.page.waitForSelector('.settings-nav-btn[data-settings-target="privacySettings"]', { timeout: 15_000 });
+      await settings.page.click('.settings-nav-btn[data-settings-target="privacySettings"]');
       await settings.page.waitForSelector("#storeSourceUrl", { timeout: 15_000 });
+      await settings.page.click('.settings-nav-btn[data-settings-target="storageSettings"]');
+      await settings.page.waitForSelector("#deleteAllBtn", { timeout: 15_000 });
       assertNoPageErrors(settings.telemetry, "options");
 
       const privacy = await openPage("privacy.html", "privacy");

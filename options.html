@@ -26,11 +26,28 @@
           <span class="status-pill" data-state="info">Local Configuration</span>
         </header>
 
-        <main class="layout">
-          <form id="optionsForm" class="card" aria-labelledby="options-heading">
-            <h2 id="options-heading">Settings Groups</h2>
+        <main class="layout settings-layout">
+          <aside class="card settings-nav-card" aria-label="Settings categories">
+            <h2 class="settings-nav-title">Categories</h2>
+            <nav class="settings-nav" aria-label="Settings sections">
+              <button type="button" class="settings-nav-btn active" data-settings-target="generalSettings">General</button>
+              <button type="button" class="settings-nav-btn" data-settings-target="captureSettings">Capture</button>
+              <button type="button" class="settings-nav-btn" data-settings-target="editorSettings">Editor</button>
+              <button type="button" class="settings-nav-btn" data-settings-target="exportSettings">Export</button>
+              <button type="button" class="settings-nav-btn" data-settings-target="memorySettings">Memory</button>
+              <button type="button" class="settings-nav-btn" data-settings-target="recordingSettings">Recording</button>
+              <button type="button" class="settings-nav-btn" id="settingsStorageNavBtn" data-settings-target="storageSettings">Storage</button>
+              <button type="button" class="settings-nav-btn" data-settings-target="shortcutsSettings">Shortcuts</button>
+              <button type="button" class="settings-nav-btn" data-settings-target="privacySettings">Privacy</button>
+              <button type="button" class="settings-nav-btn" data-settings-target="permissionsSettings">Permissions</button>
+              <button type="button" class="settings-nav-btn" data-settings-target="advancedSettings">Advanced</button>
+            </nav>
+          </aside>
 
-            <details class="section-disclosure" open>
+          <form id="optionsForm" class="card settings-main-card" aria-labelledby="options-heading">
+            <h2 id="options-heading">Local Preferences</h2>
+
+            <details class="section-disclosure settings-group" id="generalSettings" data-settings-section="generalSettings" open>
               <summary>General</summary>
               <label class="field">
                 <span>Default after-capture action</span>
@@ -42,30 +59,14 @@
                 </select>
               </label>
               <label class="field">
-                <span>Skip editor</span>
-                <select id="skipEditorMode">
-                  <option value="never">Never</option>
-                  <option value="always">Always</option>
-                  <option value="fullPageOnly">Only for full-page captures</option>
-                </select>
-              </label>
-              <label class="field">
                 <span>Default save location</span>
                 <select id="defaultSaveLocation" disabled>
                   <option value="local_library">Local library (required)</option>
                 </select>
               </label>
-              <label class="field">
-                <input type="checkbox" id="autoSave" />
-                <span>Auto-save captures to the local library</span>
-              </label>
-              <label class="field">
-                <input type="checkbox" id="soundToggle" />
-                <span>Play a sound after capture</span>
-              </label>
             </details>
 
-            <details class="section-disclosure" open>
+            <details class="section-disclosure settings-group" id="captureSettings" data-settings-section="captureSettings">
               <summary>Capture</summary>
               <label class="field">
                 <span>Capture delay</span>
@@ -86,6 +87,27 @@
                 </select>
               </label>
               <label class="field">
+                <input type="checkbox" id="autoDownload" />
+                <span>Auto-download after capture</span>
+              </label>
+            </details>
+
+            <details class="section-disclosure settings-group" id="editorSettings" data-settings-section="editorSettings">
+              <summary>Editor</summary>
+              <p class="hint">Editor actions, crop/resize behaviour, and annotation defaults are managed locally.</p>
+              <label class="field">
+                <span>Skip editor</span>
+                <select id="skipEditorMode">
+                  <option value="never">Never</option>
+                  <option value="always">Always</option>
+                  <option value="fullPageOnly">Only for full-page captures</option>
+                </select>
+              </label>
+            </details>
+
+            <details class="section-disclosure settings-group" id="exportSettings" data-settings-section="exportSettings">
+              <summary>Export</summary>
+              <label class="field">
                 <span>Default export format</span>
                 <select id="defaultExportFormat">
                   <option value="png">PNG</option>
@@ -94,13 +116,31 @@
                   <option value="pdf">PDF</option>
                 </select>
               </label>
+              <p class="hint">All exports are local files generated in this browser profile.</p>
+            </details>
+
+            <details class="section-disclosure settings-group" id="memorySettings" data-settings-section="memorySettings">
+              <summary>Memory</summary>
               <label class="field">
-                <input type="checkbox" id="autoDownload" />
-                <span>Auto-download after capture</span>
+                <input type="checkbox" id="autoSave" />
+                <span>Auto-save captures to the local library</span>
+              </label>
+              <label class="field">
+                <input type="checkbox" id="askBeforeDeleting" />
+                <span>Ask before moving items to trash</span>
               </label>
             </details>
 
-            <details class="section-disclosure" open>
+            <details class="section-disclosure settings-group" id="recordingSettings" data-settings-section="recordingSettings">
+              <summary>Recording</summary>
+              <label class="field">
+                <input type="checkbox" id="soundToggle" />
+                <span>Play a sound after capture</span>
+              </label>
+              <p class="hint">Recording output is saved locally as WebM.</p>
+            </details>
+
+            <details class="section-disclosure settings-group" id="privacySettings" data-settings-section="privacySettings" open>
               <summary>Privacy</summary>
               <label class="field">
                 <input type="checkbox" id="privacyLocalOnlyMode" checked disabled />
@@ -110,16 +150,12 @@
                 <input type="checkbox" id="storeSourceUrl" />
                 <span>Store source URL in capture metadata (optional and potentially sensitive)</span>
               </label>
-              <label class="field">
-                <input type="checkbox" id="askBeforeDeleting" />
-                <span>Ask before moving items to trash</span>
-              </label>
             </details>
 
             <button type="submit" class="primary">Save Settings</button>
           </form>
 
-          <section class="card" aria-labelledby="privacy-heading">
+          <section class="card settings-support-card" data-settings-section="privacySettings" aria-labelledby="privacy-heading">
             <h2 id="privacy-heading">Privacy</h2>
             <p>Olho runs locally in your browser. Captures and recordings are stored in local IndexedDB and stay under your control.</p>
             <ul class="list">
@@ -130,7 +166,7 @@
             </ul>
           </section>
 
-          <section class="card" aria-labelledby="permissions-heading">
+          <section class="card settings-support-card" id="permissionsSettings" data-settings-section="permissionsSettings" aria-labelledby="permissions-heading">
             <h2 id="permissions-heading">Permission Explanations</h2>
             <ul class="list">
               <li><strong>activeTab</strong>: capture the current tab when you click capture actions.</li>
@@ -144,7 +180,7 @@
             </ul>
           </section>
 
-          <section class="card" aria-labelledby="storage-heading">
+          <section class="card settings-support-card" id="storageSettings" data-settings-section="storageSettings" aria-labelledby="storage-heading">
             <h2 id="storage-heading">Storage</h2>
             <div id="storageStats" class="storage-stats"></div>
             <div id="pressureSummary" class="hint">Storage pressure: calculating...</div>
@@ -157,6 +193,16 @@
             <p class="hint">
               Export first if you need backups. Delete removes captures, recordings, folders, and blobs from this browser profile.
             </p>
+          </section>
+
+          <section class="card settings-support-card" id="shortcutsSettings" data-settings-section="shortcutsSettings" aria-labelledby="shortcuts-heading">
+            <h2 id="shortcuts-heading">Shortcuts</h2>
+            <p>Use extension command shortcuts configured in Chrome extension settings for capture and recording actions.</p>
+          </section>
+
+          <section class="card settings-support-card" id="advancedSettings" data-settings-section="advancedSettings" aria-labelledby="advanced-heading">
+            <h2 id="advanced-heading">Advanced</h2>
+            <p>Local data maintenance actions stay under your control. No cloud sync, no remote execution, no telemetry.</p>
           </section>
 
           <p id="status" class="status" role="status" aria-live="polite"></p>

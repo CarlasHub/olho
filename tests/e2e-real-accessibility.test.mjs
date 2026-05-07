@@ -54,7 +54,8 @@ test(
       assert.notEqual(galleryFocus.tag, "BODY");
 
       const options = await openPage("options.html", "options-a11y");
-      await options.page.waitForSelector("#deleteAllBtn", { timeout: 15_000 });
+      await options.page.click('.settings-nav-btn[data-settings-target="storageSettings"]');
+      await options.page.waitForSelector('#storageSettings:not([hidden]) #deleteAllBtn', { timeout: 15_000 });
       await options.page.focus("body");
       await pressTabs(options.page, 5);
       const optionsFocus = await options.page.evaluate(() => {

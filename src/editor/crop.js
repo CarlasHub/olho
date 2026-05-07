@@ -60,6 +60,14 @@ function cursorForHandle(handle) {
   return cursors[handle] || "crosshair";
 }
 
+function getEditorColor(canvas, token, fallback) {
+  if (typeof getComputedStyle !== "function") {
+    return fallback;
+  }
+  const value = getComputedStyle(canvas).getPropertyValue(token).trim();
+  return value || fallback;
+}
+
 export class CropTool {
   constructor({ canvas, viewport, getImageBitmap, setImageBitmap, onChange }) {
     this.canvas = canvas;
@@ -137,22 +145,34 @@ export class CropTool {
   drawOverlay(ctx) {
     if (!this.rect) return;
 
+    const overlayColor = getEditorColor(this.canvas, "--editor-crop-overlay", "rgba(0, 0, 0, 0.55)");
+    const cropLineShadow = getEditorColor(this.canvas, "--editor-handle-border", "#020617");
+    const cropLine = getEditorColor(this.canvas, "--editor-crop-line", "#f8fafc");
+    const handleFill = getEditorColor(this.canvas, "--editor-handle", "#f8fafc");
+    const handleBorder = getEditorColor(this.canvas, "--editor-handle-border", "#020617");
+    const badgeBg = getEditorColor(this.canvas, "--editor-bg-workspace", "rgba(6, 10, 16, 0.92)");
+    const badgeStroke = getEditorColor(this.canvas, "--editor-border-strong", "rgba(248, 251, 255, 0.82)");
+    const badgeTextColor = getEditorColor(this.canvas, "--editor-text-primary", "#f8fafc");
+
     ctx.save();
-    ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
+    ctx.fillStyle = overlayColor;
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.clearRect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
     ctx.restore();
 
     ctx.save();
-    ctx.strokeStyle = "#f8fbff";
+    ctx.strokeStyle = cropLineShadow;
+    ctx.lineWidth = 4 / Math.max(0.001, this.zoom);
+    ctx.strokeRect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
+    ctx.strokeStyle = cropLine;
     ctx.lineWidth = 2 / Math.max(0.001, this.zoom);
     ctx.strokeRect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
 
     const handles = makeHandles(this.rect);
     const size = HANDLE_SIZE / Math.max(0.001, this.zoom);
     const half = size / 2;
-    ctx.fillStyle = "#ffffff";
-    ctx.strokeStyle = "#0c1119";
+    ctx.fillStyle = handleFill;
+    ctx.strokeStyle = handleBorder;
     ctx.lineWidth = 1.1 / Math.max(0.001, this.zoom);
 
     Object.values(handles).forEach((handle) => {
@@ -172,12 +192,12 @@ export class CropTool {
     const badgeW = textWidth + padX * 2;
     const badgeX = clamp(this.rect.x, 4 / this.zoom, this.canvas.width - badgeW - 4 / this.zoom);
     const badgeY = clamp(this.rect.y - badgeH - 6 / this.zoom, 4 / this.zoom, this.canvas.height - badgeH - 4 / this.zoom);
-    ctx.fillStyle = "rgba(6, 10, 16, 0.9)";
-    ctx.strokeStyle = "rgba(248, 251, 255, 0.82)";
+    ctx.fillStyle = badgeBg;
+    ctx.strokeStyle = badgeStroke;
     ctx.lineWidth = 1 / Math.max(0.001, this.zoom);
     ctx.fillRect(badgeX, badgeY, badgeW, badgeH);
     ctx.strokeRect(badgeX, badgeY, badgeW, badgeH);
-    ctx.fillStyle = "#f8fbff";
+    ctx.fillStyle = badgeTextColor;
     ctx.textBaseline = "middle";
     ctx.fillText(badgeText, badgeX + padX, badgeY + badgeH / 2);
 

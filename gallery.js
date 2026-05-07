@@ -90,6 +90,7 @@ const inspectorSizeValue = document.getElementById("inspectorSizeValue");
 const inspectorTagsValue = document.getElementById("inspectorTagsValue");
 const inspectorFolderValue = document.getElementById("inspectorFolderValue");
 const inspectorOpenBtn = document.getElementById("inspectorOpenBtn");
+const inspectorReviewBtn = document.getElementById("inspectorReviewBtn");
 const inspectorRenameBtn = document.getElementById("inspectorRenameBtn");
 const inspectorFavouriteBtn = document.getElementById("inspectorFavouriteBtn");
 const inspectorTagsBtn = document.getElementById("inspectorTagsBtn");
@@ -482,6 +483,10 @@ function updateInspectorPanel() {
       inspectorPreviewVideo.load();
     }
     if (inspectorOpenBtn) inspectorOpenBtn.disabled = true;
+    if (inspectorReviewBtn) {
+      inspectorReviewBtn.hidden = true;
+      inspectorReviewBtn.disabled = true;
+    }
     if (inspectorRenameBtn) inspectorRenameBtn.disabled = true;
     if (inspectorFavouriteBtn) inspectorFavouriteBtn.disabled = true;
     if (inspectorTagsBtn) inspectorTagsBtn.disabled = true;
@@ -536,6 +541,11 @@ function updateInspectorPanel() {
   if (inspectorOpenBtn) {
     inspectorOpenBtn.hidden = trashView;
     inspectorOpenBtn.disabled = trashView;
+  }
+  if (inspectorReviewBtn) {
+    const canReview = !trashView && itemType(selected) === "image";
+    inspectorReviewBtn.hidden = !canReview;
+    inspectorReviewBtn.disabled = !canReview;
   }
   if (inspectorRenameBtn) {
     inspectorRenameBtn.hidden = trashView;
@@ -927,6 +937,15 @@ async function openItemInEditor(item) {
   await chrome.tabs.create({ url });
 }
 
+async function openItemInReview(item) {
+  if (itemType(item) !== "image") {
+    showToast("Review Mode supports saved screenshots only.", true);
+    return;
+  }
+  const url = chrome.runtime.getURL(`review.html?itemId=${encodeURIComponent(item.id)}`);
+  await chrome.tabs.create({ url });
+}
+
 async function toggleFavouriteItem(item) {
   const nextFavourite = !item.metadata?.favourite;
   await updateMediaMetadata(item.id, { favourite: nextFavourite });
@@ -1026,6 +1045,7 @@ function getCardView() {
       promptRenameItem,
       promptDuplicateItem,
       openItemInEditor,
+      openItemInReview,
       openVideoPreview,
       toggleFavouriteItem,
       downloadItem,
@@ -1881,6 +1901,15 @@ function bindEvents() {
     openMediaItem(selected).catch((error) => {
       console.error(error);
       showToast("Open failed.", true);
+    });
+  });
+
+  inspectorReviewBtn?.addEventListener("click", () => {
+    const selected = selectedInspectorItem();
+    if (!selected || isTrashView()) return;
+    openItemInReview(selected).catch((error) => {
+      console.error(error);
+      showToast("Review Mode failed to open.", true);
     });
   });
 

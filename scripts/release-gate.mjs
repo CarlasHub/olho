@@ -46,6 +46,9 @@ const REQUIRED_TEST_COVERAGE = [
   { category: "Integration (Mocked): Editor", file: "tests/editor-workflow.test.mjs" },
   { category: "Integration (Mocked): Recorder", file: "tests/recording-system.test.mjs" },
   { category: "Integration (Mocked): Gallery", file: "tests/gallery-offscreen.test.mjs" },
+  { category: "Unit: Review Engine", file: "tests/review-engine.test.mjs" },
+  { category: "Unit: Review Reports", file: "tests/review-report.test.mjs" },
+  { category: "Unit: Optional AI Review", file: "tests/ai-review.test.mjs" },
   { category: "Integration (Mocked): Extension Workflow", file: "tests/e2e-smoke.test.mjs" },
   { category: "Production Hardening", file: "tests/production-hardening.test.mjs" },
   { category: "Accessibility (Static)", file: "tests/ui-redesign-a11y.test.mjs" },
@@ -93,7 +96,10 @@ const EXECUTION_STEPS = [
       "tests/export-sharing.test.mjs",
       "tests/settings.unit.test.mjs",
       "tests/annotation-model.unit.test.mjs",
-      "tests/production-hardening.test.mjs"
+      "tests/production-hardening.test.mjs",
+      "tests/review-engine.test.mjs",
+      "tests/review-report.test.mjs",
+      "tests/ai-review.test.mjs"
     ]
   },
   {
@@ -262,6 +268,10 @@ const FORBIDDEN_DEPENDENCY_PATTERNS = [
   /sendgrid/i,
   /mailgun/i
 ];
+
+function isAllowedOptionalAiReviewReference(relPath, pattern) {
+  return relPath.startsWith("src/review/ai/") && String(pattern) === "/gemini/i";
+}
 
 const API_KEY_PATTERNS = [
   /AIza[0-9A-Za-z_-]{35}/,
@@ -493,7 +503,7 @@ async function scanSource() {
 
     if (isRuntimeSource) {
       FORBIDDEN_RUNTIME_SERVICE_PATTERNS.forEach((pattern) => {
-        if (pattern.test(text)) {
+        if (pattern.test(text) && !isAllowedOptionalAiReviewReference(relPath, pattern)) {
           serviceHits.push(`${relPath}: ${pattern}`);
         }
       });
@@ -639,7 +649,7 @@ async function scanBuildOutput() {
     });
 
     FORBIDDEN_RUNTIME_SERVICE_PATTERNS.forEach((pattern) => {
-      if (pattern.test(text)) {
+      if (pattern.test(text) && !isAllowedOptionalAiReviewReference(relPath, pattern)) {
         fail(`build output contains forbidden service pattern ${pattern} in ${relPath}`);
       }
     });

@@ -7,8 +7,6 @@ export function createGalleryCardView(deps) {
     itemTitle,
     itemSize,
     itemType,
-    itemTags,
-    folderName,
     formatDate,
     formatBytes,
     formatDuration,
@@ -16,6 +14,7 @@ export function createGalleryCardView(deps) {
     promptRenameItem,
     promptDuplicateItem,
     openItemInEditor,
+    openItemInReview,
     openVideoPreview,
     toggleFavouriteItem,
     downloadItem,
@@ -151,15 +150,6 @@ export function createGalleryCardView(deps) {
     }
     meta.textContent = metaParts.join(" · ");
 
-    const folderMeta = document.createElement("p");
-    folderMeta.className = "card-submeta";
-    folderMeta.textContent = `Folder: ${folderName(item.folderId)}`;
-
-    const tagsMeta = document.createElement("p");
-    tagsMeta.className = "card-submeta";
-    const tags = itemTags(item);
-    tagsMeta.textContent = tags.length ? `Tags: ${tags.join(", ")}` : "Tags: none";
-
     const actions = document.createElement("div");
     actions.className = "card-actions";
     actions.append(createContextButton("Open", () => openMediaItem(item)));
@@ -175,10 +165,16 @@ export function createGalleryCardView(deps) {
     const menuActions = document.createElement("div");
     menuActions.className = "context-actions";
 
+    const reviewActions = [];
+    if (itemType(item) === "image") {
+      reviewActions.push(createContextButton("Open in Review Mode", () => openItemInReview(item)));
+    }
+
     menuActions.append(
       createContextButton("Rename", () => promptRenameItem(item, summary)),
       createContextButton("Duplicate", () => promptDuplicateItem(item)),
       createContextButton("Edit Screenshot", () => openItemInEditor(item)),
+      ...reviewActions,
       createContextButton("Preview Video", async () => {
         if (itemType(item) !== "video") {
           showToast("Only recordings support preview.", true);
@@ -213,10 +209,9 @@ export function createGalleryCardView(deps) {
 
     menu.append(summary, menuActions);
     actions.append(menu);
-    actions.append(createContextButton("Delete", () => moveItemToOutOfSight(item, summary), "danger"));
 
     card.addEventListener("keydown", (event) => onCardKeydown(event, item.id, false));
-    card.append(top, thumbWrap, title, badgeRow, meta, folderMeta, tagsMeta, actions);
+    card.append(top, thumbWrap, title, badgeRow, meta, actions);
     return card;
   }
 

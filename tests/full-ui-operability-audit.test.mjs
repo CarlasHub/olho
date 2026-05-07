@@ -82,7 +82,7 @@ test("full UI operability gate validates control audit + workflow audit and writ
     ["editor.html", "button#openExportPanelBtn"],
     ["export-report.html", "button#downloadPdfBtn"],
     ["record.html", "button#startBtn"],
-    ["options.html", "button#deleteAllBtn"]
+    ["options.html", "button#settingsStorageNavBtn"]
   ];
 
   const byControl = new Map();

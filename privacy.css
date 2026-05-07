@@ -1,13 +1,8 @@
 :root {
   color-scheme: dark;
   font-family: "Segoe UI", "Avenir Next", "Noto Sans", sans-serif;
-  --bg: var(--olho-bg-page);
-  --panel: var(--olho-bg-panel);
   --text: var(--olho-text-primary);
-  --muted: var(--olho-text-muted);
-  --accent: var(--olho-accent-primary);
-  --focus: var(--olho-focus-ring);
-  --border: var(--olho-border-subtle);
+  --bg: var(--olho-bg-page);
 }
 
 * {
@@ -16,7 +11,7 @@
 
 body {
   margin: 0;
-  color: var(--text);
+  color: var(--olho-text-primary);
   background: var(--olho-gradient-page);
   padding: 20px;
   min-height: 100vh;
@@ -28,6 +23,10 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 14px;
+  border: 1px solid var(--olho-border-subtle);
+  border-radius: 16px;
+  padding: 14px;
+  background: var(--olho-gradient-panel);
 }
 
 .eyebrow {
@@ -35,7 +34,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-size: 0.72rem;
-  color: var(--muted);
+  color: var(--olho-text-muted);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -53,28 +52,48 @@ p {
 }
 
 h1 {
-  font-size: 1.45rem;
+  font-size: 1.48rem;
 }
 
 .subtitle {
   margin-top: 4px;
-  color: var(--muted);
+  color: var(--olho-text-muted);
+  font-size: 0.88rem;
 }
 
 .layout {
   display: grid;
   gap: 10px;
-  max-width: 980px;
+  max-width: 1120px;
+}
+
+.trust-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .card {
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  border: 1px solid var(--olho-border-subtle);
+  border-radius: 14px;
   background: var(--olho-gradient-card);
   padding: 14px;
   box-shadow: var(--olho-shadow-soft);
   display: grid;
   gap: 8px;
+}
+
+.summary-card h2 {
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--olho-text-secondary);
+}
+
+.summary-card p {
+  color: var(--olho-text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.45;
 }
 
 .card ul {
@@ -89,33 +108,45 @@ h1 {
   color: var(--olho-text-secondary);
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
+.permission-table {
+  display: grid;
   gap: 8px;
 }
 
-button {
+.permission-row {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--olho-border-subtle);
   border-radius: 10px;
-  border: 1px solid var(--olho-border-medium);
-  background: var(--olho-bg-card);
-  color: var(--text);
-  padding: 10px 14px;
-  min-height: 42px;
-  cursor: pointer;
-  transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+  background: rgba(11, 16, 27, 0.84);
 }
 
-button:hover {
-  transform: translateY(-1px);
-  border-color: var(--olho-border-strong);
-  box-shadow: 0 0 0 2px rgba(139, 124, 255, 0.24);
+.permission-name {
+  color: var(--olho-text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
-button:focus-visible {
-  outline: 3px solid var(--focus);
+.permission-value {
+  color: var(--olho-text-secondary);
+  font-size: 0.84rem;
+}
+
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: 3px solid var(--olho-focus-ring);
   outline-offset: 2px;
   box-shadow: 0 0 0 3px var(--olho-focus-glow);
+}
+
+@media (max-width: 960px) {
+  .trust-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 760px) {
@@ -130,6 +161,15 @@ button:focus-visible {
 
   .header .olho-header-nav {
     display: none;
+  }
+
+  .trust-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .permission-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 }
 

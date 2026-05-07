@@ -14,6 +14,12 @@ function parseHexToken(css, tokenName) {
   return match ? match[1].toLowerCase() : null;
 }
 
+function parseHexTokenFromEditor(css, tokenName) {
+  const pattern = new RegExp(`${tokenName}\\s*:\\s*(#[0-9a-fA-F]{6})\\s*;`);
+  const match = css.match(pattern);
+  return match ? match[1].toLowerCase() : null;
+}
+
 function srgbToLinear(channel) {
   const value = channel / 255;
   if (value <= 0.03928) return value / 12.92;
@@ -135,4 +141,56 @@ test("violet remains accent, not default surface color family", async () => {
   assert.equal(oldPurpleSurfaceValues.has(bgPanel), false, "Panel still uses old purple-heavy surface");
   assert.equal(oldPurpleSurfaceValues.has(bgCard), false, "Card still uses old purple-heavy surface");
   assert.equal(oldPurpleSurfaceValues.has(bgSidebar), false, "Sidebar still uses old purple-heavy surface");
+});
+
+test("editor dark creative-tool palette keeps contrast and high-visibility handles", async () => {
+  const css = await fs.readFile(path.join(root, "editor.css"), "utf8");
+
+  const tokens = {
+    bgTopbar: parseHexTokenFromEditor(css, "--editor-bg-topbar"),
+    bgToolbar: parseHexTokenFromEditor(css, "--editor-bg-toolbar"),
+    bgInspector: parseHexTokenFromEditor(css, "--editor-bg-inspector"),
+    bgWorkspace: parseHexTokenFromEditor(css, "--editor-bg-workspace"),
+    textPrimary: parseHexTokenFromEditor(css, "--editor-text-primary"),
+    textSecondary: parseHexTokenFromEditor(css, "--editor-text-secondary"),
+    textMuted: parseHexTokenFromEditor(css, "--editor-text-muted"),
+    accent: parseHexTokenFromEditor(css, "--editor-accent"),
+    dangerBg: parseHexTokenFromEditor(css, "--editor-danger-bg"),
+    dangerText: parseHexTokenFromEditor(css, "--editor-danger-text"),
+    successBg: parseHexTokenFromEditor(css, "--editor-success-bg"),
+    successText: parseHexTokenFromEditor(css, "--editor-success-text"),
+    warningBg: parseHexTokenFromEditor(css, "--editor-warning-bg"),
+    warningText: parseHexTokenFromEditor(css, "--editor-warning-text"),
+    infoBg: parseHexTokenFromEditor(css, "--editor-info-bg"),
+    infoText: parseHexTokenFromEditor(css, "--editor-info-text"),
+    cropLine: parseHexTokenFromEditor(css, "--editor-crop-line"),
+    resizeLine: parseHexTokenFromEditor(css, "--editor-resize-line"),
+    focusRing: parseHexTokenFromEditor(css, "--editor-focus-ring")
+  };
+
+  for (const [name, value] of Object.entries(tokens)) {
+    assert.ok(value, `Missing editor token ${name}`);
+  }
+
+  const pairs = [
+    { label: "Editor primary text on topbar", ratio: contrastRatio(tokens.textPrimary, tokens.bgTopbar), min: 4.5 },
+    { label: "Editor primary text on inspector", ratio: contrastRatio(tokens.textPrimary, tokens.bgInspector), min: 4.5 },
+    { label: "Editor secondary text on toolbar", ratio: contrastRatio(tokens.textSecondary, tokens.bgToolbar), min: 4.5 },
+    { label: "Editor muted text on inspector", ratio: contrastRatio(tokens.textMuted, tokens.bgInspector), min: 4.5 },
+    { label: "Active accent on toolbar", ratio: contrastRatio(tokens.accent, tokens.bgToolbar), min: 3.0 },
+    { label: "Primary button text/background", ratio: contrastRatio("#05070d", tokens.accent), min: 4.5 },
+    { label: "Danger text/background", ratio: contrastRatio(tokens.dangerText, tokens.dangerBg), min: 4.5 },
+    { label: "Success text/background", ratio: contrastRatio(tokens.successText, tokens.successBg), min: 4.5 },
+    { label: "Warning text/background", ratio: contrastRatio(tokens.warningText, tokens.warningBg), min: 4.5 },
+    { label: "Info text/background", ratio: contrastRatio(tokens.infoText, tokens.infoBg), min: 4.5 },
+    { label: "Crop line vs dark workspace", ratio: contrastRatio(tokens.cropLine, tokens.bgWorkspace), min: 4.5 },
+    { label: "Resize line vs dark workspace", ratio: contrastRatio(tokens.resizeLine, tokens.bgWorkspace), min: 4.5 },
+    { label: "Focus ring vs topbar", ratio: contrastRatio(tokens.focusRing, tokens.bgTopbar), min: 3.0 },
+    { label: "Focus ring vs toolbar", ratio: contrastRatio(tokens.focusRing, tokens.bgToolbar), min: 3.0 },
+    { label: "Focus ring vs inspector", ratio: contrastRatio(tokens.focusRing, tokens.bgInspector), min: 3.0 }
+  ];
+
+  pairs.forEach((pair) => {
+    assert.ok(pair.ratio >= pair.min, `${pair.label} is ${pair.ratio.toFixed(2)} below ${pair.min}`);
+  });
 });

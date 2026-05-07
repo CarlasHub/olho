@@ -74,6 +74,11 @@ function isRuntimeFile(relPath) {
   return !relPath.startsWith("tests/") && !relPath.startsWith("scripts/") && !relPath.endsWith(".md");
 }
 
+function isAllowedOptionalAiReviewReference(relPath, pattern) {
+  const normalizedPath = relPath.replace(/^dist\/build\//, "");
+  return normalizedPath.startsWith("src/review/ai/") && String(pattern) === "/gemini/i";
+}
+
 function toPos(text, index) {
   const prefix = text.slice(0, index);
   const line = prefix.split("\n").length;
@@ -217,6 +222,7 @@ function scanTextFile(relPath, text, context = "source") {
   for (const pattern of FORBIDDEN_RUNTIME_PATTERNS) {
     if (!isRuntimeFile(relPath)) continue;
     if (!pattern.test(text)) continue;
+    if (isAllowedOptionalAiReviewReference(relPath, pattern)) continue;
     disallowedPatterns.push({ context, file: relPath, pattern: String(pattern), reason: "Forbidden runtime pattern" });
   }
 
@@ -265,6 +271,7 @@ function scanBuiltOutput(buildDir) {
 
       for (const pattern of FORBIDDEN_RUNTIME_PATTERNS) {
         if (pattern.test(text)) {
+          if (isAllowedOptionalAiReviewReference(rel, pattern)) continue;
           findings.disallowedPatterns.push({
             context: "dist-build",
             file: rel,
@@ -333,6 +340,7 @@ function scanZip(zipPath) {
 
     for (const pattern of FORBIDDEN_RUNTIME_PATTERNS) {
       if (pattern.test(text)) {
+        if (isAllowedOptionalAiReviewReference(entry, pattern)) continue;
         findings.disallowedPatterns.push({
           context: "zip",
           file: entry,

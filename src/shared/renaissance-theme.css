@@ -109,6 +109,21 @@
   --olho-radius-sm: 10px;
   --olho-radius-md: 14px;
   --olho-radius-lg: 18px;
+  --olho-radius-xl: 22px;
+  --olho-space-1: 4px;
+  --olho-space-2: 8px;
+  --olho-space-3: 12px;
+  --olho-space-4: 16px;
+  --olho-space-5: 20px;
+  --olho-space-6: 24px;
+  --olho-font-size-xs: 0.72rem;
+  --olho-font-size-sm: 0.84rem;
+  --olho-font-size-md: 0.94rem;
+  --olho-font-size-lg: 1.1rem;
+  --olho-font-size-xl: 1.36rem;
+  --olho-z-dialog: 80;
+  --olho-z-toast: 90;
+  --olho-z-overlay: 100;
   --olho-transition-fast: 120ms ease;
 }
 
@@ -134,6 +149,99 @@ body {
   min-width: 0;
   display: grid;
   gap: 14px;
+}
+
+.app-shell,
+.olho-app-shell {
+  width: 100%;
+}
+
+.page-header,
+.olho-topbar {
+  border: 1px solid var(--olho-border-subtle);
+  border-radius: var(--olho-radius-md);
+  background: var(--olho-gradient-panel);
+  padding: var(--olho-space-3);
+}
+
+.page-title {
+  font-size: var(--olho-font-size-xl);
+  letter-spacing: -0.01em;
+}
+
+.toolbar,
+.filter-bar {
+  border: 1px solid var(--olho-border-subtle);
+  border-radius: var(--olho-radius-sm);
+  background: rgba(12, 18, 30, 0.84);
+  padding: var(--olho-space-3);
+}
+
+.segmented-control {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.segmented-control > button {
+  min-height: 32px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
+.segmented-control > button[aria-current="page"],
+.segmented-control > button.active {
+  border-color: var(--olho-selected-border);
+  background: var(--olho-selected-bg);
+  color: var(--olho-selected-text);
+}
+
+.panel,
+.olho-panel {
+  border-radius: var(--olho-radius-md);
+  border: 1px solid var(--olho-border-subtle);
+  background: var(--olho-gradient-card);
+}
+
+.card,
+.olho-card {
+  border-radius: var(--olho-radius-sm);
+  border: 1px solid var(--olho-border-subtle);
+  background: rgba(12, 18, 30, 0.88);
+}
+
+.inspector-panel,
+.olho-inspector {
+  border-radius: var(--olho-radius-md);
+  background: rgba(12, 18, 30, 0.9);
+}
+
+.bulk-action-bar {
+  border: 1px solid var(--olho-border-medium);
+  border-radius: var(--olho-radius-sm);
+  background: var(--olho-gradient-panel);
+  box-shadow: var(--olho-shadow-soft);
+}
+
+.empty-state {
+  border-radius: var(--olho-radius-sm);
+  border: 1px dashed var(--olho-border-medium);
+  background: rgba(11, 16, 27, 0.86);
+}
+
+.icon-button {
+  width: 36px;
+  min-height: 36px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+}
+
+.action-menu {
+  border-radius: var(--olho-radius-sm);
+  border: 1px solid var(--olho-border-subtle);
+  background: rgba(11, 16, 27, 0.96);
 }
 
 .olho-sidebar {

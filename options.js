@@ -30,6 +30,9 @@ const refreshUsageBtn = document.getElementById("refreshUsageBtn");
 const emptyTrashBtn = document.getElementById("emptyTrashBtn");
 const deleteLargeBtn = document.getElementById("deleteLargeBtn");
 const deleteAllBtn = document.getElementById("deleteAllBtn");
+const settingsNavButtons = Array.from(document.querySelectorAll(".settings-nav-btn[data-settings-target]"));
+const settingsGroups = Array.from(document.querySelectorAll(".settings-group"));
+const settingsPanels = Array.from(document.querySelectorAll("[data-settings-section]"));
 
 function showStatus(message, isError = false) {
   status.textContent = message;
@@ -199,6 +202,41 @@ deleteAllBtn?.addEventListener("click", async () => {
     showStatus("Delete failed.", true);
   }
 });
+
+function activateSettingsSection(targetId, scroll = false) {
+  const normalizedId = String(targetId || "").trim();
+  if (!normalizedId) return;
+
+  settingsNavButtons.forEach((entry) => {
+    const isActive = String(entry.dataset.settingsTarget || "").trim() === normalizedId;
+    entry.classList.toggle("active", isActive);
+    entry.setAttribute("aria-current", isActive ? "true" : "false");
+  });
+
+  settingsPanels.forEach((panel) => {
+    const panelId = String(panel.dataset.settingsSection || "").trim();
+    const isMatch = panelId === normalizedId;
+    panel.hidden = !isMatch;
+    if (panel instanceof HTMLDetailsElement) {
+      panel.open = isMatch;
+    }
+  });
+
+  if (scroll) {
+    const target = settingsPanels.find((panel) => String(panel.dataset.settingsSection || "").trim() === normalizedId);
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+settingsNavButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const targetId = String(button.dataset.settingsTarget || "").trim();
+    if (!targetId) return;
+    activateSettingsSection(targetId, true);
+  });
+});
+
+activateSettingsSection("generalSettings", false);
 
 loadOptions();
 refreshUsage();

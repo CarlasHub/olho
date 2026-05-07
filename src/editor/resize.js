@@ -28,6 +28,14 @@ function cursorForHandle(handle) {
   return cursors[handle] || "nwse-resize";
 }
 
+function getEditorColor(canvas, token, fallback) {
+  if (typeof getComputedStyle !== "function") {
+    return fallback;
+  }
+  const value = getComputedStyle(canvas).getPropertyValue(token).trim();
+  return value || fallback;
+}
+
 export class ResizeTool {
   constructor({ canvas, viewport, onChange, onSizeChange }) {
     this.canvas = canvas;
@@ -129,14 +137,24 @@ export class ResizeTool {
     const rect = { x: 0, y: 0, width: this.size.width, height: this.size.height };
     const handleSize = BASE_HANDLE_SIZE / Math.max(0.001, this.zoom);
     const handles = this.getHandles(rect, handleSize);
+    const resizeLineShadow = getEditorColor(this.canvas, "--editor-handle-border", "#020617");
+    const resizeLine = getEditorColor(this.canvas, "--editor-resize-line", "#67e8f9");
+    const handleFill = getEditorColor(this.canvas, "--editor-handle", "#f8fafc");
+    const handleBorder = getEditorColor(this.canvas, "--editor-handle-border", "#020617");
+    const badgeBg = getEditorColor(this.canvas, "--editor-bg-workspace", "rgba(6, 10, 16, 0.92)");
+    const badgeStroke = getEditorColor(this.canvas, "--editor-border-strong", "rgba(248, 251, 255, 0.82)");
+    const badgeTextColor = getEditorColor(this.canvas, "--editor-text-primary", "#f8fafc");
 
     ctx.save();
-    ctx.strokeStyle = "#f8fbff";
+    ctx.strokeStyle = resizeLineShadow;
+    ctx.lineWidth = 4 / Math.max(0.001, this.zoom);
+    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+    ctx.strokeStyle = resizeLine;
     ctx.lineWidth = 2 / Math.max(0.001, this.zoom);
     ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
 
-    ctx.fillStyle = "#f8fafc";
-    ctx.strokeStyle = "#0c1119";
+    ctx.fillStyle = handleFill;
+    ctx.strokeStyle = handleBorder;
     ctx.lineWidth = 1.1 / Math.max(0.001, this.zoom);
 
     Object.values(handles).forEach((handle) => {
@@ -152,12 +170,12 @@ export class ResizeTool {
     const badgeW = textWidth + padX * 2;
     const badgeX = 4 / Math.max(0.001, this.zoom);
     const badgeY = 4 / Math.max(0.001, this.zoom);
-    ctx.fillStyle = "rgba(6, 10, 16, 0.9)";
-    ctx.strokeStyle = "rgba(248, 251, 255, 0.82)";
+    ctx.fillStyle = badgeBg;
+    ctx.strokeStyle = badgeStroke;
     ctx.lineWidth = 1 / Math.max(0.001, this.zoom);
     ctx.fillRect(badgeX, badgeY, badgeW, badgeH);
     ctx.strokeRect(badgeX, badgeY, badgeW, badgeH);
-    ctx.fillStyle = "#f8fbff";
+    ctx.fillStyle = badgeTextColor;
     ctx.textBaseline = "middle";
     ctx.fillText(badgeText, badgeX + padX, badgeY + badgeH / 2);
 

@@ -14,7 +14,7 @@
           <div class="header-copy">
             <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
             <h1>Export</h1>
-            <p class="page-subtitle">Create a local export bundle and prepare manual share drafts.</p>
+            <p class="page-subtitle">Local export only. Nothing is uploaded by Olho.</p>
           </div>
           <nav class="olho-nav olho-header-nav" aria-label="Olho sections">
             <a class="olho-nav-link" href="popup.html">Capture</a>
@@ -33,8 +33,8 @@
               <button type="button" id="refreshBtn" class="ghost">Refresh</button>
             </div>
             <p id="filterSummary" class="muted"></p>
-            <div class="stats" id="stats"></div>
-            <div class="toggle-row" aria-label="Report options">
+            <div class="stats summary-strip" id="stats"></div>
+            <div class="toggle-row options-strip" aria-label="Report options">
               <label class="toggle-option" for="includeSourceUrlInReport">
                 <input id="includeSourceUrlInReport" type="checkbox" />
                 <span>Include source URL in report output when available</span>
@@ -121,7 +121,7 @@
 
           <section class="card items-card" aria-labelledby="itemsHeading">
             <h2 id="itemsHeading">Items for Manual Attachment</h2>
-            <p class="muted">Export files locally, then attach them manually to your destination tool.</p>
+            <p class="muted">Each card keeps local actions separate: open editor, download, copy, or remove from this export set.</p>
             <div id="itemsContainer" class="items" role="list"></div>
           </section>
         </main>

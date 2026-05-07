@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Olho Review Mode</title>
+    <link rel="stylesheet" href="src/shared/renaissance-theme.css" />
+    <link rel="stylesheet" href="review.css" />
+  </head>
+  <body>
+    <div class="review-shell">
+      <header class="review-toolbar">
+        <button type="button" id="backToMemoryBtn" class="ghost review-back-btn">Back to Memory</button>
+        <div class="review-title-block">
+          <p class="review-eyebrow">Olho Review</p>
+          <h1 id="reviewTitle">Review Mode</h1>
+          <p id="reviewMeta" class="review-meta">Read-only screenshot review workspace.</p>
+        </div>
+        <div class="review-toolbar-actions" aria-label="Review report actions">
+          <button type="button" id="copySummaryBtn" class="ghost" disabled>Copy full summary</button>
+          <button type="button" id="exportHtmlBtn" class="ghost" disabled>Export HTML</button>
+          <button type="button" id="exportMarkdownBtn" class="ghost" disabled>Export Markdown</button>
+          <button type="button" id="exportJsonBtn" class="ghost" disabled>Export JSON</button>
+        </div>
+        <span class="review-status" aria-label="Review Mode is read-only">Read-only</span>
+      </header>
+
+      <main class="review-layout">
+        <aside class="review-panel findings-panel" aria-labelledby="findingsTitle">
+          <div class="panel-header">
+            <h2 id="findingsTitle">Findings</h2>
+            <span id="findingsCount" class="panel-count">0</span>
+          </div>
+          <section class="ai-review-panel" aria-labelledby="aiReviewSettingsTitle">
+            <div class="ai-review-panel-heading">
+              <div>
+                <h3 id="aiReviewSettingsTitle">AI Review</h3>
+                <p id="aiProviderSummary" class="ai-review-summary">Disabled by default.</p>
+              </div>
+              <span id="aiStatusPill" class="ai-status-pill">Off</span>
+            </div>
+            <p class="ai-review-warning">
+              External AI review may send screenshots or design data to third-party providers.
+            </p>
+            <div class="ai-control-grid">
+              <label class="ai-check-row">
+                <input type="checkbox" id="aiEnabledToggle" />
+                <span>Enable optional AI review</span>
+              </label>
+              <label>
+                <span>Provider</span>
+                <select id="aiProviderSelect"></select>
+              </label>
+              <label>
+                <span>Review mode</span>
+                <select id="aiReviewModeSelect"></select>
+              </label>
+              <label>
+                <span>Model</span>
+                <input type="text" id="aiModelInput" autocomplete="off" />
+              </label>
+              <label id="aiEndpointRow">
+                <span>Local endpoint</span>
+                <input type="text" id="aiEndpointInput" autocomplete="off" />
+              </label>
+              <label id="aiApiKeyRow">
+                <span>API key</span>
+                <input type="password" id="aiApiKeyInput" autocomplete="off" />
+              </label>
+              <label class="ai-check-row">
+                <input type="checkbox" id="aiScreenshotSharingToggle" />
+                <span>Allow screenshot sharing for AI review</span>
+              </label>
+            </div>
+            <div class="ai-actions">
+              <button type="button" id="runAiReviewBtn" class="ghost" disabled>Run AI Review</button>
+              <button type="button" id="cancelAiReviewBtn" class="ghost" disabled>Cancel AI Review</button>
+              <button type="button" id="testAiConnectionBtn" class="ghost">Test connection</button>
+              <button type="button" id="clearAiSettingsBtn" class="ghost">Clear AI settings</button>
+            </div>
+            <p id="aiStatusText" class="ai-status-text">
+              AI review is off. Deterministic local findings remain available without external processing.
+            </p>
+            <ul id="aiPassList" class="ai-pass-list" aria-label="AI review pass status"></ul>
+            <p class="ai-limitations">
+              AI output is optional, schema-validated, and never replaces deterministic rule-engine findings.
+            </p>
+          </section>
+          <div id="findingsList" class="findings-list"></div>
+        </aside>
+
+        <section class="screenshot-workspace" aria-labelledby="screenshotTitle">
+          <h2 id="screenshotTitle" class="sr-only">Screenshot under review</h2>
+          <div id="loadingState" class="workspace-state" role="status">
+            <strong>Preparing Review Mode</strong>
+            <span id="progressText">Loading saved screenshot.</span>
+          </div>
+          <div id="errorState" class="workspace-state error-state" role="alert" hidden></div>
+          <div id="screenshotFrame" class="screenshot-frame" hidden>
+            <img id="screenshotImage" class="screenshot-image" alt="" />
+            <div id="overlayLayer" class="overlay-layer"></div>
+          </div>
+        </section>
+
+        <aside class="review-panel inspector-panel" aria-labelledby="inspectorTitle">
+          <div class="panel-header">
+            <h2 id="inspectorTitle">Inspector</h2>
+          </div>
+          <div id="findingInspector" class="finding-inspector"></div>
+        </aside>
+      </main>
+    </div>
+
+    <dialog id="copyFallbackDialog" aria-labelledby="copyFallbackTitle">
+      <h2 id="copyFallbackTitle">Copy manually</h2>
+      <p>Clipboard access was blocked. Select the text below and copy it manually.</p>
+      <textarea id="copyFallbackText" rows="12" readonly></textarea>
+      <div class="dialog-actions">
+        <button type="button" id="copyFallbackCloseBtn" class="ghost">Close</button>
+      </div>
+    </dialog>
+
+    <div id="reviewLiveStatus" class="review-live-status" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script type="module" src="review.js"></script>
+  </body>
+</html>

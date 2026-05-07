@@ -10,10 +10,14 @@
   <body>
     <div class="olho-app-shell gallery-shell">
       <div class="olho-main-shell">
-        <header class="gallery-header">
-          <div>
+        <header class="gallery-header olho-topbar">
+          <div class="page-title-wrap">
             <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
-            <h1>Memory</h1>
+            <div class="title-row">
+              <h1>Memory</h1>
+              <span id="itemCount" class="pill" aria-live="polite">0</span>
+            </div>
+            <p class="page-subtitle">Local media library for captures, imports, edits, and recordings.</p>
           </div>
           <nav class="olho-nav olho-header-nav" aria-label="Olho sections">
             <a class="olho-nav-link" href="popup.html">Capture</a>
@@ -23,31 +27,38 @@
             <a class="olho-nav-link" href="options.html">Settings</a>
             <a class="olho-nav-link" href="privacy.html">Privacy</a>
           </nav>
-          <div class="header-actions"></div>
         </header>
 
         <main class="layout">
       <section class="panel content-panel" aria-labelledby="libraryTitle">
-        <div class="section-head">
-          <h2 id="libraryTitle">Memory Library</h2>
-          <span id="itemCount" class="pill" aria-live="polite">0</span>
+        <div class="section-head section-head-library">
+          <h2 id="libraryTitle">Library Workspace</h2>
+          <button id="refreshBtn" type="button" class="ghost icon-only-btn" aria-label="Refresh library">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7H4v4M4 11a8 8 0 1 0 2.3-5.7" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+          </button>
         </div>
 
         <section class="memory-controls" aria-labelledby="viewsTitle">
           <h3 id="viewsTitle">Views</h3>
           <nav class="view-nav view-nav-row" aria-label="Memory views">
-            <button type="button" class="view-btn active" data-view="all">All Captures</button>
+            <button type="button" class="view-btn active" data-view="all">All</button>
             <button type="button" class="view-btn" data-view="screenshots">Screenshots</button>
             <button type="button" class="view-btn" data-view="imports">Imports</button>
-            <button type="button" class="view-btn" data-view="edited">Edited Images</button>
+            <button type="button" class="view-btn" data-view="edited">Edited</button>
             <button type="button" class="view-btn" data-view="recordings">Recordings</button>
             <button type="button" class="view-btn" data-view="favourites">Kept in Sight</button>
-            <button type="button" class="view-btn" data-view="recent">Recent</button>
-            <button type="button" class="view-btn" data-view="folders">Folders</button>
-            <button type="button" class="view-btn" data-view="tags">Tags</button>
             <button type="button" class="view-btn" data-view="trash">Out of Sight</button>
             <button type="button" class="view-btn" data-view="storage">Storage Usage</button>
           </nav>
+
+          <details class="sub-panel section-disclosure">
+            <summary>More views</summary>
+            <div class="view-nav view-nav-row aux-view-nav" role="group" aria-label="Additional memory views">
+              <button type="button" class="view-btn" data-view="recent">Recent</button>
+              <button type="button" class="view-btn" data-view="folders">Folders</button>
+              <button type="button" class="view-btn" data-view="tags">Tags</button>
+            </div>
+          </details>
 
           <details class="sub-panel section-disclosure">
             <summary>Manage folders and tags</summary>
@@ -105,7 +116,6 @@
               <option value="type">Type</option>
             </select>
           </label>
-          <button id="refreshBtn" type="button" class="ghost">Refresh</button>
         </div>
 
         <div id="bulkToolbar" class="bulk-toolbar" hidden>
@@ -122,7 +132,7 @@
           <button type="button" id="bulkClearSelectionBtn" class="ghost">Clear Selection</button>
 
           <details id="bulkMoreActions" class="bulk-more section-disclosure">
-            <summary>More actions</summary>
+            <summary>Bulk More</summary>
             <div class="bulk-more-actions">
               <div id="bulkMoveGroup" class="bulk-inline-group">
                 <label class="field inline-field">
@@ -197,6 +207,7 @@
           </dl>
           <div class="inspector-actions" id="inspectorActions">
             <button type="button" id="inspectorOpenBtn" class="ghost">Open</button>
+            <button type="button" id="inspectorReviewBtn" class="ghost">Open in Review Mode</button>
             <button type="button" id="inspectorRenameBtn" class="ghost">Rename</button>
             <button type="button" id="inspectorFavouriteBtn" class="ghost">Keep in Sight</button>
             <button type="button" id="inspectorTagsBtn" class="ghost">Edit Tags</button>

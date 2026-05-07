@@ -1275,6 +1275,31 @@ hideClipboardFallback();
 hideCaptureBlockedFallback();
 hideScreenRegionCropPanel();
 bindScreenRegionCropCanvas();
+
+function enforcePopupWidthForActionPanel() {
+  if (!chrome?.tabs?.getCurrent) {
+    return;
+  }
+  chrome.tabs.getCurrent((tab) => {
+    // When popup.html is opened as a full browser tab during debugging/tests,
+    // do not force narrow popup dimensions.
+    if (tab?.id) {
+      return;
+    }
+    if (document.documentElement) {
+      document.documentElement.style.minWidth = "0";
+      document.documentElement.style.width = "100%";
+      document.documentElement.style.maxWidth = "420px";
+    }
+    if (document.body) {
+      document.body.style.minWidth = "0";
+      document.body.style.width = "100%";
+      document.body.style.maxWidth = "420px";
+    }
+  });
+}
+
+enforcePopupWidthForActionPanel();
 Promise.all([loadPopupSettings(), refreshRecent()]).catch((error) => {
   console.error("Popup initialization failed", error);
 });

@@ -184,77 +184,81 @@
               <h2 id="previewHeading">Review and Save</h2>
               <p class="hint">Rename, retag, and save to Memory.</p>
             </div>
-
-            <video id="previewVideo" controls playsinline></video>
-
-            <div class="meta-grid" aria-label="Recording details">
-              <div>
-                <span class="meta-label">Duration</span>
-                <strong id="previewDuration">00:00</strong>
+            <div class="preview-layout">
+              <div class="preview-media-column">
+                <video id="previewVideo" controls playsinline></video>
               </div>
-              <div>
-                <span class="meta-label">Format</span>
-                <strong id="previewMime">video/webm</strong>
-              </div>
-              <div>
-                <span class="meta-label">Size</span>
-                <strong id="previewSize">0 B</strong>
+              <div class="preview-details-column">
+                <div class="meta-grid" aria-label="Recording details">
+                  <div>
+                    <span class="meta-label">Duration</span>
+                    <strong id="previewDuration">00:00</strong>
+                  </div>
+                  <div>
+                    <span class="meta-label">Format</span>
+                    <strong id="previewMime">video/webm</strong>
+                  </div>
+                  <div>
+                    <span class="meta-label">Size</span>
+                    <strong id="previewSize">0 B</strong>
+                  </div>
+                </div>
+
+                <div class="field-grid preview-field-grid">
+                  <label class="field">
+                    <span>Title</span>
+                    <input id="titleInput" type="text" />
+                  </label>
+
+                  <label class="field">
+                    <span>Folder</span>
+                    <select id="saveFolderSelect"></select>
+                  </label>
+
+                  <label class="field">
+                    <span>Tags (comma separated)</span>
+                    <input id="saveTagsInput" type="text" placeholder="demo, release" />
+                  </label>
+                </div>
+
+                <div class="actions preview-actions-primary">
+                  <button type="button" id="saveBtn" class="primary btn-with-icon">
+                    <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10l2 2v14H6z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 14l3 3 5-6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                    <span class="btn-label">Save to Memory</span>
+                  </button>
+                  <button type="button" id="downloadBtn" class="ghost btn-with-icon">
+                    <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v10M8 11l4 4 4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                    <span class="btn-label">Download WebM</span>
+                  </button>
+                  <button type="button" id="recordAgainBtn" class="ghost btn-with-icon">
+                    <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7H4v4M4 11a8 8 0 1 0 2.3-5.7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                    <span class="btn-label">Record Again</span>
+                  </button>
+                </div>
+                <div class="actions preview-actions-danger">
+                  <button type="button" id="discardPreviewBtn" class="danger btn-with-icon">
+                    <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                    <span class="btn-label">Discard</span>
+                  </button>
+                </div>
+
+                <details class="disclosure preview-more-actions">
+                  <summary>More actions</summary>
+                  <div class="actions">
+                    <button type="button" id="saveDraftBtn" class="ghost btn-with-icon">
+                      <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10l2 2v14H6z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 4v6h6V4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+                      <span class="btn-label">Save Draft Progress</span>
+                    </button>
+                    <button type="button" id="openGalleryBtn" class="ghost btn-with-icon">
+                      <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="6" width="14" height="12" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 10h8M8 14h8" stroke="currentColor" stroke-width="1.4"/></svg>
+                      <span class="btn-label">Open Memory</span>
+                    </button>
+                  </div>
+                </details>
+
+                <p class="hint">MP4/GIF export is not available locally in this version. WebM is supported.</p>
               </div>
             </div>
-
-            <div class="field-grid">
-              <label class="field">
-                <span>Title</span>
-                <input id="titleInput" type="text" />
-              </label>
-
-              <label class="field">
-                <span>Folder</span>
-                <select id="saveFolderSelect"></select>
-              </label>
-
-              <label class="field">
-                <span>Tags (comma separated)</span>
-                <input id="saveTagsInput" type="text" placeholder="demo, release" />
-              </label>
-            </div>
-
-            <div class="actions preview-actions-primary">
-              <button type="button" id="saveBtn" class="primary btn-with-icon">
-                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10l2 2v14H6z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 14l3 3 5-6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
-                <span class="btn-label">Save to Memory</span>
-              </button>
-              <button type="button" id="downloadBtn" class="ghost btn-with-icon">
-                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v10M8 11l4 4 4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
-                <span class="btn-label">Download WebM</span>
-              </button>
-              <button type="button" id="recordAgainBtn" class="ghost btn-with-icon">
-                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7H4v4M4 11a8 8 0 1 0 2.3-5.7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-                <span class="btn-label">Record Again</span>
-              </button>
-            </div>
-            <div class="actions preview-actions-danger">
-              <button type="button" id="discardPreviewBtn" class="danger btn-with-icon">
-                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
-                <span class="btn-label">Discard</span>
-              </button>
-            </div>
-
-            <details class="disclosure preview-more-actions">
-              <summary>More actions</summary>
-              <div class="actions">
-                <button type="button" id="saveDraftBtn" class="ghost btn-with-icon">
-                  <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10l2 2v14H6z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 4v6h6V4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
-                  <span class="btn-label">Save Draft Progress</span>
-                </button>
-                <button type="button" id="openGalleryBtn" class="ghost btn-with-icon">
-                  <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="6" width="14" height="12" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 10h8M8 14h8" stroke="currentColor" stroke-width="1.4"/></svg>
-                  <span class="btn-label">Open Memory</span>
-                </button>
-              </div>
-            </details>
-
-            <p class="hint">MP4/GIF export is not available locally in this version. WebM is supported.</p>
           </section>
         </main>
       </div>

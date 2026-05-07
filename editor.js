@@ -190,6 +190,17 @@ const localImageDropHint = document.getElementById("localImageDropHint");
 
 const annotationList = document.getElementById("annotationList");
 const annotationEmpty = document.getElementById("annotationEmpty");
+const historyList = document.getElementById("historyList");
+const documentTitle = document.getElementById("documentTitle");
+const documentState = document.getElementById("documentState");
+const statusTool = document.getElementById("statusTool");
+const statusDimensions = document.getElementById("statusDimensions");
+const statusZoom = document.getElementById("statusZoom");
+const statusSaveState = document.getElementById("statusSaveState");
+const statusHint = document.getElementById("statusHint");
+const editorInspector = document.getElementById("editorInspector");
+const inspectorToggleBtn = document.getElementById("inspectorToggleBtn");
+const inspectorBodyContainer = document.getElementById("inspectorBodyContainer");
 
 const overwriteDialog = document.getElementById("overwriteDialog");
 const overwriteCancelBtn = document.getElementById("overwriteCancelBtn");
@@ -227,6 +238,25 @@ const resizeTool = new ResizeTool({
   viewport,
   onChange: () => render(),
   onSizeChange: (size) => syncResizeInputs(size)
+});
+
+const TOOL_DISPLAY_NAMES = Object.freeze({
+  [TOOL_TYPES.SELECT]: "Select",
+  [TOOL_TYPES.DRAW]: "Pen",
+  [TOOL_TYPES.HIGHLIGHT]: "Highlight",
+  [TOOL_TYPES.LINE]: "Line",
+  [TOOL_TYPES.ARROW]: "Arrow",
+  [TOOL_TYPES.RECT]: "Rectangle",
+  [TOOL_TYPES.ROUNDED_RECT]: "Rounded Rectangle",
+  [TOOL_TYPES.ELLIPSE]: "Ellipse",
+  [TOOL_TYPES.TEXT]: "Text",
+  [TOOL_TYPES.NUMBER_MARKER]: "Number Marker",
+  [TOOL_TYPES.CALLOUT]: "Callout",
+  [TOOL_TYPES.BLUR]: "Blur",
+  [TOOL_TYPES.PIXELATE]: "Pixelate",
+  [TOOL_TYPES.REDACT]: "Solid Redaction",
+  [TOOL_TYPES.CROP]: "Crop",
+  [TOOL_TYPES.RESIZE]: "Resize"
 });
 
 setup().catch((error) => {
@@ -910,11 +940,103 @@ async function setup() {
   annotationWorkCanvas.width = canvas.width;
   annotationWorkCanvas.height = canvas.height;
   bindEvents();
+  if (inspectorToggleBtn) {
+    inspectorToggleBtn.setAttribute("aria-expanded", "true");
+    inspectorToggleBtn.setAttribute("aria-label", "Collapse inspector");
+  }
+  if (inspectorBodyContainer) {
+    inspectorBodyContainer.hidden = false;
+  }
   syncStyleControls();
   updateToolOptionVisibility(state.tool);
+  updateEditorStatusBar();
   updateZoom();
   await initLoad();
   render();
+}
+
+function toolHint(tool) {
+  if (tool === TOOL_TYPES.CROP) {
+    return "Hint: Drag crop handles. Enter applies. Esc cancels.";
+  }
+  if (tool === TOOL_TYPES.RESIZE) {
+    return "Hint: Drag resize handles. Enter applies. Esc cancels.";
+  }
+  if (tool === TOOL_TYPES.TEXT || tool === TOOL_TYPES.CALLOUT) {
+    return "Hint: Click canvas to place text. Double-click text to edit.";
+  }
+  if (tool === TOOL_TYPES.SELECT) {
+    return "Hint: Drag selected objects. Delete removes selection.";
+  }
+  return "Hint: Esc exits current tool.";
+}
+
+function hasUnsavedEdits() {
+  return state.undoStack.length > 0 || state.redoStack.length > 0;
+}
+
+function updateHistoryPanel() {
+  if (!historyList) return;
+  historyList.innerHTML = "";
+
+  const entries = [];
+  if (state.undoStack.length > 0) {
+    entries.push(`Undo available: ${state.undoStack.length}`);
+  }
+  if (state.redoStack.length > 0) {
+    entries.push(`Redo available: ${state.redoStack.length}`);
+  }
+  if (state.actions.length > 0) {
+    entries.push(`Annotations: ${state.actions.length}`);
+  }
+  if (state.selectedActionId) {
+    const selected = getSelectedAction();
+    if (selected) {
+      entries.push(`Selected: ${actionLabel(selected)}`);
+    }
+  }
+
+  if (!entries.length) {
+    const empty = document.createElement("li");
+    empty.className = "history-empty";
+    empty.textContent = "No edits yet.";
+    historyList.append(empty);
+    return;
+  }
+
+  entries.slice(0, 8).forEach((entry) => {
+    const item = document.createElement("li");
+    item.textContent = entry;
+    historyList.append(item);
+  });
+}
+
+function updateEditorStatusBar() {
+  if (documentTitle) {
+    documentTitle.textContent = state.itemTitle || "Untitled Screenshot";
+  }
+
+  const toolName = TOOL_DISPLAY_NAMES[state.tool] || "Tool";
+  if (statusTool) {
+    statusTool.textContent = `Tool: ${toolName}`;
+  }
+  if (statusDimensions) {
+    statusDimensions.textContent = `Image: ${canvas.width} x ${canvas.height}`;
+  }
+  if (statusZoom) {
+    statusZoom.textContent = `Zoom: ${Math.round(state.zoom * 100)}%`;
+  }
+
+  const saveText = hasUnsavedEdits() ? "Unsaved edits" : "Saved locally";
+  if (statusSaveState) {
+    statusSaveState.textContent = saveText;
+  }
+  if (documentState) {
+    documentState.textContent = saveText;
+  }
+  if (statusHint) {
+    statusHint.textContent = toolHint(state.tool);
+  }
 }
 
 function bindEvents() {
@@ -933,6 +1055,11 @@ function bindEvents() {
     }
   });
   openExportPanelBtn.addEventListener("click", () => {
+    if (editorInspector?.classList.contains("collapsed")) {
+      editorInspector.classList.remove("collapsed");
+      inspectorToggleBtn?.setAttribute("aria-expanded", "true");
+      inspectorToggleBtn?.setAttribute("aria-label", "Collapse inspector");
+    }
     const exportSection = document.getElementById("inspectorExportSection");
     if (exportSection instanceof HTMLDetailsElement) {
       exportSection.open = true;
@@ -1033,6 +1160,17 @@ function bindEvents() {
   zoomOutBtn.addEventListener("click", () => setZoom(state.zoom - 0.1));
   fitBtn.addEventListener("click", () => fitToScreen());
   actualSizeBtn.addEventListener("click", () => setZoom(1));
+
+  inspectorToggleBtn?.addEventListener("click", () => {
+    if (!editorInspector) return;
+    const nextCollapsed = !editorInspector.classList.contains("collapsed");
+    editorInspector.classList.toggle("collapsed", nextCollapsed);
+    inspectorToggleBtn.setAttribute("aria-expanded", nextCollapsed ? "false" : "true");
+    inspectorToggleBtn.setAttribute("aria-label", nextCollapsed ? "Expand inspector" : "Collapse inspector");
+    if (inspectorBodyContainer) {
+      inspectorBodyContainer.hidden = nextCollapsed;
+    }
+  });
 
   applyCropBtn.addEventListener("click", () => applyCrop());
   cancelCropBtn.addEventListener("click", () => setTool(TOOL_TYPES.SELECT));
@@ -1686,6 +1824,14 @@ function getSelectedAction() {
   return state.actions.find((action) => action.id === state.selectedActionId) || null;
 }
 
+function getEditorColor(token, fallback) {
+  if (typeof getComputedStyle !== "function" || !canvas) {
+    return fallback;
+  }
+  const value = getComputedStyle(canvas).getPropertyValue(token).trim();
+  return value || fallback;
+}
+
 function updateActionById(id, nextAction) {
   const index = state.actions.findIndex((action) => action.id === id);
   if (index < 0) return;
@@ -1700,7 +1846,7 @@ function render() {
   if (state.baseImage) {
     annotationWorkCtx.drawImage(state.baseImage, 0, 0);
   } else {
-    annotationWorkCtx.fillStyle = "#101b35";
+    annotationWorkCtx.fillStyle = getEditorColor("--editor-bg-workspace", "#0b0d12");
     annotationWorkCtx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
@@ -2103,13 +2249,15 @@ function drawSelectionOverlay(context) {
   if (!bounds) return;
 
   context.save();
-  context.strokeStyle = "#f8fbff";
+  context.strokeStyle = getEditorColor("--editor-selection-border", "#67e8f9");
+  context.fillStyle = getEditorColor("--editor-selection-fill", "rgba(103, 232, 249, 0.12)");
+  context.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
   context.lineWidth = 2 / state.zoom;
   context.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
   const handles = getSelectionHandles(bounds);
-  context.fillStyle = "#ffffff";
-  context.strokeStyle = "#0a0d13";
+  context.fillStyle = getEditorColor("--editor-handle", "#f8fafc");
+  context.strokeStyle = getEditorColor("--editor-handle-border", "#020617");
   context.lineWidth = 1.2 / state.zoom;
   Object.values(handles).forEach((handle) => {
     context.fillRect(handle.x, handle.y, handle.size, handle.size);
@@ -2119,8 +2267,8 @@ function drawSelectionOverlay(context) {
   if (selected.type === TOOL_TYPES.LINE || selected.type === TOOL_TYPES.ARROW) {
     const endpoints = getEndpointHandles(selected);
     if (endpoints) {
-      context.fillStyle = "#ffffff";
-      context.strokeStyle = "#0a0d13";
+      context.fillStyle = getEditorColor("--editor-handle", "#f8fafc");
+      context.strokeStyle = getEditorColor("--editor-handle-border", "#020617");
       context.lineWidth = 1.2 / state.zoom;
       Object.values(endpoints).forEach((endpoint) => {
         context.beginPath();
@@ -2146,6 +2294,8 @@ function updateToolbarState() {
   secureRedactionBtn.disabled = !hasRedaction;
   undoBtn.disabled = state.undoStack.length === 0;
   redoBtn.disabled = state.redoStack.length === 0;
+  updateHistoryPanel();
+  updateEditorStatusBar();
 }
 
 function captureSessionSnapshot() {
@@ -2270,6 +2420,7 @@ function updateZoom() {
   zoomValue.textContent = `${Math.round(state.zoom * 100)}%`;
   cropTool.setZoom(state.zoom);
   resizeTool.setZoom(state.zoom);
+  updateEditorStatusBar();
 }
 
 function pushUndoSnapshot() {
@@ -2585,11 +2736,13 @@ function destroyTextComposer() {
 function setItemTitle(title) {
   state.itemTitle = sanitizeText(title || "");
   itemTitleInput.value = state.itemTitle;
+  updateEditorStatusBar();
 }
 
 function setItemTags(tags = []) {
   state.itemTags = Array.isArray(tags) ? tags : [];
   itemTagsInput.value = state.itemTags.join(", ");
+  updateEditorStatusBar();
 }
 
 function resizeCanvasToBitmap(bitmap) {
@@ -2993,7 +3146,7 @@ async function exportCompositeCanvas() {
   if (state.baseImage) {
     outCtx.drawImage(state.baseImage, 0, 0);
   } else {
-    outCtx.fillStyle = "#101b35";
+    outCtx.fillStyle = getEditorColor("--editor-bg-workspace", "#0b0d12");
     outCtx.fillRect(0, 0, out.width, out.height);
   }
 
@@ -3029,7 +3182,7 @@ async function exportPdfRasterBaseCanvas() {
   if (state.baseImage) {
     outCtx.drawImage(state.baseImage, 0, 0);
   } else {
-    outCtx.fillStyle = "#101b35";
+    outCtx.fillStyle = getEditorColor("--editor-bg-workspace", "#0b0d12");
     outCtx.fillRect(0, 0, out.width, out.height);
   }
 
@@ -3917,9 +4070,9 @@ function onKeyDown(event) {
 function showToast(message, isError = false) {
   if (!toast) return;
   toast.textContent = message;
+  toast.classList.remove("error", "success");
+  toast.classList.add(isError ? "error" : "success");
   toast.classList.add("show");
-  toast.style.borderColor = isError ? "rgba(239, 83, 80, 0.7)" : "rgba(159, 176, 216, 0.45)";
-  toast.style.color = isError ? "#ffebee" : "#f4f7ff";
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => {
     toast.classList.remove("show");

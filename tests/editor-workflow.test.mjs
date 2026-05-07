@@ -202,10 +202,14 @@ test("17. Crop and resize action bars are contextual and include apply/cancel", 
 test("18. Crop and resize modules draw high-contrast handles and live dimensions", async () => {
   const crop = await read("src/editor/crop.js");
   const resize = await read("src/editor/resize.js");
-  assert.equal(crop.includes('ctx.strokeStyle = "#f8fbff";'), true);
+  assert.equal(crop.includes('getEditorColor(this.canvas, "--editor-crop-line"'), true);
+  assert.equal(crop.includes('getEditorColor(this.canvas, "--editor-handle"'), true);
+  assert.equal(crop.includes('getEditorColor(this.canvas, "--editor-handle-border"'), true);
   assert.equal(crop.includes("badgeText ="), true);
   assert.equal(crop.includes("cursorForHandle"), true);
-  assert.equal(resize.includes('ctx.strokeStyle = "#f8fbff";'), true);
+  assert.equal(resize.includes('getEditorColor(this.canvas, "--editor-resize-line"'), true);
+  assert.equal(resize.includes('getEditorColor(this.canvas, "--editor-handle"'), true);
+  assert.equal(resize.includes('getEditorColor(this.canvas, "--editor-handle-border"'), true);
   assert.equal(resize.includes("badgeText ="), true);
   assert.equal(resize.includes("cursorForHandle"), true);
 });
@@ -224,4 +228,74 @@ test("20. Inspector tool options are contextual per active tool", async () => {
   assert.equal(html.includes("data-tool-scope"), true);
   assert.equal(js.includes("function updateToolOptionVisibility(tool)"), true);
   assert.equal(js.includes("toolOptionGroups.forEach"), true);
+});
+
+test("21. Professional document bar and status bar layout are present", async () => {
+  const html = await read("editor.html");
+  assert.equal(html.includes('class="editor-header editor-docbar"'), true);
+  assert.equal(html.includes('id="documentTitle"'), true);
+  assert.equal(html.includes('id="documentState"'), true);
+  assert.equal(html.includes('id="statusTool"'), true);
+  assert.equal(html.includes('id="statusDimensions"'), true);
+  assert.equal(html.includes('id="statusZoom"'), true);
+  assert.equal(html.includes('id="statusSaveState"'), true);
+  assert.equal(html.includes('id="statusHint"'), true);
+});
+
+test("22. Contextual options bar and inspector sections render", async () => {
+  const html = await read("editor.html");
+  assert.equal(html.includes('class="context-options section-disclosure"'), true);
+  assert.equal(html.includes('id="inspectorToolSection" open'), true);
+  assert.equal(html.includes('id="inspectorDetailsSection"'), true);
+  assert.equal(html.includes('id="inspectorLayersSection" open'), true);
+  assert.equal(html.includes('id="inspectorHistorySection"'), true);
+  assert.equal(html.includes('id="inspectorExportSection"'), true);
+  assert.equal(html.includes('id="inspectorToggleBtn"'), true);
+});
+
+test("23. Inspector collapse wiring and status/history updates exist", async () => {
+  const js = await read("editor.js");
+  assert.equal(js.includes("inspectorToggleBtn?.addEventListener"), true);
+  assert.equal(js.includes("editorInspector.classList.toggle(\"collapsed\""), true);
+  assert.equal(js.includes("function updateEditorStatusBar()"), true);
+  assert.equal(js.includes("function updateHistoryPanel()"), true);
+  assert.equal(js.includes("historyList"), true);
+});
+
+test("24. Editor theme uses dedicated editor tokens and blocks old Olho surface tokens", async () => {
+  const css = await read("editor.css");
+  assert.equal(css.includes("--editor-bg-app"), true);
+  assert.equal(css.includes("--editor-bg-workspace"), true);
+  assert.equal(css.includes("--editor-bg-inspector"), true);
+  assert.equal(css.includes("--editor-accent"), true);
+  assert.equal(css.includes("--editor-crop-line"), true);
+  assert.equal(css.includes("--editor-resize-line"), true);
+  assert.equal(css.includes("--editor-handle"), true);
+  assert.equal(css.includes("--editor-handle-border"), true);
+  assert.equal(css.includes("--editor-selection-border"), true);
+  assert.equal(css.includes("--editor-selection-fill"), true);
+  assert.equal(css.includes("var(--olho-"), false);
+});
+
+test("25. Active tool and inspector surfaces use editor tokens", async () => {
+  const css = await read("editor.css");
+  assert.equal(css.includes(".tool-btn.active"), true);
+  assert.equal(css.includes("border-color: var(--editor-accent-border);"), true);
+  assert.equal(css.includes("background: var(--editor-accent-soft);"), true);
+  assert.equal(css.includes(".inspector"), true);
+  assert.equal(css.includes("background: var(--editor-bg-inspector);"), true);
+  assert.equal(css.includes(".panel"), true);
+  assert.equal(css.includes("background: var(--editor-bg-inspector-section);"), true);
+});
+
+test("26. Editor visual snapshot script includes palette migration states", async () => {
+  const script = await read("scripts/capture-ui-snapshots.mjs");
+  assert.equal(script.includes("editor-loaded-image.png"), true);
+  assert.equal(script.includes("editor-crop-active.png"), true);
+  assert.equal(script.includes("editor-resize-active.png"), true);
+  assert.equal(script.includes("editor-text-selected.png"), true);
+  assert.equal(script.includes("editor-shape-selected.png"), true);
+  assert.equal(script.includes("editor-redaction-selected.png"), true);
+  assert.equal(script.includes("editor-inspector-collapsed.png"), true);
+  assert.equal(script.includes("editor-inspector-expanded.png"), true);
 });

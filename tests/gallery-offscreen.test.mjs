@@ -257,6 +257,15 @@ test("14. inspector actions are wired for selected items", async () => {
   assert.equal(js.includes("inspectorPermanentDeleteBtn?.addEventListener"), true);
 });
 
+test("15. media cards default actions remain Open + More, with delete contextual", async () => {
+  const cardView = await read("src/gallery/card-view.js");
+
+  assert.equal(cardView.includes('actions.append(createContextButton("Open", () => openMediaItem(item)));'), true);
+  assert.equal(cardView.includes('summary.textContent = "More";'), true);
+  assert.equal(cardView.includes('actions.append(createContextButton("Delete", () => moveItemToOutOfSight(item, summary), "danger"));'), false);
+  assert.equal(cardView.includes('createContextButton("Move Out of Sight", () => moveItemToOutOfSight(item, summary), "danger")'), true);
+});
+
 test("offscreen thumbnail pipeline is wired", async () => {
   const manifest = JSON.parse(await read("manifest.json"));
   const worker = await read("service_worker.js");

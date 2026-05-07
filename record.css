@@ -2,17 +2,8 @@
   color-scheme: dark;
   font-family: "Segoe UI", "Avenir Next", "Noto Sans", sans-serif;
   line-height: 1.45;
-  --bg: var(--olho-bg-page);
-  --panel: var(--olho-bg-panel);
-  --panel-strong: var(--olho-bg-panel-raised);
   --text: var(--olho-text-primary);
-  --muted: var(--olho-text-muted);
-  --accent: var(--olho-accent-primary);
-  --accent-strong: var(--olho-accent-primary-active);
-  --danger: var(--olho-danger-bg);
-  --danger-strong: var(--olho-danger-border);
-  --focus: var(--olho-focus-ring);
-  --border: var(--olho-border-subtle);
+  --bg: var(--olho-bg-page);
 }
 
 * {
@@ -23,7 +14,7 @@ body {
   margin: 0;
   min-height: 100vh;
   background: var(--olho-gradient-page);
-  color: var(--text);
+  color: var(--olho-text-primary);
   padding: 18px;
 }
 
@@ -43,14 +34,19 @@ main {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 14px;
+  border: 1px solid var(--olho-border-subtle);
+  border-radius: 16px;
+  padding: 14px;
+  background: var(--olho-gradient-panel);
 }
 
 .section-head {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .section-head h2 {
   margin: 0;
+  font-size: 1.02rem;
 }
 
 .eyebrow {
@@ -58,7 +54,7 @@ main {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-size: 0.72rem;
-  color: var(--muted);
+  color: var(--olho-text-muted);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -71,18 +67,18 @@ main {
 
 h1 {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 1.42rem;
 }
 
 .header-subtitle {
   margin: 5px 0 0;
-  color: var(--muted);
+  color: var(--olho-text-muted);
   font-size: 0.9rem;
 }
 
 .record-card {
   background: var(--olho-gradient-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--olho-border-subtle);
   border-radius: 16px;
   padding: 14px;
   box-shadow: var(--olho-shadow-soft);
@@ -101,8 +97,10 @@ h1 {
 }
 
 .field > span {
-  font-size: 0.82rem;
-  color: var(--muted);
+  font-size: 0.8rem;
+  color: var(--olho-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .field.checkbox {
@@ -113,8 +111,10 @@ h1 {
 }
 
 .field.checkbox > span {
-  color: var(--text);
-  font-size: 0.9rem;
+  color: var(--olho-text-primary);
+  font-size: 0.88rem;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .field-range div {
@@ -126,7 +126,7 @@ h1 {
 output {
   min-width: 44px;
   text-align: right;
-  color: var(--muted);
+  color: var(--olho-text-muted);
 }
 
 input,
@@ -141,8 +141,8 @@ select {
   border-radius: 10px;
   border: 1px solid var(--olho-border-subtle);
   background: var(--olho-bg-panel-raised);
-  color: var(--text);
-  padding: 10px 12px;
+  color: var(--olho-text-primary);
+  padding: 9px 11px;
 }
 
 input[type="range"] {
@@ -152,11 +152,11 @@ input[type="range"] {
 button {
   border-radius: 10px;
   border: 1px solid transparent;
-  padding: 10px 14px;
-  color: var(--text);
-  background: var(--panel-strong);
+  padding: 9px 12px;
+  color: var(--olho-text-primary);
+  background: rgba(12, 18, 30, 0.9);
   cursor: pointer;
-  min-height: 42px;
+  min-height: 38px;
   transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
@@ -167,20 +167,28 @@ button:hover {
 }
 
 button.primary {
-  background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+  background: linear-gradient(180deg, var(--olho-accent-primary), var(--olho-accent-primary-active));
+  border-color: var(--olho-accent-primary-active);
   color: var(--olho-text-inverse);
   font-weight: 700;
 }
 
 button.ghost {
   border-color: var(--olho-border-medium);
-  background: var(--olho-bg-card);
+  background: transparent;
 }
 
 button.danger {
-  background: linear-gradient(180deg, var(--danger), var(--danger-strong));
+  background: var(--olho-danger-bg);
+  border-color: var(--olho-danger-border);
   color: var(--olho-danger-text);
   font-weight: 700;
+}
+
+button.recording {
+  background: var(--olho-recording-bg);
+  border-color: var(--olho-recording-border);
+  color: var(--olho-recording-text);
 }
 
 button[disabled] {
@@ -191,8 +199,10 @@ button[disabled] {
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
-dialog:focus-visible {
-  outline: 3px solid var(--focus);
+dialog:focus-visible,
+summary:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--olho-focus-ring);
   outline-offset: 2px;
   box-shadow: 0 0 0 3px var(--olho-focus-glow);
 }
@@ -214,9 +224,9 @@ dialog:focus-visible {
 }
 
 .hint {
-  color: var(--muted);
+  color: var(--olho-text-muted);
   margin: 6px 0 0;
-  font-size: 0.86rem;
+  font-size: 0.84rem;
 }
 
 kbd {
@@ -225,12 +235,12 @@ kbd {
   padding: 1px 5px;
   font-size: 0.78rem;
   background: var(--olho-bg-canvas);
-  color: var(--text);
+  color: var(--olho-text-primary);
 }
 
 .status {
   margin: 14px 2px 0;
-  color: var(--text);
+  color: var(--olho-text-primary);
   min-height: 1.2em;
 }
 
@@ -239,7 +249,7 @@ kbd {
   font-weight: 800;
   text-align: center;
   margin: 8px 0 14px;
-  color: var(--focus);
+  color: var(--olho-focus-ring);
 }
 
 .recording-overlay {
@@ -266,38 +276,77 @@ kbd {
 }
 
 #timerValue {
-  font-size: 1.32rem;
+  font-size: 1.3rem;
+}
+
+.preview-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.preview-media-column {
+  border: 1px solid var(--olho-border-subtle);
+  border-radius: 12px;
+  background: rgba(10, 14, 24, 0.9);
+  padding: 8px;
 }
 
 #previewVideo {
   width: 100%;
-  max-height: min(54vh, 420px);
-  border-radius: 12px;
+  max-height: min(62vh, 460px);
+  border-radius: 10px;
   border: 1px solid var(--olho-border-subtle);
   background: var(--olho-bg-canvas);
+}
+
+.preview-details-column {
+  display: grid;
+  gap: 10px;
 }
 
 .meta-grid {
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  margin: 12px 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.meta-grid > div {
+  border: 1px solid var(--olho-border-subtle);
+  border-radius: 10px;
+  background: rgba(12, 18, 30, 0.84);
+  padding: 8px;
 }
 
 .meta-label {
-  color: var(--muted);
+  color: var(--olho-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   display: block;
   margin-bottom: 4px;
 }
 
+.preview-field-grid {
+  margin-bottom: 0;
+  grid-template-columns: 1fr;
+}
+
+.preview-actions-primary,
+.preview-actions-danger {
+  margin-top: 0;
+}
+
+.preview-more-actions {
+  border-radius: 10px;
+}
+
 dialog {
-  border: 1px solid var(--border);
+  border: 1px solid var(--olho-border-strong);
   border-radius: 14px;
   background: var(--olho-bg-panel-raised);
-  color: var(--text);
+  color: var(--olho-text-primary);
   max-width: 360px;
   width: calc(100vw - 32px);
   padding: 16px;
@@ -305,6 +354,16 @@ dialog {
 
 dialog::backdrop {
   background: var(--olho-bg-overlay);
+}
+
+@media (max-width: 1024px) {
+  .preview-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 760px) {
@@ -324,6 +383,10 @@ dialog::backdrop {
   .header-actions {
     justify-content: flex-start;
     margin-left: 0;
+  }
+
+  .meta-grid {
+    grid-template-columns: 1fr;
   }
 }
 

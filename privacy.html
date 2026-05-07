@@ -13,8 +13,8 @@
         <header class="header olho-topbar">
           <div>
             <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
-            <h1>Privacy View</h1>
-            <p class="subtitle">Local-first and manual export only.</p>
+            <h1>Privacy</h1>
+            <p class="subtitle">Local-first. No upload pipeline. No telemetry.</p>
           </div>
           <nav class="olho-nav olho-header-nav" aria-label="Olho sections">
             <a class="olho-nav-link" href="popup.html">Capture</a>
@@ -27,6 +27,25 @@
         </header>
 
         <main class="layout">
+          <section class="trust-summary" aria-label="Privacy trust summary">
+            <article class="card summary-card">
+              <h2>Stored Locally</h2>
+              <p>Screenshots and recordings stay in local IndexedDB Blob storage.</p>
+            </article>
+            <article class="card summary-card">
+              <h2>Never Uploaded</h2>
+              <p>Olho does not upload files, create hosted links, or sync to cloud services.</p>
+            </article>
+            <article class="card summary-card">
+              <h2>No Analytics</h2>
+              <p>No telemetry, no analytics SDKs, no remote logging.</p>
+            </article>
+            <article class="card summary-card">
+              <h2>You Control Deletion</h2>
+              <p>Delete items or clear local data from Memory and Settings at any time.</p>
+            </article>
+          </section>
+
           <section class="card" aria-labelledby="localTitle">
             <h2 id="localTitle">What Olho stores</h2>
             <ul>
@@ -52,14 +71,32 @@
 
           <section class="card" aria-labelledby="permissionsTitle">
             <h2 id="permissionsTitle">Permission use in plain language</h2>
-            <ul>
-              <li><strong>activeTab</strong>: capture the page you explicitly choose.</li>
-              <li><strong>tabs</strong>: open Olho pages like Mark View, Memory, and Export.</li>
-              <li><strong>scripting</strong>: draw focus overlays for region and element capture.</li>
-              <li><strong>clipboardWrite</strong>: copy files when you click copy actions.</li>
-              <li><strong>desktopCapture</strong>: open the browser picker for recording.</li>
-              <li><strong>downloads</strong>: save exported files to your local disk.</li>
-            </ul>
+            <div class="permission-table" role="table" aria-label="Permission explanations">
+              <div class="permission-row" role="row">
+                <p class="permission-name" role="cell">activeTab</p>
+                <p class="permission-value" role="cell">Capture the page you explicitly choose.</p>
+              </div>
+              <div class="permission-row" role="row">
+                <p class="permission-name" role="cell">tabs</p>
+                <p class="permission-value" role="cell">Open Olho pages such as editor, Memory, recorder, and Export.</p>
+              </div>
+              <div class="permission-row" role="row">
+                <p class="permission-name" role="cell">scripting</p>
+                <p class="permission-value" role="cell">Run capture overlays and full-page progress scripts on chosen pages.</p>
+              </div>
+              <div class="permission-row" role="row">
+                <p class="permission-name" role="cell">clipboardWrite</p>
+                <p class="permission-value" role="cell">Copy local files only when you trigger copy actions.</p>
+              </div>
+              <div class="permission-row" role="row">
+                <p class="permission-name" role="cell">desktopCapture</p>
+                <p class="permission-value" role="cell">Open browser picker for screen, tab, or window recording.</p>
+              </div>
+              <div class="permission-row" role="row">
+                <p class="permission-name" role="cell">downloads</p>
+                <p class="permission-value" role="cell">Save exported files to your local disk.</p>
+              </div>
+            </div>
           </section>
 
           <section class="card" aria-labelledby="warningTitle">

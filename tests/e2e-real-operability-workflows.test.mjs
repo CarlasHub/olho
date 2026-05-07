@@ -608,6 +608,8 @@ test(
         await seedImage(stage.page, { title: "WF10 Seed" });
 
         const options = await openPage("options.html", "wf10-options");
+        await options.page.click('.settings-nav-btn[data-settings-target="storageSettings"]');
+        await options.page.waitForSelector('#storageSettings:not([hidden]) #deleteAllBtn', { timeout: 20_000 });
         await options.page.evaluate(() => {
           window.prompt = () => "DELETE";
         });
