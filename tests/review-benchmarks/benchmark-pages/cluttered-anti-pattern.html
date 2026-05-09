@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Benchmark - Cluttered Anti-pattern</title>
+  <style>
+    body { margin: 0; font: 14px/1.25 Inter, system-ui, sans-serif; background: #fff; color: #1f2937; }
+    main { padding: 24px; }
+    .banner { padding: 20px; border-radius: 22px; background: linear-gradient(90deg,#ff006e,#8338ec,#3a86ff); color: white; box-shadow: 0 18px 50px rgba(131,56,236,.35); }
+    .actions button { margin: 8px 8px 0 0; border: 0; border-radius: 4px; padding: 10px 18px; background: #ffbe0b; font-weight: 800; }
+    .layout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
+    .box { min-height: 130px; border: 2px solid #111; border-radius: 4px 18px 30px 8px; padding: 12px; box-shadow: 0 12px 0 #f15bb5; }
+  </style>
+</head>
+<body>
+  <main data-benchmark-id="cluttered-anti-pattern" data-intentional-issues="visual-noise, fragmented-composition, excessive-decoration">
+    <section class="banner" data-expected-region="noisy-hero"><h1>Everything your team needs right now</h1><p>Announcements, updates, workflows, alerts, reporting, actions, settings, and review history all in one place.</p><div class="actions"><button>Start</button><button>Learn</button><button>Compare</button><button>Export</button></div></section>
+    <section class="layout" data-expected-region="fragmented-grid"><article class="box">Alert center</article><article class="box">Metrics</article><article class="box">Tasks</article><article class="box">Files</article><article class="box">Approvals</article><article class="box">Risks</article><article class="box">Users</article><article class="box">Reports</article></section>
+  </main>
+</body>
+</html>

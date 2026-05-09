@@ -5,7 +5,11 @@ const FORBIDDEN_VAGUE_PATTERNS = Object.freeze([
   /\blooks modern\b/i,
   /\bui is nice\b/i,
   /\bdesign is clean\b/i,
+  /\blooks clean\b/i,
   /\blooks good\b/i,
+  /\bgood design\b/i,
+  /\bnice design\b/i,
+  /\blooks professional\b/i,
   /\bimprove the design\b/i,
   /\bmake it modern\b/i,
   /^button inconsistency detected\.?$/i,
@@ -21,6 +25,16 @@ function containsVagueOutput(finding = {}) {
   return FORBIDDEN_VAGUE_PATTERNS.some((pattern) => pattern.test(text));
 }
 
+function claimsWcagFailureWithoutMeasurement(finding = {}) {
+  const text = [finding.issue, finding.evidence, finding.impact, finding.recommendation].join(" ");
+  if (!/\b(fails?|failure|violates?|violation)\s+wcag\b|\bwcag\s+(fails?|failure|violation)\b/i.test(text)) {
+    return false;
+  }
+  const measured = finding.evidenceType === "measured" || finding.evidence_type === "measured";
+  const hasRatio = /\b\d+(?:\.\d+)?:1\b|\bcontrast ratio\b/i.test(finding.evidence || "");
+  return !(measured && hasRatio);
+}
+
 export function validateAiReviewFinding(finding) {
   const base = validateReviewFinding(finding);
   const errors = [...base.errors];
@@ -31,6 +45,10 @@ export function validateAiReviewFinding(finding) {
 
   if (containsVagueOutput(finding)) {
     errors.push("AI finding uses forbidden vague review wording.");
+  }
+
+  if (claimsWcagFailureWithoutMeasurement(finding)) {
+    errors.push("AI finding claims WCAG failure without measured contrast/accessibility evidence.");
   }
 
   if (!meaningfulText(finding?.issue, 24)) {

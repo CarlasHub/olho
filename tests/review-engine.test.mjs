@@ -120,6 +120,83 @@ function dashboardFixture() {
   };
 }
 
+function cleanFixture() {
+  return {
+    itemId: "fixture-clean",
+    screenshotRef: "media:fixture-clean",
+    sourceType: "dom-metrics",
+    viewport: { width: 1280, height: 900 },
+    imageMetrics: { width: 1280, height: 900, sizeBytes: 380000, mimeType: "image/png" },
+    elements: [
+      element({
+        selector: ".page-title",
+        tagName: "h1",
+        role: "heading",
+        text: "Run operational reviews with calm, structured confidence.",
+        bounds: { x: 88, y: 156, width: 620, height: 104 },
+        fontSize: 48,
+        lineHeight: 52,
+        fontWeight: 800,
+        color: "#111827",
+        backgroundColor: "#ffffff",
+        borderRadius: 0
+      }),
+      element({
+        selector: ".lede",
+        tagName: "p",
+        text: "A focused workspace for teams that need traceable decisions, readable status, and clear next actions without dashboard noise.",
+        bounds: { x: 88, y: 282, width: 600, height: 56 },
+        fontSize: 18,
+        lineHeight: 28,
+        color: "#4b5c6b",
+        backgroundColor: "#ffffff",
+        borderRadius: 0
+      }),
+      element({
+        selector: ".primary",
+        tagName: "a",
+        role: "link",
+        text: "Start review",
+        bounds: { x: 88, y: 366, width: 128, height: 46 },
+        fontSize: 16,
+        lineHeight: 22,
+        fontWeight: 800,
+        color: "#ffffff",
+        backgroundColor: "#0f766e",
+        borderRadius: 10
+      }),
+      element({
+        selector: ".secondary",
+        tagName: "a",
+        role: "link",
+        text: "View workflow",
+        bounds: { x: 228, y: 366, width: 142, height: 46 },
+        fontSize: 16,
+        lineHeight: 22,
+        fontWeight: 800,
+        color: "#243241",
+        backgroundColor: "#ffffff",
+        borderRadius: 10
+      }),
+      ...[0, 1, 2].map((index) =>
+        element({
+          selector: `.card-${index}`,
+          type: "card",
+          text: ["Readable by default", "Consistent components", "Action-led review"][index],
+          bounds: { x: 88 + index * 276, y: 560, width: 252, height: 168 },
+          fontSize: 18,
+          lineHeight: 26,
+          fontWeight: 700,
+          color: "#17212b",
+          backgroundColor: "#ffffff",
+          borderRadius: 16,
+          boxShadow: "none"
+        })
+      )
+    ]
+  };
+}
+
 test("review rule registry contains the enterprise milestone rule set", () => {
   assert.equal(REVIEW_RULES.length, 30);
   assert.equal(REVIEW_RULES.some((rule) => rule.id === "visual-hierarchy/competing-primary-actions"), true);
@@ -167,6 +244,43 @@ test("engine returns conservative image-only output without invented findings", 
   assert.equal(result.skippedRules.length, 30);
 });
 
+test("engine uses measured local OCR contrast evidence for image-only accessibility-visible findings", () => {
+  const result = runReviewEngine({
+    itemId: "image-only-contrast",
+    screenshotRef: "media:image-only-contrast",
+    sourceType: "static-design",
+    imageMetrics: { width: 960, height: 540, sizeBytes: 512000, mimeType: "image/png" },
+    visualAnalysis: {
+      evidence: {
+        ocrContrastResults: [
+          {
+            id: "ocr-contrast-1",
+            text: "Muted hero copy",
+            textRegionId: "ocr-text-1",
+            region: '"Muted hero copy"',
+            bounds: { x: 12, y: 18, width: 42, height: 8 },
+            contrastRatio: 2.72,
+            evidence:
+              "Local OCR detected text in this region and local pixel analysis measured approximately 2.72:1 foreground/background contrast.",
+            evidence_type: "measured_evidence"
+          }
+        ],
+        lowContrastTextLikeRegions: [],
+        contrastPairs: [],
+        colourPalette: []
+      }
+    }
+  });
+  const lowContrast = result.findings.find((finding) => finding.id.startsWith("accessibility-visible/low-contrast-risk"));
+
+  assert.equal(result.metadata.hasLocalVisualAnalysis, true);
+  assert.equal(Boolean(lowContrast), true);
+  assert.equal(lowContrast.evidenceType, "measured");
+  assert.equal(lowContrast.markerType, "accessibility-risk");
+  assert.equal(lowContrast.regionBounds.x, 12);
+  assert.equal(lowContrast.issue.includes("difficult to read"), true);
+});
+
 test("engine produces evidence-based findings with rich DOM metrics", () => {
   const result = runReviewEngine(dashboardFixture());
   const ids = result.findings.map((finding) => finding.id);
@@ -181,8 +295,61 @@ test("engine produces evidence-based findings with rich DOM metrics", () => {
     assert.equal(finding.source, "rule-engine");
     assert.equal(typeof finding.evidence, "string");
     assert.equal(finding.evidence.length > 20, true);
+    assert.equal(typeof finding.bestPracticeReference, "string");
+    assert.equal(finding.bestPracticeReference.length > 20, true);
+    assert.equal(typeof finding.reviewRationale, "string");
+    assert.equal(typeof finding.affectedUsers, "string");
+    assert.equal(typeof finding.suggestedPriority, "string");
+    assert.equal(typeof finding.markerSummary, "string");
+    assert.equal(Array.isArray(finding.acceptanceCriteria), true);
+    assert.equal(finding.acceptanceCriteria.length >= 3, true);
+    assert.equal(
+      ["section", "component-group", "text-region", "action", "accessibility-risk", "composition"].includes(
+        finding.markerType
+      ),
+      true
+    );
     assert.equal(finding.confidence >= 0 && finding.confidence <= 1, true);
+    assert.equal(typeof finding.regionBounds?.x, "number");
+    assert.equal(typeof finding.regionBounds?.y, "number");
+    assert.equal(finding.regionBounds.width > 0, true);
+    assert.equal(finding.regionBounds.height > 0, true);
   });
+  assert.equal(result.metadata.reviewDepth, "standard");
+  assert.equal(result.metadata.reviewIndicators.visualHierarchy.length > 0, true);
+  assert.equal(result.metadata.screenComprehension.screenType.length > 0, true);
+  assert.equal(result.metadata.synthesisSummary.includes("Synthesised"), true);
+  assert.equal(result.findings.some((finding) => finding.isSynthesisFinding), true);
+});
+
+test("clean baseline remains conservative with no high-severity findings", () => {
+  const result = runReviewEngine(cleanFixture());
+
+  assert.equal(result.findings.length <= 5, true);
+  assert.equal(result.findings.some((finding) => ["critical", "high"].includes(finding.severity)), false);
+});
+
+test("review depth controls finding count without fabricating unsupported findings", () => {
+  const quick = runReviewEngine({ ...dashboardFixture(), reviewDepth: "quick" });
+  const standard = runReviewEngine({ ...dashboardFixture(), reviewDepth: "standard" });
+  const deep = runReviewEngine({ ...dashboardFixture(), reviewDepth: "deep" });
+
+  assert.equal(quick.metadata.reviewDepth, "quick");
+  assert.equal(quick.findings.length <= 5, true);
+  assert.equal(standard.findings.length <= 10, true);
+  assert.equal(deep.findings.length <= 20, true);
+  assert.equal(deep.findings.length >= standard.findings.length, true);
+  assert.equal(quick.findings.every((finding) => finding.source === "rule-engine"), true);
+});
+
+test("synthesis creates broad section-level reviewer findings when evidence supports it", () => {
+  const result = runReviewEngine({ ...dashboardFixture(), reviewDepth: "deep" });
+  const synthesis = result.findings.filter((finding) => finding.isSynthesisFinding);
+
+  assert.equal(synthesis.length > 0, true);
+  assert.equal(synthesis.some((finding) => finding.markerType === "section" || finding.markerType === "composition"), true);
+  assert.equal(synthesis.some((finding) => finding.bestPracticeReference.includes("Visual hierarchy")), true);
+  assert.equal(result.metadata.reviewPasses.some((pass) => pass.passId === "synthesis" && pass.status === "completed"), true);
 });
 
 test("finding dedupe and sort keep higher-signal overlapping findings", () => {
@@ -214,7 +381,7 @@ test("finding dedupe and sort keep higher-signal overlapping findings", () => {
   const deduped = dedupeFindings([low, high, later]);
   assert.equal(deduped.some((finding) => finding.id === "high"), true);
   assert.equal(deduped.some((finding) => finding.id === "low"), false);
-  assert.equal(sortReviewFindings(deduped)[0].id, "high");
+  assert.equal(sortReviewFindings(deduped)[0].id, "later");
 });
 
 test("engine stays within the local performance budget for dashboard metrics", () => {

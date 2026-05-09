@@ -1,3 +1,5 @@
+import { isReviewWorkspaceItem, reviewWorkspaceSummaryForItem } from "./review-workspace-summary.js";
+
 export function createGalleryCardView(deps) {
   const {
     state,
@@ -75,14 +77,19 @@ export function createGalleryCardView(deps) {
   }
 
   function createMediaCard(item) {
+    const reviewSummary = reviewWorkspaceSummaryForItem(item);
     const card = document.createElement("article");
     card.className = "gallery-card";
     card.dataset.card = "true";
     card.dataset.itemId = item.id;
+    if (reviewSummary.isReviewable) {
+      card.dataset.reviewStatus = reviewSummary.statusLabel;
+    }
     card.tabIndex = 0;
     card.setAttribute("role", "gridcell");
     card.setAttribute("aria-label", cardAriaLabel(item));
     card.classList.toggle("is-selected", state.selectedMediaIds.has(item.id));
+    card.classList.toggle("review-workspace-card", isReviewWorkspaceItem(item));
 
     const top = document.createElement("div");
     top.className = "card-top";
@@ -135,11 +142,41 @@ export function createGalleryCardView(deps) {
     typeChip.className = "type-chip";
     typeChip.textContent = itemType(item) === "video" ? "Recording" : "Screenshot";
     badgeRow.append(typeChip);
+    if (reviewSummary.isReviewable) {
+      const reviewTypeChip = document.createElement("span");
+      reviewTypeChip.className = "review-type-chip";
+      reviewTypeChip.textContent = reviewSummary.reviewType;
+      badgeRow.append(reviewTypeChip);
+
+      const sourceChip = document.createElement("span");
+      sourceChip.className = "review-source-chip";
+      sourceChip.textContent = reviewSummary.sourceLabel;
+      badgeRow.append(sourceChip);
+    }
     if (item.metadata?.favourite) {
       const sightChip = document.createElement("span");
       sightChip.className = "favourite-chip";
       sightChip.textContent = "Kept in Sight";
       badgeRow.append(sightChip);
+    }
+
+    const reviewPanel = document.createElement("div");
+    reviewPanel.className = "card-review-summary";
+    if (reviewSummary.isReviewable) {
+      [
+        ["Findings", reviewSummary.findingCountLabel],
+        ["Severity", reviewSummary.severityText],
+        ["Report", reviewSummary.reportStatus]
+      ].forEach(([label, value]) => {
+        const row = document.createElement("p");
+        row.className = "review-summary-row";
+        const rowLabel = document.createElement("span");
+        rowLabel.textContent = label;
+        const rowValue = document.createElement("strong");
+        rowValue.textContent = value;
+        row.append(rowLabel, rowValue);
+        reviewPanel.append(row);
+      });
     }
 
     const meta = document.createElement("p");
@@ -211,7 +248,11 @@ export function createGalleryCardView(deps) {
     actions.append(menu);
 
     card.addEventListener("keydown", (event) => onCardKeydown(event, item.id, false));
-    card.append(top, thumbWrap, title, badgeRow, meta, actions);
+    if (reviewSummary.isReviewable) {
+      card.append(top, thumbWrap, title, badgeRow, reviewPanel, meta, actions);
+    } else {
+      card.append(top, thumbWrap, title, badgeRow, meta, actions);
+    }
     return card;
   }
 

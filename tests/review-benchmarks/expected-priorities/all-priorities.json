@@ -1,0 +1,62 @@
+{
+  "marketing-hero": {
+    "priorityOrder": ["visual-hierarchy", "ux", "accessibility-visible"],
+    "shouldNotPrioritize": ["design-system"],
+    "rationale": "Conversion clarity depends first on hero reading path and CTA dominance."
+  },
+  "saas-dashboard": {
+    "priorityOrder": ["enterprise-polish", "ux", "visual-hierarchy"],
+    "shouldNotPrioritize": ["responsive-layout"],
+    "rationale": "Operational dashboard usefulness depends on density control and metric priority."
+  },
+  "dense-admin-panel": {
+    "priorityOrder": ["ux", "visual-hierarchy", "enterprise-polish"],
+    "shouldNotPrioritize": ["design-system"],
+    "rationale": "Task completion risk comes from cognitive load and weak grouping."
+  },
+  "onboarding-form": {
+    "priorityOrder": ["ux", "accessibility-visible", "visual-hierarchy"],
+    "shouldNotPrioritize": ["enterprise-polish"],
+    "rationale": "Completion confidence and validation visibility should lead."
+  },
+  "pricing-page": {
+    "priorityOrder": ["visual-hierarchy", "design-system", "ux"],
+    "shouldNotPrioritize": ["accessibility-visible"],
+    "rationale": "Comparison hierarchy and component consistency drive usefulness."
+  },
+  "mobile-app-mockup": {
+    "priorityOrder": ["accessibility-visible", "ux", "visual-hierarchy"],
+    "shouldNotPrioritize": ["enterprise-polish"],
+    "rationale": "Mobile review should prioritise target confidence and constrained viewport clarity."
+  },
+  "zeplin-artboard": {
+    "priorityOrder": ["visual-hierarchy", "enterprise-polish", "ux"],
+    "shouldNotPrioritize": ["design-system"],
+    "rationale": "The isolated artboard should be reviewed for hierarchy and polish while editor UI is ignored."
+  },
+  "figma-frame": {
+    "priorityOrder": ["design-system", "visual-hierarchy", "enterprise-polish"],
+    "shouldNotPrioritize": ["accessibility-visible"],
+    "rationale": "The frame benchmark is mainly about repeated component treatment drift."
+  },
+  "typography-editorial": {
+    "priorityOrder": ["accessibility-visible", "visual-hierarchy", "ux"],
+    "shouldNotPrioritize": ["enterprise-polish"],
+    "rationale": "Readability and editorial hierarchy are the core concern."
+  },
+  "cluttered-anti-pattern": {
+    "priorityOrder": ["enterprise-polish", "visual-hierarchy", "ux"],
+    "shouldNotPrioritize": ["responsive-layout"],
+    "rationale": "Visual maturity and composition are the release-quality risk."
+  },
+  "accessibility-visible-failure": {
+    "priorityOrder": ["accessibility-visible", "ux", "visual-hierarchy"],
+    "shouldNotPrioritize": ["enterprise-polish"],
+    "rationale": "Visible readability, status communication, and target clarity should dominate."
+  },
+  "inconsistent-design-system": {
+    "priorityOrder": ["design-system", "enterprise-polish", "ux"],
+    "shouldNotPrioritize": ["responsive-layout"],
+    "rationale": "Repeated component drift is the root issue."
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "benchmarkId": "accessibility-visible-failure",
+  "title": "Accessibility-visible failure",
+  "intendedUserGoal": "Understand verification status and act on visible account requirements.",
+  "strongFindings": [
+    {
+      "id": "low-contrast-copy",
+      "category": "accessibility-visible",
+      "severity": "high",
+      "region": "Muted copy and validation text",
+      "rootCause": "Important text is visually soft against the background.",
+      "evidenceKeywords": ["contrast", "read", "low vision", "text"],
+      "priority": 1
+    },
+    {
+      "id": "colour-only-status",
+      "category": "accessibility-visible",
+      "severity": "medium",
+      "region": "Status indicator",
+      "rootCause": "Status is communicated primarily through colour.",
+      "evidenceKeywords": ["colour", "status", "indicator"],
+      "priority": 2
+    },
+    {
+      "id": "small-target",
+      "category": "accessibility-visible",
+      "severity": "medium",
+      "region": "Small icon action",
+      "rootCause": "The small circular action may be difficult to recognise and activate.",
+      "evidenceKeywords": ["small", "target", "activate"],
+      "priority": 3
+    }
+  ],
+  "weakFindingsToAvoid": ["fails wcag without measured ratio", "looks inaccessible"],
+  "rootCauseObservations": ["Visible readability and recognisable state communication are the primary concerns."],
+  "mergeGuidance": ["Keep contrast, colour-only state, and target size separate when they affect different user needs."],
+  "scannerSpamToAvoid": ["Do not claim full WCAG failure unless measured evidence is present."]
+}

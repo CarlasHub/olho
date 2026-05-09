@@ -313,7 +313,6 @@ textarea {
 .item-main {
   display: grid;
   gap: 8px;
-  min-width: 0;
 }
 
 .item-title {
@@ -402,8 +401,7 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .item-actions {
-    min-width: 0;
+.item-actions {
     width: 100%;
   }
 

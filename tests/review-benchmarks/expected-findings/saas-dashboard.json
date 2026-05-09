@@ -1,0 +1,29 @@
+{
+  "benchmarkId": "saas-dashboard",
+  "title": "SaaS dashboard",
+  "intendedUserGoal": "Scan operational risk, understand priority metrics, and act on the most important queue.",
+  "strongFindings": [
+    {
+      "id": "summary-density",
+      "category": "enterprise-polish",
+      "severity": "medium",
+      "region": "Summary cards",
+      "rootCause": "Too many similarly weighted cards compete for first attention.",
+      "evidenceKeywords": ["dense", "cards", "summary", "scan", "priority"],
+      "priority": 1
+    },
+    {
+      "id": "action-ambiguity",
+      "category": "visual-hierarchy",
+      "severity": "medium",
+      "region": "Header actions",
+      "rootCause": "Multiple header actions use similar weight, weakening the intended next step.",
+      "evidenceKeywords": ["actions", "similar", "primary", "decision"],
+      "priority": 2
+    }
+  ],
+  "weakFindingsToAvoid": ["metric card detected", "dashboard has data", "looks clean"],
+  "rootCauseObservations": ["Information priority and density should be treated as the main issue, not as many separate card complaints."],
+  "mergeGuidance": ["Merge repeated card density findings into one summary-region observation."],
+  "scannerSpamToAvoid": ["Avoid listing every metric card as a separate issue."]
+}

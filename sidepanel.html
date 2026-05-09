@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Olho Review Panel</title>
+    <link rel="stylesheet" href="src/shared/renaissance-theme.css" />
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <main class="sidepanel-shell">
+      <header class="sidepanel-header">
+        <div>
+          <p class="eyebrow">Olho Review</p>
+          <h1>Live visual review</h1>
+        </div>
+        <span id="reviewTypeBadge" class="review-badge">Live webpage review</span>
+      </header>
+
+      <section class="target-card" aria-labelledby="targetTitle">
+        <div>
+          <h2 id="targetTitle">Current target</h2>
+          <p id="targetLabel">No target selected</p>
+          <p id="targetMeta" class="muted">Not reviewed yet</p>
+        </div>
+        <div class="status-row" aria-label="Review status">
+          <span id="localStatus">Local review active</span>
+          <span id="aiStatus">AI off</span>
+        </div>
+      </section>
+
+      <section class="toolbar-card" aria-label="Review actions">
+        <label class="sidepanel-field" for="reviewDepthSelect">
+          <span>Review depth</span>
+          <select id="reviewDepthSelect">
+            <option value="quick">Quick</option>
+            <option value="standard" selected>Standard</option>
+            <option value="deep">Deep</option>
+          </select>
+        </label>
+        <button id="reviewVisibleViewBtn" type="button" class="primary-action">Review Visible View</button>
+        <button id="reviewDesignAreaBtn" type="button">Review Design Area Only</button>
+        <button id="reviewFullVisibleBtn" type="button">Review Full Page</button>
+        <button id="clearMarkersBtn" type="button">Clear Markers</button>
+        <button id="selectReviewAreaBtn" type="button" hidden>Select Review Area</button>
+        <div class="export-actions" aria-label="Review report exports">
+          <button id="copySummaryBtn" type="button">Copy Summary</button>
+          <button id="exportHtmlBtn" type="button">Export HTML</button>
+          <button id="exportMarkdownBtn" type="button">Export Markdown</button>
+          <button id="exportJsonBtn" type="button">Export JSON</button>
+        </div>
+        <button id="openFallbackReviewBtn" type="button">Open Screenshot Fallback</button>
+      </section>
+
+      <div id="reviewProgress" class="progress" hidden>Reviewing visible interface...</div>
+      <p id="statusText" class="status-text" data-tone="neutral" aria-live="polite">
+        Local deterministic review is ready.
+      </p>
+      <p id="targetLimitation" class="limitation-note" hidden></p>
+
+      <details class="local-ai-card">
+        <summary>Local AI Reviewer</summary>
+        <p id="ollamaSummary" class="muted">Ollama is off. Local deterministic review still runs without AI.</p>
+        <div id="ollamaCapability" class="ai-capability" aria-live="polite">
+          Capability: not checked
+        </div>
+        <label class="ai-check-row">
+          <input type="checkbox" id="ollamaEnabledToggle" />
+          <span>Enable Ollama local review</span>
+        </label>
+        <div class="ai-control-grid">
+          <label class="sidepanel-field" for="ollamaModeSelect">
+            <span>Review mode</span>
+            <select id="ollamaModeSelect"></select>
+          </label>
+          <label class="sidepanel-field" for="ollamaModelInput">
+            <span>Model</span>
+            <input id="ollamaModelInput" type="text" autocomplete="off" placeholder="Installed local model" />
+          </label>
+          <label class="sidepanel-field" for="ollamaEndpointInput">
+            <span>Local endpoint</span>
+            <input id="ollamaEndpointInput" type="text" autocomplete="off" />
+          </label>
+          <label class="ai-check-row">
+            <input type="checkbox" id="ollamaScreenshotToggle" />
+            <span>Allow local screenshot review for vision models</span>
+          </label>
+        </div>
+        <div class="ai-action-row">
+          <button id="saveOllamaSettingsBtn" type="button">Save Ollama Settings</button>
+          <button id="testOllamaConnectionBtn" type="button">Test Local Connection</button>
+          <button id="runOllamaReviewBtn" type="button" class="primary-action">Run Ollama Review</button>
+          <button id="cancelOllamaReviewBtn" type="button">Cancel</button>
+        </div>
+        <p id="ollamaStatusText" class="status-text" data-tone="neutral">
+          Ollama runs only after you enable it and click Run Ollama Review.
+        </p>
+        <details class="ai-detail-panel">
+          <summary>Understanding</summary>
+          <div id="ollamaUnderstanding">Run Ollama review to generate screen understanding.</div>
+        </details>
+        <details class="ai-detail-panel">
+          <summary>Synthesis</summary>
+          <div id="ollamaSynthesis">Run Ollama review to generate final synthesis.</div>
+        </details>
+        <details class="ai-detail-panel">
+          <summary>AI details</summary>
+          <div id="ollamaDetails">No Ollama design review metadata yet.</div>
+        </details>
+        <ul id="ollamaPassList" class="ai-pass-list" aria-label="Ollama review pass status"></ul>
+      </details>
+
+      <section class="findings-card" aria-labelledby="findingsTitle">
+        <div class="section-head">
+          <h2 id="findingsTitle">Findings</h2>
+          <div id="findingSummary" class="finding-summary" aria-label="Severity summary"></div>
+        </div>
+        <p class="filter-label">Review focus</p>
+        <div id="categoryFilters" class="category-filters" aria-label="Review focus filters"></div>
+        <div id="findingsList"></div>
+      </section>
+
+      <section class="inspector-card" aria-labelledby="inspectorTitle">
+        <h2 id="inspectorTitle">Reviewer note</h2>
+        <div id="findingInspector"></div>
+      </section>
+    </main>
+
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>

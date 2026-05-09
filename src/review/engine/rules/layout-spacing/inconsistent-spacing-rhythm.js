@@ -7,12 +7,12 @@ export const inconsistentSpacingRhythmRule = {
     return missingElements(context, 6);
   },
   run(context) {
-    const gaps = adjacentVerticalGaps(context.elements);
+    const gaps = adjacentVerticalGaps(context.elements).filter((gap) => gap <= 72);
     if (gaps.length < 5) return null;
     const variation = coefficientOfVariation(gaps);
 
     // Gestalt proximity depends on predictable spacing rhythm to show what belongs together.
-    if (variation < 0.72) return null;
+    if (variation < 1.05) return null;
 
     return createFinding(context, {
       ruleId: this.id,
@@ -20,7 +20,7 @@ export const inconsistentSpacingRhythmRule = {
       severity: "medium",
       region: "Layout rhythm",
       issue: "Vertical spacing rhythm is inconsistent across adjacent content.",
-      evidence: `Detected ${gaps.length} adjacent vertical gaps with high variation (${variation.toFixed(2)} coefficient of variation).`,
+      evidence: `Measured ${gaps.length} adjacent vertical gaps with high variation (${variation.toFixed(2)} coefficient of variation).`,
       impact: "Inconsistent spacing makes related content harder to group and reduces the screen's perceived product quality.",
       recommendation: "Normalize vertical spacing around sections and component groups using a small, repeatable spacing scale.",
       confidence: 0.73

@@ -1,0 +1,29 @@
+{
+  "benchmarkId": "pricing-page",
+  "title": "Pricing page",
+  "intendedUserGoal": "Compare plans and identify the recommended or most relevant plan.",
+  "strongFindings": [
+    {
+      "id": "plan-priority",
+      "category": "visual-hierarchy",
+      "severity": "medium",
+      "region": "Pricing cards",
+      "rootCause": "Plan emphasis and CTA treatment do not create a clean comparison hierarchy.",
+      "evidenceKeywords": ["plan", "card", "comparison", "priority"],
+      "priority": 1
+    },
+    {
+      "id": "component-drift",
+      "category": "design-system",
+      "severity": "medium",
+      "region": "Pricing cards",
+      "rootCause": "Radii, shadows, and button treatments drift across repeated cards.",
+      "evidenceKeywords": ["consistent", "card", "button", "radius", "shadow"],
+      "priority": 2
+    }
+  ],
+  "weakFindingsToAvoid": ["pricing page detected", "cards exist"],
+  "rootCauseObservations": ["Comparison hierarchy matters more than isolated component styling unless drift hurts decision clarity."],
+  "mergeGuidance": ["Merge repeated card style drift into one design-system consistency finding."],
+  "scannerSpamToAvoid": ["Avoid one issue for each individual plan card."]
+}

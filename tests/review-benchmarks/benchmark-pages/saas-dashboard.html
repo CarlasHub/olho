@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Benchmark - SaaS Dashboard</title>
+  <style>
+    body { margin: 0; font: 14px/1.35 Inter, system-ui, sans-serif; background: #f6f8fb; color: #1f2937; }
+    .shell { padding: 32px 40px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+    h1 { font-size: 20px; margin: 0; }
+    .actions button { height: 38px; border-radius: 8px; border: 1px solid #d5dbe5; background: white; font-weight: 700; margin-left: 8px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .card { min-height: 92px; padding: 12px; border-radius: 14px; background: white; box-shadow: 0 8px 20px rgba(31,41,55,.09); }
+    .card strong { display: block; font-size: 24px; }
+    .table { margin-top: 14px; background: white; border-radius: 14px; padding: 10px; display: grid; gap: 7px; }
+    .row { display: grid; grid-template-columns: 1.2fr .8fr .8fr .8fr; gap: 8px; padding: 8px; border: 1px solid #e6eaf0; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <main class="shell" data-benchmark-id="saas-dashboard" data-intentional-issues="dense-cards, weak-priority, competing-actions">
+    <header>
+      <h1>Pipeline Review Dashboard</h1>
+      <div class="actions"><button>Approve forecast</button><button>Request changes</button><button>Export</button></div>
+    </header>
+    <section class="grid" data-expected-region="summary-cards">
+      <article class="card"><span>Revenue risk</span><strong>42%</strong><small>Updated 3m ago</small></article>
+      <article class="card"><span>Renewal exposure</span><strong>$2.8m</strong><small>14 accounts</small></article>
+      <article class="card"><span>Stuck deals</span><strong>31</strong><small>Across 5 regions</small></article>
+      <article class="card"><span>Next actions</span><strong>118</strong><small>Due this week</small></article>
+      <article class="card"><span>Forecast change</span><strong>-8%</strong><small>Since Monday</small></article>
+      <article class="card"><span>Coverage</span><strong>2.1x</strong><small>Target 3.0x</small></article>
+      <article class="card"><span>Decision queue</span><strong>67</strong><small>Needs review</small></article>
+      <article class="card"><span>Escalations</span><strong>12</strong><small>High touch</small></article>
+    </section>
+    <section class="table" data-expected-region="dense-table">
+      <div class="row"><b>Account</b><b>Risk</b><b>Owner</b><b>Action</b></div>
+      <div class="row"><span>Northwind Enterprise</span><span>High</span><span>EMEA</span><span>Review</span></div>
+      <div class="row"><span>Acme Logistics</span><span>Medium</span><span>NA</span><span>Follow up</span></div>
+    </section>
+  </main>
+</body>
+</html>

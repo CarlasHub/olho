@@ -34,6 +34,7 @@ test("manifest keeps local-first baseline", async () => {
     "scripting",
     "clipboardWrite",
     "storage",
+    "sidePanel",
     "desktopCapture",
     "downloads",
     "offscreen"

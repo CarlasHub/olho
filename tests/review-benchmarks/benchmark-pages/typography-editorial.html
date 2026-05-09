@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Benchmark - Typography Editorial</title>
+  <style>
+    body { margin: 0; font: 15px/1.22 Georgia, serif; color: #24313d; background: #fbfaf7; }
+    article { width: min(1120px, calc(100% - 64px)); margin: 56px auto; }
+    h1 { font: 600 32px/1.05 Inter, system-ui, sans-serif; max-width: 760px; }
+    .columns { display: grid; grid-template-columns: 1.7fr .8fr; gap: 34px; }
+    .body { font-size: 13px; line-height: 1.28; max-width: 92ch; }
+    aside { color: #89919c; font-size: 12px; line-height: 1.25; }
+  </style>
+</head>
+<body>
+  <article data-benchmark-id="typography-editorial" data-intentional-issues="long-line-length, tight-line-height, weak-type-scale">
+    <h1>Enterprise design quality depends on how quickly reviewers can understand visual evidence</h1>
+    <section class="columns"><p class="body" data-expected-region="long-copy">Design review tools often fail because they treat screenshots as raw artefacts rather than communication surfaces. A professional reviewer needs structure, rhythm, evidence, and prioritisation. When lines are too long and line-height is too tight, readers must track across wide spans while holding context in working memory, which makes the critique harder to absorb and reduces confidence in the report.</p><aside>Related notes, context, audit details, status, metadata, review version, ownership, and historical decisions all compete in a narrow area.</aside></section>
+  </article>
+</body>
+</html>

@@ -1,0 +1,396 @@
+{
+  "runType": "deterministic-current",
+  "generatedBy": "tests/review-quality/quality-harness.mjs",
+  "generatedAt": "2026-05-09T15:18:38.274Z",
+  "benchmarkCount": 12,
+  "cleanBaseline": {
+    "findingCount": 0,
+    "highOrCriticalCount": 0
+  },
+  "scenarios": [
+    {
+      "id": "marketing-hero",
+      "findingCount": 4,
+      "markerCount": 4,
+      "markerPixelAccuracy": {
+        "markerCount": 4,
+        "measuredCount": 4,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      },
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Mostly strong",
+        "accessibilityVisibleReasoning": "Mostly strong",
+        "designSystemReasoning": "Needs attention",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "matchedExpectedCount": 2,
+      "missedExpectedCount": 0,
+      "falsePositiveCandidateCount": 0,
+      "duplicateCount": 0,
+      "topFindingCategory": "visual-hierarchy",
+      "topFindingIssue": "In primary reading path, the primary reading path is not strong enough to make priority immediately clear.",
+      "missedExpectedIds": [],
+      "falsePositiveIssues": []
+    },
+    {
+      "id": "saas-dashboard",
+      "findingCount": 13,
+      "markerCount": 13,
+      "markerPixelAccuracy": {
+        "markerCount": 13,
+        "measuredCount": 13,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      },
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Mostly strong",
+        "accessibilityVisibleReasoning": "Mostly strong",
+        "designSystemReasoning": "Mostly strong",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "matchedExpectedCount": 2,
+      "missedExpectedCount": 0,
+      "falsePositiveCandidateCount": 0,
+      "duplicateCount": 0,
+      "topFindingCategory": "enterprise-polish",
+      "topFindingIssue": "In summary cards, too many similarly weighted summary cards compete for first attention.",
+      "missedExpectedIds": [],
+      "falsePositiveIssues": []
+    },
+    {
+      "id": "dense-admin-panel",
+      "findingCount": 12,
+      "markerCount": 12,
+      "markerPixelAccuracy": {
+        "markerCount": 12,
+        "measuredCount": 12,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      },
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Mostly strong",
+        "accessibilityVisibleReasoning": "Mostly strong",
+        "designSystemReasoning": "Mostly strong",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "matchedExpectedCount": 2,
+      "missedExpectedCount": 0,
+      "falsePositiveCandidateCount": 0,
+      "duplicateCount": 0,
+      "topFindingCategory": "ux",
+      "topFindingIssue": "In screen composition, the composition relies on too many competing groups and spacing decisions.",
+      "missedExpectedIds": [],
+      "falsePositiveIssues": []
+    },
+    {
+      "id": "onboarding-form",
+      "findingCount": 7,
+      "markerCount": 7,
+      "markerPixelAccuracy": {
+        "markerCount": 7,
+        "measuredCount": 7,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      },
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Mostly strong",
+        "accessibilityVisibleReasoning": "Mostly strong",
+        "designSystemReasoning": "Needs attention",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Needs attention",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "matchedExpectedCount": 2,
+      "missedExpectedCount": 0,
+      "falsePositiveCandidateCount": 0,
+      "duplicateCount": 0,
+      "topFindingCategory": "visual-hierarchy",
+      "topFindingIssue": "In primary reading path, the primary reading path is not strong enough to make priority immediately clear.",
+      "missedExpectedIds": [],
+      "falsePositiveIssues": []
+    },
+    {
+      "id": "pricing-page",
+      "findingCount": 8,
+      "markerCount": 8,
+      "markerPixelAccuracy": {
+        "markerCount": 8,
+        "measuredCount": 8,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      },
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Mostly strong",
+        "accessibilityVisibleReasoning": "Mostly strong",
+        "designSystemReasoning": "Mostly strong",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "matchedExpectedCount": 2,
+      "missedExpectedCount": 0,
+      "falsePositiveCandidateCount": 0,
+      "duplicateCount": 0,
+      "topFindingCategory": "visual-hierarchy",
+      "topFindingIssue": "In pricing cards, the comparison area does not create a clean plan priority.",
+      "missedExpectedIds": [],
+      "falsePositiveIssues": []
+    },
+    {
+      "id": "mobile-app-mockup",
+      "findingCount": 9,
+      "markerCount": 9,
+      "markerPixelAccuracy": {
+        "markerCount": 9,
+        "measuredCount": 9,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      },
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Mostly strong",
+        "accessibilityVisibleReasoning": "Mostly strong",
+        "designSystemReasoning": "Needs attention",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Needs attention",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "matchedExpectedCount": 2,
+      "missedExpectedCount": 0,
+      "falsePositiveCandidateCount": 0,
+      "duplicateCount": 0,
+      "topFindingCategory": "visual-hierarchy",
+      "topFindingIssue": "In primary reading path, the primary reading path is not strong enough to make priority immediately clear.",
+      "missedExpectedIds": [],
+      "falsePositiveIssues": []
+    },
+    {
+      "id": "zeplin-artboard",
+      "findingCount": 2,
+      "markerCount": 2,
+      "markerPixelAccuracy": {
+        "markerCount": 2,
+        "measuredCount": 2,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      },
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Needs attention",
+        "accessibilityVisibleReasoning": "Needs attention",
+        "designSystemReasoning": "Needs attention",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "matchedExpectedCount": 2,
+      "missedExpectedCount": 0,
+      "falsePositiveCandidateCount": 0,
+      "duplicateCount": 0,
+      "topFindingCategory": "visual-hierarchy",
+      "topFindingIssue": "In central artboard hierarchy, the primary reading path is not strong enough to make priority immediately clear.",
+      "missedExpectedIds": [],
+      "falsePositiveIssues": []
+    },
+    {
+      "id": "figma-frame",
+      "findingCount": 2,
+      "markerCount": 2,
+      "markerPixelAccuracy": {
+        "markerCount": 2,
+        "measuredCount": 2,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      },
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Needs attention",
+        "accessibilityVisibleReasoning": "Needs attention",
+        "designSystemReasoning": "Mostly strong",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "matchedExpectedCount": 1,
+      "missedExpectedCount": 0,
+      "falsePositiveCandidateCount": 0,
+      "duplicateCount": 0,
+      "topFindingCategory": "design-system",
+      "topFindingIssue": "In figma frame cards, repeated components do not feel governed by one consistent system.",
+      "missedExpectedIds": [],
+      "falsePositiveIssues": []
+    },
+    {
+      "id": "typography-editorial",
+      "findingCount": 3,
+      "markerCount": 3,
+      "markerPixelAccuracy": {
+        "markerCount": 3,
+        "measuredCount": 3,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      },
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Mostly strong",
+        "accessibilityVisibleReasoning": "Mostly strong",
+        "designSystemReasoning": "Needs attention",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "matchedExpectedCount": 2,
+      "missedExpectedCount": 0,
+      "falsePositiveCandidateCount": 0,
+      "duplicateCount": 0,
+      "topFindingCategory": "accessibility-visible",
+      "topFindingIssue": "In readable content, some content may be visually harder to read or activate than it should be.",
+      "missedExpectedIds": [],
+      "falsePositiveIssues": []
+    },
+    {
+      "id": "cluttered-anti-pattern",
+      "findingCount": 11,
+      "markerCount": 11,
+      "markerPixelAccuracy": {
+        "markerCount": 11,
+        "measuredCount": 11,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      },
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Mostly strong",
+        "accessibilityVisibleReasoning": "Mostly strong",
+        "designSystemReasoning": "Mostly strong",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "matchedExpectedCount": 2,
+      "missedExpectedCount": 0,
+      "falsePositiveCandidateCount": 0,
+      "duplicateCount": 0,
+      "topFindingCategory": "enterprise-polish",
+      "topFindingIssue": "In summary cards, too many similarly weighted summary cards compete for first attention.",
+      "missedExpectedIds": [],
+      "falsePositiveIssues": []
+    },
+    {
+      "id": "accessibility-visible-failure",
+      "findingCount": 4,
+      "markerCount": 4,
+      "markerPixelAccuracy": {
+        "markerCount": 4,
+        "measuredCount": 4,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      },
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Needs attention",
+        "accessibilityVisibleReasoning": "Mostly strong",
+        "designSystemReasoning": "Needs attention",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "matchedExpectedCount": 3,
+      "missedExpectedCount": 0,
+      "falsePositiveCandidateCount": 0,
+      "duplicateCount": 0,
+      "topFindingCategory": "accessibility-visible",
+      "topFindingIssue": "In readable content, some content may be visually harder to read or activate than it should be.",
+      "missedExpectedIds": [],
+      "falsePositiveIssues": []
+    },
+    {
+      "id": "inconsistent-design-system",
+      "findingCount": 7,
+      "markerCount": 7,
+      "markerPixelAccuracy": {
+        "markerCount": 7,
+        "measuredCount": 7,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      },
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Mostly strong",
+        "accessibilityVisibleReasoning": "Mostly strong",
+        "designSystemReasoning": "Mostly strong",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "matchedExpectedCount": 2,
+      "missedExpectedCount": 0,
+      "falsePositiveCandidateCount": 0,
+      "duplicateCount": 0,
+      "topFindingCategory": "design-system",
+      "topFindingIssue": "In component treatment, repeated components do not feel governed by one consistent system.",
+      "missedExpectedIds": [],
+      "falsePositiveIssues": []
+    }
+  ]
+}

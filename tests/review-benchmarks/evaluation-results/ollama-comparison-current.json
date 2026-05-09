@@ -1,0 +1,418 @@
+{
+  "runType": "ollama-mode-comparison",
+  "generatedAt": "2026-05-09T15:24:49.139Z",
+  "endpoint": "http://127.0.0.1:11434",
+  "deterministicOnly": [
+    {
+      "benchmarkId": "marketing-hero",
+      "findingCount": 4,
+      "topCategory": "visual-hierarchy",
+      "topIssue": "In primary reading path, the primary reading path is not strong enough to make priority immediately clear.",
+      "matchedIds": [
+        "hero-reading-path",
+        "cta-dominance"
+      ],
+      "missedIds": [],
+      "falsePositiveCount": 0,
+      "duplicateCount": 0,
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Mostly strong",
+        "accessibilityVisibleReasoning": "Mostly strong",
+        "designSystemReasoning": "Needs attention",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "markerPixelAccuracy": {
+        "markerCount": 4,
+        "measuredCount": 4,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      }
+    },
+    {
+      "benchmarkId": "zeplin-artboard",
+      "findingCount": 2,
+      "topCategory": "visual-hierarchy",
+      "topIssue": "In central artboard hierarchy, the primary reading path is not strong enough to make priority immediately clear.",
+      "matchedIds": [
+        "artboard-hierarchy",
+        "testimonial-credibility"
+      ],
+      "missedIds": [],
+      "falsePositiveCount": 0,
+      "duplicateCount": 0,
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Needs attention",
+        "accessibilityVisibleReasoning": "Needs attention",
+        "designSystemReasoning": "Needs attention",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "markerPixelAccuracy": {
+        "markerCount": 2,
+        "measuredCount": 2,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      }
+    },
+    {
+      "benchmarkId": "figma-frame",
+      "findingCount": 2,
+      "topCategory": "design-system",
+      "topIssue": "In figma frame cards, repeated components do not feel governed by one consistent system.",
+      "matchedIds": [
+        "frame-card-consistency"
+      ],
+      "missedIds": [],
+      "falsePositiveCount": 0,
+      "duplicateCount": 0,
+      "scores": {
+        "relevance": "Strong",
+        "depth": "Strong",
+        "uxReasoning": "Needs attention",
+        "accessibilityVisibleReasoning": "Needs attention",
+        "designSystemReasoning": "Mostly strong",
+        "rootCauseIdentification": "Mostly strong",
+        "noiseControl": "Strong",
+        "prioritisationQuality": "Mostly strong",
+        "humanLikeWording": "Mostly strong",
+        "markerAccuracy": "Strong",
+        "exportReportUsefulness": "Mostly strong"
+      },
+      "markerPixelAccuracy": {
+        "markerCount": 2,
+        "measuredCount": 2,
+        "averageOverlapRatio": 1,
+        "lowOverlapMarkers": []
+      }
+    }
+  ],
+  "modes": [
+    {
+      "mode": "deterministic-only",
+      "status": "evaluated",
+      "resultFile": "tests/review-benchmarks/evaluation-results/deterministic-current.json"
+    },
+    {
+      "mode": "deterministic-plus-ollama-text-refine",
+      "status": "evaluated",
+      "model": "a11y-cat-assistant:latest",
+      "results": [
+        {
+          "mode": "deterministic-plus-ollama-text-refine",
+          "benchmarkId": "marketing-hero",
+          "status": "evaluated",
+          "executionTimeMs": 47946,
+          "executiveVerdict": "The marketing hero section has several issues with visual hierarchy and UX that need attention to improve user experience and accessibility.",
+          "findingCount": 4,
+          "matchedIds": [
+            "hero-reading-path",
+            "cta-dominance"
+          ],
+          "missedIds": [],
+          "deltasVsDeterministic": {
+            "findingCount": 0,
+            "matchedExpected": 0,
+            "missedExpected": 0
+          },
+          "findings": [
+            {
+              "category": "visual-hierarchy",
+              "severity": "high",
+              "region": "Primary reading path",
+              "issue": "In primary reading path, the primary reading path is not strong enough to make priority immediately clear.",
+              "evidence": "the leading heading is \"Operate every launch from one connected workspace\"; the strongest visible action appears to be \"Explore workflow\"; the hero visual area, heading, and CTA/action group share the opening scan path.",
+              "impact": "Users may need to inspect more of the screen before understanding the main message, priority action, or intended order of attention.",
+              "recommendation": "Strengthen the hierarchy from primary message to supporting detail to action, and reduce competing emphasis around secondary content.",
+              "confidence": 0.68
+            },
+            {
+              "category": "ux",
+              "severity": "medium",
+              "region": "Action path",
+              "issue": "In action path, the intended next action is not communicated with enough certainty.",
+              "evidence": "Visible primary and secondary actions include \"Start review\", \"Explore workflow\"; their size, placement, and visual weight are close enough to increase decision effort.",
+              "impact": "When users cannot quickly distinguish the preferred action from supporting actions, decision effort increases and completion confidence drops.",
+              "recommendation": "Make the primary action visually dominant, connect it more clearly to the headline or task context, and reduce secondary action emphasis.",
+              "confidence": 0.7
+            },
+            {
+              "category": "accessibility-visible",
+              "severity": "medium",
+              "region": "Readable content",
+              "issue": "In readable content, some content may be visually harder to read or activate than it should be.",
+              "evidence": "1 readability or contrast risk signal(s); 1 accessibility-visible finding(s) were generated.",
+              "impact": "Soft text, small targets, or unclear visual states can reduce confidence for users with low vision, motor needs, glare, or cognitive fatigue.",
+              "recommendation": "Increase text clarity, preserve comfortable hit areas, and ensure important states are communicated with more than colour alone.",
+              "confidence": 0.7100000000000001
+            },
+            {
+              "category": "accessibility-visible",
+              "severity": "medium",
+              "region": "Text contrast",
+              "issue": "In text contrast, some text appears visually soft against its background.",
+              "evidence": "\"Plan releases, review design quality, align stakeholders, track risks, and prepare teams.\" has an estimated contrast ratio of 3.89.",
+              "impact": "Users with low vision, glare-heavy viewing conditions, or cognitive fatigue may need more effort to read this content.",
+              "recommendation": "Increase the foreground/background separation for this text, especially if it carries navigation, instructions, status, or decision-critical content.",
+              "confidence": 0.86
+            }
+          ]
+        },
+        {
+          "mode": "deterministic-plus-ollama-text-refine",
+          "benchmarkId": "zeplin-artboard",
+          "status": "evaluated",
+          "executionTimeMs": 31974,
+          "executiveVerdict": "Visual hierarchy and enterprise polish issues identified in Zeplin Artboard review",
+          "findingCount": 2,
+          "matchedIds": [
+            "testimonial-credibility"
+          ],
+          "missedIds": [
+            "artboard-hierarchy"
+          ],
+          "deltasVsDeterministic": {
+            "findingCount": 0,
+            "matchedExpected": -1,
+            "missedExpected": 1
+          },
+          "findings": [
+            {
+              "category": "visual-hierarchy|ux|accessibility-visible|design-system|enterprise-polish|responsive-layout",
+              "severity": "medium",
+              "region": "Central artboard hierarchy",
+              "issue": "In central artboard hierarchy, the primary reading path is not strong enough to make priority immediately clear.",
+              "evidence": "the leading heading is \"Vakgebieden\"; the strongest visible action appears to be \"Find jobs\"; the hero visual area, heading, and CTA/action group share the opening scan path; the central design area contains the main artboard hierarchy rather than editor chrome.",
+              "impact": "Users may need to inspect more of the screen before understanding the main message, priority action, or intended order of attention.",
+              "recommendation": "Strengthen the hierarchy from primary message to supporting detail to action, and reduce competing emphasis around secondary content.",
+              "confidence": 0.68
+            },
+            {
+              "category": "enterprise-polish",
+              "severity": "medium",
+              "region": "Testimonial block",
+              "issue": "In testimonial block, the testimonial treatment may compete with the credibility of the quote.",
+              "evidence": "Within the central artboard, the testimonial/quote area is visually prominent enough to affect polish and trust.",
+              "impact": "If decorative quote treatment competes with the actual testimonial text or attribution, the section can feel less credible and less editorially mature.",
+              "recommendation": "Make the quote text and attribution the clearest elements, then reduce any decorative treatment that competes with readability.",
+              "confidence": 0.72
+            }
+          ]
+        },
+        {
+          "mode": "deterministic-plus-ollama-text-refine",
+          "benchmarkId": "figma-frame",
+          "status": "evaluated",
+          "executionTimeMs": 25674,
+          "executiveVerdict": "Design system inconsistencies and visual hierarchy weaknesses identified in Figma frame cards and central artboard hierarchy.",
+          "findingCount": 2,
+          "matchedIds": [
+            "frame-card-consistency"
+          ],
+          "missedIds": [],
+          "deltasVsDeterministic": {
+            "findingCount": 0,
+            "matchedExpected": 0,
+            "missedExpected": 0
+          },
+          "findings": [
+            {
+              "category": "design-system",
+              "severity": "medium",
+              "region": "Figma frame cards",
+              "issue": "In figma frame cards, repeated components do not feel governed by one consistent system.",
+              "evidence": "3 frame card component(s); 2 rounded-corner treatments; 1 elevation/shadow treatments.",
+              "impact": "Visual drift across repeated components makes the product feel less mature and can make similar controls appear to behave differently.",
+              "recommendation": "Standardise repeated component states, radius, elevation, spacing, and icon treatment through a smaller set of reusable patterns.",
+              "confidence": 0.62
+            },
+            {
+              "category": "visual-hierarchy",
+              "severity": "low",
+              "region": "Central artboard hierarchy",
+              "issue": "In central artboard hierarchy, the primary reading path is not strong enough to make priority immediately clear.",
+              "evidence": "the leading heading is \"Bring design review into the release workflow\"; the central design area contains the main artboard hierarchy rather than editor chrome.",
+              "impact": "Users may need to inspect more of the screen before understanding the main message, priority action, or intended order of attention.",
+              "recommendation": "Strengthen the hierarchy from primary message to supporting detail to action, and reduce competing emphasis around secondary content.",
+              "confidence": 0.68
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "deterministic-plus-ollama-synthesis",
+      "status": "evaluated",
+      "model": "a11y-cat-assistant:latest",
+      "results": [
+        {
+          "mode": "deterministic-plus-ollama-synthesis",
+          "benchmarkId": "marketing-hero",
+          "status": "evaluated",
+          "executionTimeMs": 45926,
+          "executiveVerdict": "The marketing hero section has several issues with visual hierarchy and UX that need attention to improve user experience and accessibility.",
+          "findingCount": 4,
+          "matchedIds": [
+            "cta-dominance"
+          ],
+          "missedIds": [
+            "hero-reading-path"
+          ],
+          "deltasVsDeterministic": {
+            "findingCount": 0,
+            "matchedExpected": -1,
+            "missedExpected": 1
+          },
+          "findings": [
+            {
+              "category": "visual-hierarchy|ux",
+              "severity": "high",
+              "region": "Primary reading path",
+              "issue": "In primary reading path, the primary reading path is not strong enough to make priority immediately clear.",
+              "evidence": "the leading heading is \"Operate every launch from one connected workspace\"; the strongest visible action appears to be \"Explore workflow\"; the hero visual area, heading, and CTA/action group share the opening scan path.",
+              "impact": "Users may need to inspect more of the screen before understanding the main message, priority action, or intended order of attention.",
+              "recommendation": "Strengthen the hierarchy from primary message to supporting detail to action, and reduce competing emphasis around secondary content.",
+              "confidence": 0.68
+            },
+            {
+              "category": "ux",
+              "severity": "medium",
+              "region": "Action path",
+              "issue": "In action path, the intended next action is not communicated with enough certainty.",
+              "evidence": "Visible primary and secondary actions include \"Start review\", \"Explore workflow\"; their size, placement, and visual weight are close enough to increase decision effort.",
+              "impact": "When users cannot quickly distinguish the preferred action from supporting actions, decision effort increases and completion confidence drops.",
+              "recommendation": "Make the primary action visually dominant, connect it more clearly to the headline or task context, and reduce secondary action emphasis.",
+              "confidence": 0.7
+            },
+            {
+              "category": "accessibility-visible",
+              "severity": "medium",
+              "region": "Readable content",
+              "issue": "In readable content, some content may be visually harder to read or activate than it should be.",
+              "evidence": "1 readability or contrast risk signal(s); 1 accessibility-visible finding(s) were generated.",
+              "impact": "Soft text, small targets, or unclear visual states can reduce confidence for users with low vision, motor needs, glare, or cognitive fatigue.",
+              "recommendation": "Increase text clarity, preserve comfortable hit areas, and ensure important states are communicated with more than colour alone.",
+              "confidence": 0.7100000000000001
+            },
+            {
+              "category": "accessibility-visible",
+              "severity": "medium",
+              "region": "Text contrast",
+              "issue": "In text contrast, some text appears visually soft against its background.",
+              "evidence": "\"Plan releases, review design quality, align stakeholders, track risks, and prepare teams.\" has an estimated contrast ratio of 3.89.",
+              "impact": "Users with low vision, glare-heavy viewing conditions, or cognitive fatigue may need more effort to read this content.",
+              "recommendation": "Increase the foreground/background separation for this text, especially if it carries navigation, instructions, status, or decision-critical content.",
+              "confidence": 0.86
+            }
+          ]
+        },
+        {
+          "mode": "deterministic-plus-ollama-synthesis",
+          "benchmarkId": "zeplin-artboard",
+          "status": "evaluated",
+          "executionTimeMs": 27939,
+          "executiveVerdict": "Visual hierarchy and enterprise polish issues identified in Zeplin Artboard review",
+          "findingCount": 2,
+          "matchedIds": [
+            "testimonial-credibility"
+          ],
+          "missedIds": [
+            "artboard-hierarchy"
+          ],
+          "deltasVsDeterministic": {
+            "findingCount": 0,
+            "matchedExpected": -1,
+            "missedExpected": 1
+          },
+          "findings": [
+            {
+              "category": "visual-hierarchy|ux|accessibility-visible|design-system|enterprise-polish|responsive-layout",
+              "severity": "medium",
+              "region": "Central artboard hierarchy",
+              "issue": "In central artboard hierarchy, the primary reading path is not strong enough to make priority immediately clear.",
+              "evidence": "the leading heading is \"Vakgebieden\"; the strongest visible action appears to be \"Find jobs\"; the hero visual area, heading, and CTA/action group share the opening scan path; the central design area contains the main artboard hierarchy rather than editor chrome.",
+              "impact": "Users may need to inspect more of the screen before understanding the main message, priority action, or intended order of attention.",
+              "recommendation": "Strengthen the hierarchy from primary message to supporting detail to action, and reduce competing emphasis around secondary content.",
+              "confidence": 0.68
+            },
+            {
+              "category": "enterprise-polish",
+              "severity": "medium",
+              "region": "Testimonial block",
+              "issue": "In testimonial block, the testimonial treatment may compete with the credibility of the quote.",
+              "evidence": "Within the central artboard, the testimonial/quote area is visually prominent enough to affect polish and trust.",
+              "impact": "If decorative quote treatment competes with the actual testimonial text or attribution, the section can feel less credible and less editorially mature.",
+              "recommendation": "Make the quote text and attribution the clearest elements, then reduce any decorative treatment that competes with readability.",
+              "confidence": 0.72
+            }
+          ]
+        },
+        {
+          "mode": "deterministic-plus-ollama-synthesis",
+          "benchmarkId": "figma-frame",
+          "status": "evaluated",
+          "executionTimeMs": 25955,
+          "executiveVerdict": "Design system inconsistencies and visual hierarchy weaknesses identified in Figma frame cards and central artboard hierarchy.",
+          "findingCount": 2,
+          "matchedIds": [
+            "frame-card-consistency"
+          ],
+          "missedIds": [],
+          "deltasVsDeterministic": {
+            "findingCount": 0,
+            "matchedExpected": 0,
+            "missedExpected": 0
+          },
+          "findings": [
+            {
+              "category": "design-system",
+              "severity": "medium",
+              "region": "Figma frame cards",
+              "issue": "In figma frame cards, repeated components do not feel governed by one consistent system.",
+              "evidence": "3 frame card component(s); 2 rounded-corner treatments; 1 elevation/shadow treatments.",
+              "impact": "Visual drift across repeated components makes the product feel less mature and can make similar controls appear to behave differently.",
+              "recommendation": "Standardise repeated component states, radius, elevation, spacing, and icon treatment through a smaller set of reusable patterns.",
+              "confidence": 0.62
+            },
+            {
+              "category": "visual-hierarchy",
+              "severity": "low",
+              "region": "Central artboard hierarchy",
+              "issue": "In central artboard hierarchy, the primary reading path is not strong enough to make priority immediately clear.",
+              "evidence": "the leading heading is \"Bring design review into the release workflow\"; the central design area contains the main artboard hierarchy rather than editor chrome.",
+              "impact": "Users may need to inspect more of the screen before understanding the main message, priority action, or intended order of attention.",
+              "recommendation": "Strengthen the hierarchy from primary message to supporting detail to action, and reduce competing emphasis around secondary content.",
+              "confidence": 0.68
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "deterministic-plus-local-vision-runtime-plus-ollama-synthesis",
+      "status": "not-run",
+      "reason": "This comparison requires a configured local vision runtime and benchmark screenshots; deterministic and Ollama text/synthesis modes were evaluated first."
+    }
+  ],
+  "status": "evaluated",
+  "capabilities": {
+    "reachable": true,
+    "models": [
+      "a11y-cat-assistant:latest",
+      "llama3.1:8b"
+    ],
+    "model": "a11y-cat-assistant:latest"
+  }
+}

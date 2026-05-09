@@ -235,7 +235,89 @@ test("13. memory includes imports and edited image views", async () => {
   assert.equal(js.includes("function isEditedImage"), true);
 });
 
-test("14. inspector actions are wired for selected items", async () => {
+test("13b. memory is structured as a review workspace", async () => {
+  const html = await read("gallery.html");
+  const js = await read("gallery.js");
+  const cardView = await read("src/gallery/card-view.js");
+
+  assert.equal(html.includes("<title>Olho Review Workspace</title>"), true);
+  assert.equal(html.includes("<h1>Review Workspace</h1>"), true);
+  assert.equal(html.includes('data-view="reviews"'), true);
+  assert.equal(html.includes('id="reviewWorkspaceItemCount"'), true);
+  assert.equal(html.includes('id="reviewWorkspaceReviewedCount"'), true);
+  assert.equal(html.includes('id="reviewWorkspaceFindingCount"'), true);
+  assert.equal(html.includes('id="reviewWorkspaceReportCount"'), true);
+  assert.equal(html.includes('id="inspectorReviewTypeValue"'), true);
+  assert.equal(html.includes('id="inspectorFindingsValue"'), true);
+  assert.equal(html.includes('id="inspectorReportValue"'), true);
+  assert.equal(js.includes("reviewWorkspaceStats"), true);
+  assert.equal(js.includes("reviewWorkspaceSummaryForItem"), true);
+  assert.equal(js.includes('state.view === "reviews"'), true);
+  assert.equal(cardView.includes("card-review-summary"), true);
+  assert.equal(cardView.includes("review-type-chip"), true);
+  assert.equal(cardView.includes("review-source-chip"), true);
+});
+
+test("13c. review workspace summaries expose finding counts and report status", async () => {
+  const { reviewWorkspaceSummaryForItem, reviewWorkspaceStats } = await import("../src/gallery/review-workspace-summary.js");
+  const { buildReviewWorkspaceMetadata } = await import("../src/review/store/review-workspace-summary.js");
+  const metadata = buildReviewWorkspaceMetadata({
+    findings: [
+      {
+        id: "finding-1",
+        category: "visual-hierarchy",
+        severity: "high",
+        source: "rule-engine"
+      },
+      {
+        id: "finding-2",
+        category: "ux",
+        severity: "medium",
+        source: "rule-engine"
+      }
+    ],
+    reviewContext: {
+      sourceType: "figma-capture",
+      isImageOnly: true,
+      isDesignScreen: true
+    },
+    engineMetadata: {
+      engineVersion: "test"
+    },
+    reportStatus: "exported",
+    reportExportedAt: "2026-05-08T10:00:00.000Z"
+  });
+  const item = {
+    id: "item-1",
+    type: "image",
+    metadata
+  };
+
+  const summary = reviewWorkspaceSummaryForItem(item);
+  assert.equal(summary.reviewed, true);
+  assert.equal(summary.findingCount, 2);
+  assert.equal(summary.severityCounts.high, 1);
+  assert.equal(summary.severityCounts.medium, 1);
+  assert.equal(summary.sourceLabel, "Figma");
+  assert.equal(summary.reportStatus, "Report exported");
+
+  const stats = reviewWorkspaceStats([item, { id: "video-1", type: "video", metadata: {} }]);
+  assert.equal(stats.reviewableCount, 1);
+  assert.equal(stats.reviewedCount, 1);
+  assert.equal(stats.findingTotal, 2);
+  assert.equal(stats.exportedReports, 1);
+});
+
+test("14. memory shell keeps a usable minimum width", async () => {
+  const html = await read("gallery.html");
+  const css = await read("gallery.css");
+
+  assert.equal(html.includes('class="olho-app-shell gallery-shell"'), true);
+  assert.equal(css.includes(".gallery-shell"), true);
+  assert.equal(css.includes("min-width: 420px"), true);
+});
+
+test("15. inspector actions are wired for selected items", async () => {
   const html = await read("gallery.html");
   const js = await read("gallery.js");
 
@@ -257,7 +339,21 @@ test("14. inspector actions are wired for selected items", async () => {
   assert.equal(js.includes("inspectorPermanentDeleteBtn?.addEventListener"), true);
 });
 
-test("15. media cards default actions remain Open + More, with delete contextual", async () => {
+test("16. design review import is a local image import path and does not replace editor import", async () => {
+  const html = await read("gallery.html");
+  const js = await read("gallery.js");
+
+  assert.equal(html.includes('id="designReviewImportInput"'), true);
+  assert.equal(html.includes('accept="image/png,image/jpeg,image/webp"'), true);
+  assert.equal(html.includes('id="importDesignReviewBtn"'), true);
+  assert.equal(html.includes("Import Design for Review"), true);
+  assert.equal(js.includes("importDesignScreenshotForReview"), true);
+  assert.equal(js.includes("async function handleDesignReviewImport"), true);
+  assert.equal(js.includes("openReview: openItemInReview"), true);
+  assert.equal(js.includes("setView(\"reviews\")"), true);
+});
+
+test("17. media cards default actions remain Open + More, with delete contextual", async () => {
   const cardView = await read("src/gallery/card-view.js");
 
   assert.equal(cardView.includes('actions.append(createContextButton("Open", () => openMediaItem(item)));'), true);

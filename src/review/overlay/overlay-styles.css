@@ -1,0 +1,120 @@
+#olho-live-review-overlay-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646;
+  pointer-events: none;
+  contain: layout style;
+  overflow: visible;
+}
+
+.olho-live-region {
+  position: absolute;
+  border: 1.5px solid rgba(31, 111, 104, 0.64);
+  border-radius: 10px;
+  background: rgba(31, 111, 104, 0.045);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.42);
+  pointer-events: none;
+}
+
+.olho-live-region.marker-section,
+.olho-live-region.marker-composition {
+  border-radius: 16px;
+}
+
+.olho-live-region.marker-action {
+  border-style: solid;
+  background: rgba(31, 111, 104, 0.1);
+}
+
+.olho-live-region.marker-text-region,
+.olho-live-region.marker-accessibility-risk {
+  border-style: dashed;
+}
+
+.olho-live-region.is-selected,
+.olho-live-region:has(+ .olho-live-marker.is-selected) {
+  border-color: rgba(15, 118, 110, 0.94);
+  background: rgba(15, 118, 110, 0.11);
+}
+
+.olho-live-marker {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: #1f6f68;
+  color: #fff;
+  font: 800 12px/1 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  box-shadow: 0 5px 14px rgba(20, 24, 30, 0.18);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.olho-live-marker.severity-critical,
+.olho-live-marker.severity-high {
+  background: #8f3a32;
+}
+
+.olho-live-marker.severity-medium {
+  background: #8a651f;
+}
+
+.olho-live-marker.severity-low {
+  background: #42615e;
+}
+
+.olho-live-marker.is-selected {
+  outline: 3px solid rgba(15, 118, 110, 0.28);
+  outline-offset: 3px;
+}
+
+.olho-live-marker:focus-visible {
+  outline: 3px solid rgba(15, 118, 110, 0.45);
+  outline-offset: 4px;
+}
+
+.olho-live-popover {
+  position: fixed;
+  max-width: min(320px, calc(100vw - 24px));
+  border: 1px solid rgba(34, 40, 49, 0.14);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  color: #20242c;
+  box-shadow: 0 18px 42px rgba(20, 24, 30, 0.18);
+  font: 13px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  pointer-events: auto;
+}
+
+.olho-live-popover strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.olho-live-popover p {
+  margin: 8px 0 0;
+}
+
+.olho-live-popover span {
+  color: #68707d;
+  font-weight: 700;
+}
+
+.olho-live-popover-meta {
+  color: #68707d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.olho-live-target-highlight {
+  position: fixed;
+  z-index: 2147483645;
+  border: 1px dashed rgba(31, 111, 104, 0.72);
+  border-radius: 14px;
+  background: rgba(31, 111, 104, 0.04);
+  pointer-events: none;
+}

@@ -1,15 +1,28 @@
 import { textLineLengthChars } from "../../../utils/typography-utils.js";
 import { createFinding, elementLabel, missingText } from "../rule-utils.js";
 
+function estimatedCharactersPerRenderedLine(block = {}) {
+  const fontSize = Number(block.style?.fontSize || 0);
+  const width = Number(block.bounds?.width || 0);
+  if (!fontSize || !width) return textLineLengthChars(block.text);
+  return Math.round(width / (fontSize * 0.55));
+}
+
 export const excessiveLineLengthRule = {
   id: "typography/excessive-line-length",
   getSkipReason(context) {
     return missingText(context, 1);
   },
   run(context) {
-    const longLine = context.textBlocks.find((block) => textLineLengthChars(block.text) > 75);
+    const longLine = context.textBlocks.find((block) => {
+      if (block.isHeading || block.type === "heading") return false;
+      const textLength = textLineLengthChars(block.text);
+      if (textLength <= 75) return false;
+      if (Number(block.bounds?.height || 0) > Number(block.style?.lineHeightPx || 0) * 1.45) return false;
+      return estimatedCharactersPerRenderedLine(block) > 75;
+    });
     if (!longLine) return null;
-    const length = textLineLengthChars(longLine.text);
+    const length = estimatedCharactersPerRenderedLine(longLine);
 
     // Readability research commonly recommends roughly 45-75 characters per line for comfortable reading.
     return createFinding(context, {

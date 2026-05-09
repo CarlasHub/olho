@@ -10,6 +10,7 @@ export const missingElevationSystemRule = {
     if (surfaces.length < 4) return null;
     const shadowValues = surfaces.map((surface) => String(surface.style.boxShadow || "none").toLowerCase());
     const unique = new Set(shadowValues).size;
+    if (unique === 1 && (shadowValues[0] === "none" || shadowValues[0] === "")) return null;
     if (unique > 1 && unique <= 3) return null;
 
     // Elevation should communicate surface hierarchy consistently, as in mature enterprise design systems.

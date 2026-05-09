@@ -1,0 +1,29 @@
+{
+  "benchmarkId": "onboarding-form",
+  "title": "Onboarding form",
+  "intendedUserGoal": "Complete setup with clear field requirements and a confident next action.",
+  "strongFindings": [
+    {
+      "id": "form-action-clarity",
+      "category": "ux",
+      "severity": "medium",
+      "region": "Form actions",
+      "rootCause": "Skip and continue actions do not clearly communicate priority.",
+      "evidenceKeywords": ["action", "continue", "skip", "priority"],
+      "priority": 1
+    },
+    {
+      "id": "error-visibility",
+      "category": "accessibility-visible",
+      "severity": "medium",
+      "region": "Form validation",
+      "rootCause": "Required-state feedback is visually small and soft.",
+      "evidenceKeywords": ["error", "required", "visibility", "read"],
+      "priority": 2
+    }
+  ],
+  "weakFindingsToAvoid": ["form has fields", "button could be improved"],
+  "rootCauseObservations": ["Completion confidence is the main issue; field-level nits should support that point."],
+  "mergeGuidance": ["Keep action clarity and error visibility separate if both affect completion."],
+  "scannerSpamToAvoid": ["Do not generate one finding per input if the root issue is flow clarity."]
+}

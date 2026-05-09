@@ -1,0 +1,29 @@
+{
+  "benchmarkId": "zeplin-artboard",
+  "title": "Zeplin artboard",
+  "intendedUserGoal": "Review the client design artboard without critiquing Zeplin editor chrome.",
+  "strongFindings": [
+    {
+      "id": "artboard-hierarchy",
+      "category": "visual-hierarchy",
+      "severity": "medium",
+      "region": "Central artboard",
+      "rootCause": "The hero image, heading, and CTA compete within the artboard.",
+      "evidenceKeywords": ["artboard", "hero", "cta", "design area"],
+      "priority": 1
+    },
+    {
+      "id": "testimonial-credibility",
+      "category": "enterprise-polish",
+      "severity": "medium",
+      "region": "Testimonial block",
+      "rootCause": "Decorative quote treatment may compete with testimonial readability and credibility.",
+      "evidenceKeywords": ["testimonial", "quote", "polish"],
+      "priority": 2
+    }
+  ],
+  "weakFindingsToAvoid": ["zeplin sidebar", "zeplin toolbar", "spec panel", "comments panel"],
+  "rootCauseObservations": ["The review must isolate the artboard and ignore Zeplin UI controls."],
+  "mergeGuidance": ["Findings about editor panels should be rejected unless the whole visible screen was selected."],
+  "scannerSpamToAvoid": ["Do not flag Zeplin navigation, specs, comments, or zoom controls."]
+}

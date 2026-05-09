@@ -1,6 +1,9 @@
 import {
+  REVIEW_FINDING_DEEP_FIELDS,
   REVIEW_FINDING_REQUIRED_FIELDS,
   isReviewFindingCategory,
+  isReviewFindingEvidenceType,
+  isReviewFindingMarkerType,
   isReviewFindingSeverity,
   isReviewFindingSource
 } from "../contracts/review-finding.js";
@@ -56,6 +59,34 @@ export function validateReviewFinding(finding) {
     if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
       errors.push("confidence must be a number between 0 and 1.");
     }
+  }
+
+  REVIEW_FINDING_DEEP_FIELDS.filter((field) => field !== "acceptanceCriteria").forEach((field) => {
+    if (hasOwn(finding, field) && !isNonEmptyString(finding[field])) {
+      errors.push(`${field} must be a non-empty string when provided.`);
+    }
+  });
+
+  if (hasOwn(finding, "acceptanceCriteria")) {
+    if (
+      !Array.isArray(finding.acceptanceCriteria) ||
+      !finding.acceptanceCriteria.length ||
+      finding.acceptanceCriteria.some((item) => !isNonEmptyString(item))
+    ) {
+      errors.push("acceptanceCriteria must be a non-empty array of strings when provided.");
+    }
+  }
+
+  if (hasOwn(finding, "markerType") && !isReviewFindingMarkerType(finding.markerType)) {
+    errors.push(`Unsupported markerType: ${String(finding.markerType)}.`);
+  }
+
+  if (hasOwn(finding, "evidenceType") && !isReviewFindingEvidenceType(finding.evidenceType)) {
+    errors.push(`Unsupported evidenceType: ${String(finding.evidenceType)}.`);
+  }
+
+  if (hasOwn(finding, "evidence_type") && !isReviewFindingEvidenceType(finding.evidence_type)) {
+    errors.push(`Unsupported evidence_type: ${String(finding.evidence_type)}.`);
   }
 
   return {

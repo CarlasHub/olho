@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QA Bad Accessibility Visible</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #f1f5f9;
+        color: #1f2937;
+        font: 16px/1.42 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .shell {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 42px;
+      }
+
+      .panel {
+        display: grid;
+        gap: 22px;
+        padding: 32px;
+        border-radius: 18px;
+        background: #ffffff;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 34px;
+      }
+
+      .soft-copy {
+        max-width: 850px;
+        margin: 0;
+        color: #b7c0ca;
+        font-size: 13px;
+        line-height: 1.25;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 14px;
+        border-radius: 14px;
+        background: #f8fafc;
+      }
+
+      .icon-button {
+        width: 24px;
+        height: 24px;
+        border: 0;
+        border-radius: 6px;
+        background: #e2e8f0;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .status-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .status-card {
+        padding: 18px;
+        border-radius: 14px;
+        background: #f8fafc;
+      }
+
+      .dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        margin-right: 8px;
+        border-radius: 50%;
+      }
+
+      .ok {
+        background: #22c55e;
+      }
+
+      .warn {
+        background: #f97316;
+      }
+
+      .bad {
+        background: #ef4444;
+      }
+
+      .status-card strong {
+        font-size: 14px;
+      }
+
+      .form {
+        display: grid;
+        max-width: 520px;
+        gap: 10px;
+      }
+
+      label {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      input {
+        min-height: 32px;
+        border: 1px solid #d9e0e8;
+        border-radius: 8px;
+        padding: 6px 8px;
+      }
+
+      .error {
+        color: #d6a5a5;
+        font-size: 12px;
+      }
+
+      .submit {
+        width: fit-content;
+        min-height: 34px;
+        border: 0;
+        border-radius: 8px;
+        padding: 0 12px;
+        background: #94a3b8;
+        color: #f8fafc;
+        font-weight: 800;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- QA expected: low contrast risk, tiny text, small touch targets, colour-only status, weak error visibility. -->
+    <main class="shell" data-review-fixture="bad-accessibility-visible">
+      <section class="panel">
+        <h1>Account readiness</h1>
+        <p class="soft-copy" data-expected-issue="low-contrast-tiny-readable-text">
+          This explanatory copy is intentionally small and visually soft against the white panel, creating a readability risk for users with low vision, glare, or fatigue.
+        </p>
+
+        <div class="toolbar" data-expected-issue="small-touch-targets">
+          <button class="icon-button" type="button" aria-label="Refresh">R</button>
+          <button class="icon-button" type="button" aria-label="Filter">F</button>
+          <button class="icon-button" type="button" aria-label="Sort">S</button>
+          <button class="icon-button" type="button" aria-label="Export">E</button>
+        </div>
+
+        <section class="status-grid" aria-label="Status summary" data-expected-issue="colour-only-status-risk">
+          <article class="status-card"><span class="dot ok"></span><strong>Billing</strong></article>
+          <article class="status-card"><span class="dot warn"></span><strong>Security</strong></article>
+          <article class="status-card"><span class="dot bad"></span><strong>Access</strong></article>
+        </section>
+
+        <form class="form" data-expected-issue="poor-error-visibility">
+          <label for="team">Team name</label>
+          <input id="team" value="Northstar" />
+          <p class="error">Team URL is already in use.</p>
+          <button class="submit" type="button">Save</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

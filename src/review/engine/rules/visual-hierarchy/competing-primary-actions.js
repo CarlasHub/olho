@@ -1,5 +1,16 @@
 import { visualWeightRatio } from "../../../utils/visual-weight.js";
+import { parseColour } from "../../../utils/colour-utils.js";
 import { createFinding, elementLabel, firstSelector, missingActions } from "../rule-utils.js";
+
+function isWhiteishBackground(value) {
+  const colour = parseColour(value);
+  if (!colour || colour.a <= 0.05) return true;
+  return colour.r >= 245 && colour.g >= 245 && colour.b >= 245;
+}
+
+function isFilledAction(action = {}) {
+  return !isWhiteishBackground(action.style?.backgroundColor);
+}
 
 export const competingPrimaryActionsRule = {
   id: "visual-hierarchy/competing-primary-actions",
@@ -15,6 +26,7 @@ export const competingPrimaryActionsRule = {
 
     // Nielsen Norman Group hierarchy guidance and Hick's Law both support one clearly dominant next action.
     if (!ratio || ratio > context.profile.thresholds.maxPrimaryActionWeightRatio) return null;
+    if (isFilledAction(first) !== isFilledAction(second)) return null;
 
     return createFinding(context, {
       ruleId: this.id,

@@ -17,7 +17,7 @@ export const fragmentedCompositionRule = {
       severity: "medium",
       region: "Overall composition",
       issue: "The composition feels fragmented across too many small groups.",
-      evidence: `Detected ${groups.length} separate proximity groups in the visible screenshot.`,
+      evidence: `Measured ${groups.length} separate proximity groups in the visible screenshot.`,
       impact: "Fragmentation makes the screen feel less calm and increases the effort required to understand relationships.",
       recommendation: "Consolidate related content into fewer, clearer regions with stronger grouping and alignment.",
       confidence: 0.72

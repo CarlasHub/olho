@@ -1,13 +1,17 @@
 import { MESSAGE_TYPES, createMessage } from "./extension/models.js";
 import {
   StorageQuotaError,
+  createItem,
   getAppSettings,
   getMediaBlob,
   listRecent,
   moveToTrash,
-  saveMedia
+  saveMedia,
+  updateMediaMetadata
 } from "./src/storage/storage.js";
 import { installRuntimeGuard } from "./src/shared/runtime-guard.js";
+import { importDesignScreenshotForReview } from "./src/review/design/design-import-controller.js";
+import { detectDesignSource } from "./src/review/design/design-source-detector.js";
 
 const toast = document.getElementById("toast");
 const recentList = document.getElementById("recentList");
@@ -35,6 +39,8 @@ const screenRegionCropCanvas = document.getElementById("screenRegionCropCanvas")
 const screenRegionCropConfirmBtn = document.getElementById("screenRegionCropConfirmBtn");
 const screenRegionCropRetakeBtn = document.getElementById("screenRegionCropRetakeBtn");
 const screenRegionCropCancelBtn = document.getElementById("screenRegionCropCancelBtn");
+const reviewCurrentDesignBtn = document.getElementById("reviewCurrentDesignBtn");
+const reviewImportInput = document.getElementById("reviewImportInput");
 
 let toastTimer = null;
 let pendingClipboardItemId = null;
@@ -66,6 +72,27 @@ const actionMap = {
   "start-recording": MESSAGE_TYPES.START_RECORDING,
   "open-library": MESSAGE_TYPES.OPEN_LIBRARY,
   "open-options": MESSAGE_TYPES.OPEN_OPTIONS
+};
+
+const reviewActionMap = {
+  "review-current-screen": {
+    type: MESSAGE_TYPES.CAPTURE_VISIBLE,
+    captureAction: "capture-visible",
+    mode: "current-screen",
+    forceDesign: false
+  },
+  "review-full-page": {
+    type: MESSAGE_TYPES.CAPTURE_FULL_PAGE,
+    captureAction: "capture-full",
+    mode: "full-page",
+    forceDesign: false
+  },
+  "review-current-design": {
+    type: MESSAGE_TYPES.CAPTURE_VISIBLE,
+    captureAction: "capture-visible",
+    mode: "current-design",
+    forceDesign: true
+  }
 };
 
 function showToast(message, isError = false) {
@@ -329,6 +356,287 @@ function sanitizeTitleSegment(value) {
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 120);
+}
+
+function safeHostFromUrl(url) {
+  try {
+    return new URL(String(url || "")).hostname.toLowerCase();
+  } catch {
+    return "";
+  }
+}
+
+async function resolveCaptureTab() {
+  const tabId = await resolveCaptureTabId();
+  if (!Number.isFinite(tabId)) return null;
+  return chrome.tabs.get(tabId).catch(() => null);
+}
+
+function reviewSourceFromTab(tab, { forceDesign = false } = {}) {
+  const host = safeHostFromUrl(tab?.url || tab?.pendingUrl || "");
+  const detected = detectDesignSource({
+    metadata: {
+      sourceUrl: tab?.url || tab?.pendingUrl || "",
+      sourceLabel: host,
+      title: tab?.title || ""
+    }
+  });
+  const isKnownDesign = detected.sourceType === "figma-capture" || detected.sourceType === "zeplin-capture";
+
+  if (isKnownDesign) {
+    return {
+      ...detected,
+      host,
+      isDesignScreen: true
+    };
+  }
+
+  if (forceDesign) {
+    return {
+      sourceType: "static-design",
+      isDesignScreen: true,
+      platform: "",
+      confidence: 0.5,
+      reason: "User requested Design Review from current screen.",
+      host
+    };
+  }
+
+  return {
+    sourceType: "webpage-capture",
+    isDesignScreen: false,
+    platform: "",
+    confidence: 0.7,
+    reason: "Current browser tab capture.",
+    host
+  };
+}
+
+function reviewMetadataForTab(tab, reviewAction = {}) {
+  const source = reviewSourceFromTab(tab, reviewAction);
+  const metadata = {
+    reviewEntryPoint: "popup-review",
+    reviewCaptureMode: reviewAction.mode || "current-screen",
+    reviewSourceType: source.sourceType,
+    sourceHost: source.host || "",
+    sourcePageTitle: sanitizeTitleSegment(tab?.title || ""),
+    sourceDetectionReason: source.reason || "",
+    sourceDetectionConfidence: source.confidence
+  };
+
+  if (source.isDesignScreen) {
+    metadata.designReview = true;
+    metadata.isDesignScreen = true;
+    metadata.designPlatform = source.platform || "";
+  }
+
+  return metadata;
+}
+
+function collectVisibleReviewMetrics() {
+  const viewport = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    scrollX: window.scrollX,
+    scrollY: window.scrollY,
+    devicePixelRatio: window.devicePixelRatio || 1
+  };
+  const selectors = [
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "button",
+    "a[href]",
+    "input",
+    "select",
+    "textarea",
+    "[role='button']",
+    "[role='link']",
+    "[role='heading']",
+    "[role='tab']",
+    "[role='menuitem']",
+    "[role='alert']",
+    "[role='status']",
+    "label",
+    "p",
+    "li",
+    "th",
+    "td",
+    "main",
+    "article",
+    "section",
+    "nav",
+    "header",
+    "footer",
+    "aside",
+    "form",
+    "fieldset",
+    "[class*='card' i]",
+    "[class*='tile' i]",
+    "[class*='panel' i]",
+    "[class*='section' i]",
+    "[class*='hero' i]",
+    "[class*='block' i]",
+    "[class*='container' i]",
+    "[class*='content' i]",
+    "[class*='grid' i]",
+    "[class*='row' i]",
+    "[class*='column' i]",
+    "[class*='toolbar' i]",
+    "[class*='sidebar' i]",
+    "[class*='modal' i]",
+    "[class*='dialog' i]",
+    "[class*='badge' i]",
+    "[class*='pill' i]",
+    "[class*='alert' i]",
+    "[class*='error' i]",
+    "[class*='status' i]"
+  ];
+
+  function selectorFor(element) {
+    if (element.id) return `#${CSS.escape(element.id)}`;
+    const tag = element.tagName.toLowerCase();
+    const classNames = Array.from(element.classList || [])
+      .slice(0, 2)
+      .map((name) => `.${CSS.escape(name)}`)
+      .join("");
+    return `${tag}${classNames}`;
+  }
+
+  function roleFor(element) {
+    return element.getAttribute("role") || "";
+  }
+
+  function componentTypeFor(element, role, selector) {
+    const tag = element.tagName.toLowerCase();
+    const text = `${selector} ${role} ${tag}`.toLowerCase();
+    if (/^h[1-6]$/.test(tag) || role === "heading") return "heading";
+    if (tag === "button" || role === "button" || /\b(btn|button|cta)\b/.test(text)) return "button";
+    if (tag === "a" || role === "link") return "link";
+    if (/\b(card|tile|panel|modal|dialog)\b/.test(text)) return "card";
+    if (/\b(alert|error)\b/.test(text)) return "error";
+    if (/\b(status|badge|pill|tag)\b/.test(text)) return "status";
+    if (
+      /^(main|article|section|nav|header|footer|aside|form|fieldset)$/.test(tag) ||
+      /\b(section|hero|block|container|content|grid|row|column|toolbar|sidebar)\b/.test(text)
+    ) {
+      return "region";
+    }
+    return "";
+  }
+
+  function isVisible(rect, style) {
+    if (style.visibility === "hidden" || style.display === "none" || Number(style.opacity) === 0) return false;
+    if (rect.width < 4 || rect.height < 4) return false;
+    if (rect.right < 0 || rect.bottom < 0 || rect.left > viewport.width || rect.top > viewport.height) return false;
+    return true;
+  }
+
+  const seen = new Set();
+  const elements = [];
+  document.querySelectorAll(selectors.join(",")).forEach((element) => {
+    if (!(element instanceof HTMLElement) || seen.has(element)) return;
+    seen.add(element);
+    const rect = element.getBoundingClientRect();
+    const style = window.getComputedStyle(element);
+    if (!isVisible(rect, style)) return;
+    const selector = selectorFor(element);
+    const role = roleFor(element);
+    const text = String(element.innerText || element.getAttribute("aria-label") || element.getAttribute("title") || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 160);
+    const type = componentTypeFor(element, role, selector);
+    if (!text && !type) return;
+
+    elements.push({
+      selector,
+      tagName: element.tagName.toLowerCase(),
+      role,
+      type,
+      text,
+      bounds: {
+        x: Math.round(rect.left),
+        y: Math.round(rect.top),
+        width: Math.round(rect.width),
+        height: Math.round(rect.height)
+      },
+      computedStyle: {
+        color: style.color,
+        backgroundColor: style.backgroundColor,
+        borderColor: style.borderColor,
+        borderRadius: style.borderRadius,
+        boxShadow: style.boxShadow,
+        fontFamily: style.fontFamily,
+        fontSize: style.fontSize,
+        fontWeight: style.fontWeight,
+        lineHeight: style.lineHeight
+      },
+      interactive: Boolean(
+        element.matches("button,a[href],input,select,textarea,[role='button'],[role='link'],[role='tab'],[role='menuitem']")
+      ),
+      headingLevel: /^h[1-6]$/i.test(element.tagName) ? Number(element.tagName.slice(1)) : Number(element.getAttribute("aria-level") || 0)
+    });
+  });
+
+  return {
+    source: "popup-live-dom",
+    capturedAt: new Date().toISOString(),
+    viewport,
+    elements: elements.slice(0, 140)
+  };
+}
+
+async function collectReviewMetricsForTab(tabId) {
+  if (!Number.isFinite(tabId) || !chrome?.scripting?.executeScript) return null;
+  const [result] = await chrome.scripting.executeScript({
+    target: { tabId },
+    func: collectVisibleReviewMetrics
+  });
+  const metrics = result?.result || null;
+  if (!metrics || !Array.isArray(metrics.elements)) return null;
+  return metrics;
+}
+
+async function openReviewItem(itemId) {
+  const safeItemId = String(itemId || "").trim();
+  if (!safeItemId) {
+    throw new Error("Review Mode needs a captured image item.");
+  }
+  const url = chrome.runtime.getURL(`review.html?itemId=${encodeURIComponent(safeItemId)}`);
+  await chrome.tabs.create({ url });
+}
+
+async function queueSidepanelLaunch(action) {
+  const storage = chrome.storage?.session;
+  if (!storage?.set || !action) return;
+  await storage.set({
+    olhoSidepanelLaunch: {
+      action,
+      ts: Date.now()
+    }
+  });
+}
+
+async function openReviewSidePanel(action = "") {
+  if (!chrome.sidePanel?.open) return false;
+  const tab = await resolveCaptureTab();
+  if (!Number.isFinite(tab?.id)) {
+    throw new Error("No active page is available for Review Panel.");
+  }
+  await queueSidepanelLaunch(action);
+  if (chrome.sidePanel.setOptions) {
+    await chrome.sidePanel.setOptions({
+      tabId: tab.id,
+      path: "sidepanel.html",
+      enabled: true
+    });
+  }
+  await chrome.sidePanel.open({ windowId: tab.windowId });
+  return true;
 }
 
 function makeScreenCaptureTitle(sourceLabel) {
@@ -856,6 +1164,41 @@ function openEditorAndCopy(itemId) {
 }
 
 async function handleAction(action) {
+  if (action === "open-review-panel") {
+    try {
+      const opened = await openReviewSidePanel("");
+      if (!opened) {
+        showToast("Review side panel is unavailable in this browser.", true);
+        return;
+      }
+      window.close();
+    } catch (error) {
+      showToast(`Review panel failed: ${String(error?.message || error)}`, true);
+    }
+    return;
+  }
+
+  if (action === "review-imported-screenshot") {
+    reviewImportInput?.click();
+    return;
+  }
+
+  if (reviewActionMap[action]) {
+    if (action === "review-current-screen" || action === "review-current-design") {
+      try {
+        const opened = await openReviewSidePanel(action);
+        if (opened) {
+          window.close();
+          return;
+        }
+      } catch (error) {
+        console.warn("Review side panel unavailable; falling back to screenshot Review Mode.", error);
+      }
+    }
+    await handleReviewAction(action);
+    return;
+  }
+
   if (action === "annotate-local-image") {
     const url = chrome.runtime.getURL("editor.html?import=1");
     await chrome.tabs.create({ url });
@@ -984,6 +1327,79 @@ async function handleAction(action) {
   }
 }
 
+async function handleReviewAction(action) {
+  const reviewAction = reviewActionMap[action];
+  if (!reviewAction) return;
+
+  clearScreenCapturePreview();
+  hideCaptureBlockedFallback();
+  hideClipboardFallback();
+
+  try {
+    await runCaptureDelayIfNeeded(reviewAction.captureAction);
+    const tab = await resolveCaptureTab();
+    if (!Number.isFinite(tab?.id)) {
+      throw new Error("No capturable browser tab is available.");
+    }
+
+    const payload = {
+      action: reviewAction.captureAction,
+      destination: "review",
+      tabId: tab.id
+    };
+    const response = await sendBusMessage(reviewAction.type, payload);
+    if (response?.ok === false) {
+      const message = response.error || "Review capture failed.";
+      showToast(message, true);
+      if (/cannot capture this protected browser page|cannot access this page as a tab/i.test(message)) {
+        showCaptureBlockedFallback(
+          "Olho cannot access this page as a tab. Use Capture screen/window to capture what is visible."
+        );
+      }
+      return;
+    }
+
+    const data = response?.data || {};
+    if (data.cancelled) {
+      showToast("Review capture cancelled.");
+      return;
+    }
+    if (!data.itemId) {
+      throw new Error("Review capture completed without a saved local image.");
+    }
+
+    const metadata = reviewMetadataForTab(tab, reviewAction);
+    const reviewMetrics = await collectReviewMetricsForTab(tab.id).catch((error) => {
+      console.warn("Review metadata collection failed", error);
+      return null;
+    });
+    if (reviewMetrics?.elements?.length) {
+      metadata.reviewMetrics = reviewMetrics;
+      metadata.hasReviewMetrics = true;
+    } else {
+      metadata.reviewMetricsUnavailableReason = "Live DOM/style metrics were unavailable for this capture.";
+    }
+
+    await updateMediaMetadata(data.itemId, {
+      metadata
+    }).catch((error) => {
+      console.warn("Review metadata update failed", error);
+    });
+    await refreshRecent();
+    await openReviewItem(data.itemId);
+    showToast("Opening Review Mode.");
+    window.close();
+  } catch (error) {
+    const message = String(error?.message || error || "");
+    if (/delayed capture cancelled/i.test(message)) {
+      showToast("Review capture countdown cancelled.");
+      return;
+    }
+    showToast(`Review failed: ${message}`, true);
+    console.error("Olho review action failed", error);
+  }
+}
+
 function labelFromAction(action) {
   const labels = {
     "capture-visible": "Capture Tab",
@@ -992,6 +1408,11 @@ function labelFromAction(action) {
     "capture-screen-window": "Capture Screen/Window",
     "capture-screen-region": "Select Area (Screen/Window)",
     "capture-element": "Focus Element",
+    "review-current-screen": "Review Current Screen",
+    "review-full-page": "Review Full Page",
+    "review-current-design": "Review Current Design",
+    "open-review-panel": "Open Review Panel",
+    "review-imported-screenshot": "Review Imported Screenshot",
     "start-recording": "Record Screen",
     "annotate-local-image": "Annotate Local Image",
     "open-library": "Open Memory",
@@ -1056,6 +1477,27 @@ async function loadPopupSettings() {
     };
   }
 
+}
+
+async function updateReviewDesignAvailability() {
+  if (!(reviewCurrentDesignBtn instanceof HTMLButtonElement)) return;
+  try {
+    const tab = await resolveCaptureTab();
+    const source = reviewSourceFromTab(tab);
+    const available = source.sourceType === "figma-capture" || source.sourceType === "zeplin-capture";
+    reviewCurrentDesignBtn.hidden = !available;
+    reviewCurrentDesignBtn.disabled = !available;
+    if (available) {
+      const label = source.platform === "zeplin" ? "Review Current Zeplin Design" : "Review Current Figma Design";
+      reviewCurrentDesignBtn.querySelector(".btn-label").textContent = label;
+      reviewCurrentDesignBtn.removeAttribute("title");
+    } else {
+      reviewCurrentDesignBtn.setAttribute("title", "Open a Figma or Zeplin browser tab to review the current design.");
+    }
+  } catch {
+    reviewCurrentDesignBtn.hidden = true;
+    reviewCurrentDesignBtn.disabled = true;
+  }
 }
 
 function renderRecent(items) {
@@ -1255,6 +1697,26 @@ previewDiscardBtn?.addEventListener("click", async () => {
   }
 });
 
+reviewImportInput?.addEventListener("change", async () => {
+  const file = reviewImportInput.files?.[0] || null;
+  if (!file) return;
+  try {
+    const item = await importDesignScreenshotForReview({
+      file,
+      createItem,
+      openReview: openReviewItem
+    });
+    await refreshRecent();
+    showToast(`Opening Review Mode for ${item?.metadata?.title || "imported screenshot"}.`);
+    window.close();
+  } catch (error) {
+    console.error("Review screenshot import failed", error);
+    showToast(String(error?.message || error || "Review import failed."), true);
+  } finally {
+    reviewImportInput.value = "";
+  }
+});
+
 window.addEventListener("beforeunload", () => {
   revokeScreenCapturePreviewUrl();
 });
@@ -1287,13 +1749,13 @@ function enforcePopupWidthForActionPanel() {
       return;
     }
     if (document.documentElement) {
-      document.documentElement.style.minWidth = "0";
-      document.documentElement.style.width = "100%";
+      document.documentElement.style.minWidth = "420px";
+      document.documentElement.style.width = "420px";
       document.documentElement.style.maxWidth = "420px";
     }
     if (document.body) {
-      document.body.style.minWidth = "0";
-      document.body.style.width = "100%";
+      document.body.style.minWidth = "420px";
+      document.body.style.width = "420px";
       document.body.style.maxWidth = "420px";
     }
   });
@@ -1302,4 +1764,7 @@ function enforcePopupWidthForActionPanel() {
 enforcePopupWidthForActionPanel();
 Promise.all([loadPopupSettings(), refreshRecent()]).catch((error) => {
   console.error("Popup initialization failed", error);
+});
+updateReviewDesignAvailability().catch((error) => {
+  console.warn("Review design availability check failed", error);
 });

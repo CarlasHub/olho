@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QA Long Page Full Review</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #f8fafc;
+        color: #1f2937;
+        font: 16px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      section {
+        min-height: 760px;
+        padding: 58px;
+      }
+
+      .hero {
+        background: #ecfeff;
+      }
+
+      .middle {
+        background: #fff7ed;
+      }
+
+      .below-fold {
+        background: #fef2f2;
+      }
+
+      .card {
+        max-width: 920px;
+        padding: 32px;
+        border-radius: 26px;
+        background: #ffffff;
+        box-shadow: 0 20px 44px rgba(30, 41, 59, 0.12);
+      }
+
+      h1,
+      h2 {
+        margin: 0 0 16px;
+      }
+
+      .competing-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .competing-actions a {
+        display: inline-grid;
+        min-height: 46px;
+        place-items: center;
+        border-radius: 999px;
+        padding: 0 18px;
+        background: #ef4444;
+        color: #fff;
+        font-weight: 900;
+        text-decoration: none;
+      }
+
+      .below-fold p {
+        max-width: 920px;
+        color: #c4a0a0;
+        font-size: 13px;
+        line-height: 1.25;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- QA expected: visible review should see above fold only; full-page review should capture/review below-fold issues if implemented. -->
+    <section class="hero" data-expected-region="above-fold">
+      <div class="card">
+        <h1>Long page review top marker</h1>
+        <p>The first viewport contains a mild hierarchy issue and repeated actions.</p>
+        <div class="competing-actions" data-expected-issue="above-fold-competing-actions">
+          <a href="#a">Start</a>
+          <a href="#b">Request demo</a>
+          <a href="#c">View plans</a>
+        </div>
+      </div>
+    </section>
+    <section class="middle">
+      <div class="card">
+        <h2>Middle content</h2>
+        <p>This section is intentionally calmer and should not dominate the review.</p>
+      </div>
+    </section>
+    <section class="below-fold" data-expected-region="below-fold">
+      <div class="card" data-expected-issue="below-fold-low-contrast-and-soft-hierarchy">
+        <h2>Below fold risk area</h2>
+        <p>
+          This body text is intentionally soft and compact against the pale background. It should only be detected when the full-page flow reviews beyond the visible viewport.
+        </p>
+      </div>
+    </section>
+  </body>
+</html>

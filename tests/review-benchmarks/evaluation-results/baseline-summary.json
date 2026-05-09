@@ -1,0 +1,12 @@
+{
+  "generatedBy": "curated-baseline",
+  "status": "calibration-baseline",
+  "purpose": "This file documents the expected benchmark evaluation shape. Automated tests compute current scores in memory.",
+  "ratings": ["Strong", "Mostly strong", "Needs attention", "Weak"],
+  "knownFocus": [
+    "Reduce scanner-like wording.",
+    "Prefer root-cause synthesis over fragmented symptoms.",
+    "Keep Zeplin/Figma editor chrome out of design-area reviews.",
+    "Track missed broad hierarchy and UX clarity issues explicitly."
+  ]
+}

@@ -10,7 +10,7 @@ export const AI_PROVIDER_OPTIONS = Object.freeze([
     requiresEndpoint: true,
     supportsVision: true,
     localOnly: true,
-    defaultModel: "llama3.2"
+    defaultModel: ""
   },
   {
     id: "gemini",
@@ -51,6 +51,16 @@ export const AI_REVIEW_MODE_OPTIONS = Object.freeze([
     id: AI_REVIEW_MODES.FULL_VISUAL,
     label: "Full visual review",
     description: "May send the screenshot only when screenshot sharing is enabled."
+  },
+  {
+    id: AI_REVIEW_MODES.STATIC_DESIGN_VISUAL,
+    label: "Static design visual review",
+    description: "Uses the isolated design screenshot/crop plus structured context. Requires a vision-capable Ollama model."
+  },
+  {
+    id: AI_REVIEW_MODES.STATIC_DESIGN_SYNTHESIS,
+    label: "Static design synthesis",
+    description: "Combines deterministic findings, local visual-analysis evidence, and region summaries into broader design critique without sending a screenshot."
   }
 ]);
 
@@ -75,12 +85,54 @@ function defaultProviderSettings() {
   return Object.fromEntries(AI_PROVIDER_OPTIONS.map((provider) => [provider.id, providerDefaults(provider.id)]));
 }
 
+function chromeLocalStorage() {
+  try {
+    return globalThis.chrome?.storage?.local || null;
+  } catch {
+    return null;
+  }
+}
+
 function safeStorage(storage) {
   if (storage) return storage;
+  const chromeStorage = chromeLocalStorage();
+  if (chromeStorage) return chromeStorage;
   try {
     return globalThis.localStorage || null;
   } catch {
     return null;
+  }
+}
+
+async function readStorageValue(target, key) {
+  if (!target) return null;
+  if (typeof target.getItem === "function") return target.getItem(key);
+  if (typeof target.get === "function") {
+    const result = await target.get(key);
+    return result?.[key] || null;
+  }
+  return null;
+}
+
+async function writeStorageValue(target, key, value) {
+  if (!target) return;
+  if (typeof target.setItem === "function") {
+    target.setItem(key, value);
+    return;
+  }
+  if (typeof target.set === "function") {
+    await target.set({ [key]: value });
+  }
+}
+
+async function removeStorageValue(target, key) {
+  if (!target) return;
+  if (typeof target.removeItem === "function") {
+    target.removeItem(key);
+    return;
+  }
+  if (typeof target.remove === "function") {
+    await target.remove(key);
   }
 }
 
@@ -128,10 +180,10 @@ export function normalizeAiReviewConfig(input = {}) {
 
 export async function loadAiReviewConfig({ storage } = {}) {
   const target = safeStorage(storage);
-  if (!target?.getItem) return defaultAiReviewConfig();
+  if (!target) return defaultAiReviewConfig();
 
   try {
-    const raw = target.getItem(AI_REVIEW_CONFIG_STORAGE_KEY);
+    const raw = await readStorageValue(target, AI_REVIEW_CONFIG_STORAGE_KEY);
     return normalizeAiReviewConfig(raw ? JSON.parse(raw) : {});
   } catch (error) {
     console.warn("AI review settings could not be read. Defaults were used.", error);
@@ -142,10 +194,10 @@ export async function loadAiReviewConfig({ storage } = {}) {
 export async function saveAiReviewConfig(config, { storage } = {}) {
   const normalized = normalizeAiReviewConfig(config);
   const target = safeStorage(storage);
-  if (!target?.setItem) return normalized;
+  if (!target) return normalized;
 
   try {
-    target.setItem(AI_REVIEW_CONFIG_STORAGE_KEY, JSON.stringify(normalized));
+    await writeStorageValue(target, AI_REVIEW_CONFIG_STORAGE_KEY, JSON.stringify(normalized));
   } catch (error) {
     console.warn("AI review settings could not be saved.", error);
   }
@@ -155,9 +207,9 @@ export async function saveAiReviewConfig(config, { storage } = {}) {
 
 export async function clearAiReviewConfig({ storage } = {}) {
   const target = safeStorage(storage);
-  if (target?.removeItem) {
+  if (target) {
     try {
-      target.removeItem(AI_REVIEW_CONFIG_STORAGE_KEY);
+      await removeStorageValue(target, AI_REVIEW_CONFIG_STORAGE_KEY);
     } catch (error) {
       console.warn("AI review settings could not be cleared.", error);
     }

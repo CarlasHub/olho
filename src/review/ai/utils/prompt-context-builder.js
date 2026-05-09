@@ -69,6 +69,29 @@ export function buildAiPromptContext({ session = {}, reviewContext = {}, determi
   return {
     product: "Olho Review",
     reviewType: "Optional professional AI visual UI/UX and accessibility review",
+    reviewerStandard: {
+      role: "Senior enterprise UI/UX reviewer, accessibility-visible reviewer, and product design critic",
+      stance: "Critical professional release audit, not praise or generic commentary",
+      evaluate: [
+        "visual hierarchy",
+        "spacing rhythm",
+        "typography quality",
+        "CTA clarity",
+        "layout composition",
+        "cognitive load",
+        "discoverability",
+        "component consistency",
+        "accessibility-visible risk",
+        "enterprise polish"
+      ],
+      findingRequirements: [
+        "reference visible evidence",
+        "explain why the issue matters",
+        "describe UX or accessibility-visible impact",
+        "provide actionable recommendations",
+        "prioritize severity realistically"
+      ]
+    },
     sourceType: context.sourceType || session.engineMetadata?.sourceType || "image-only",
     screenshotRef: session.screenshotRef || context.screenshotRef || "",
     image: {
@@ -84,9 +107,22 @@ export function buildAiPromptContext({ session = {}, reviewContext = {}, determi
     },
     metadataAvailability: {
       hasDomMetrics: Boolean(context.hasDomMetrics || session.engineMetadata?.hasDomMetrics),
-      hasComputedStyles: Boolean(context.elements?.some((element) => element.style)),
+      hasComputedStyles: Boolean(context.hasComputedStyles || context.elements?.some((element) => element.style)),
+      hasTextMetrics: Boolean(context.hasTextMetrics),
+      hasInteractiveElements: Boolean(context.hasInteractiveElements),
+      hasDesignMetadata: Boolean(context.hasDesignMetadata),
+      isImageOnly: Boolean(context.isImageOnly),
+      isDesignScreen: Boolean(context.isDesignScreen),
       hasScreenshot: true,
       screenshotMayBeSharedOnlyWithExplicitConsent: true
+    },
+    designReview: {
+      isDesignScreen: Boolean(context.isDesignScreen),
+      sourceType: context.sourceType || session.engineMetadata?.sourceType || "unknown",
+      platform: context.designSource?.platform || session.designReview?.platform || "",
+      visibleOnly: true,
+      instruction:
+        "This may be a static design screenshot. DOM, code, focus states, and live interaction data may be unavailable. Do not claim WCAG failures without reliable data."
     },
     visualMetrics: {
       overallVisualScore: context.overallVisualScore ?? session.engineMetadata?.visualScore ?? null,

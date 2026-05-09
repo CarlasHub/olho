@@ -1,0 +1,29 @@
+{
+  "benchmarkId": "typography-editorial",
+  "title": "Typography editorial",
+  "intendedUserGoal": "Read and understand long-form review guidance without strain.",
+  "strongFindings": [
+    {
+      "id": "readability-rhythm",
+      "category": "accessibility-visible",
+      "severity": "medium",
+      "region": "Editorial body copy",
+      "rootCause": "Long line length and tight line height reduce reading comfort.",
+      "evidenceKeywords": ["line", "read", "copy", "typography"],
+      "priority": 1
+    },
+    {
+      "id": "type-scale",
+      "category": "visual-hierarchy",
+      "severity": "low",
+      "region": "Editorial section",
+      "rootCause": "Heading and body hierarchy does not create enough editorial rhythm.",
+      "evidenceKeywords": ["type", "heading", "body", "scale"],
+      "priority": 2
+    }
+  ],
+  "weakFindingsToAvoid": ["text exists", "font detected"],
+  "rootCauseObservations": ["Readability is the root concern; avoid generic typography labels without impact."],
+  "mergeGuidance": ["Merge line length and line height into one readability finding when they affect the same paragraph."],
+  "scannerSpamToAvoid": ["Do not create separate findings for every text block."]
+}

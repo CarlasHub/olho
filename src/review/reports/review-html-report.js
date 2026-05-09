@@ -21,6 +21,12 @@ function countCards(counts) {
     .join("");
 }
 
+function targetDescription(metadata) {
+  if (!metadata.targetType && !metadata.targetLabel) return "Not specified";
+  const isolation = metadata.designAreaIsolationUsed ? "Design/editor utility UI excluded" : "Full visible target";
+  return [metadata.targetLabel, metadata.targetType, isolation].filter(Boolean).join(" | ");
+}
+
 function findingCard(finding, index) {
   return `
     <article class="finding-card">
@@ -34,18 +40,89 @@ function findingCard(finding, index) {
       <dl class="finding-details">
         <div><dt>Category</dt><dd>${escapeHtml(finding.categoryLabel)}</dd></div>
         <div><dt>Region</dt><dd>${escapeHtml(finding.region)}</dd></div>
+        <div><dt>Marker type</dt><dd>${escapeHtml(finding.markerType || "Not specified")}</dd></div>
         <div><dt>Evidence</dt><dd>${escapeHtml(finding.evidence)}</dd></div>
         <div><dt>Impact</dt><dd>${escapeHtml(finding.impact)}</dd></div>
+        <div><dt>Best practice</dt><dd>${escapeHtml(finding.bestPracticeReference || "Not specified")}</dd></div>
+        <div><dt>Reviewer rationale</dt><dd>${escapeHtml(finding.reviewRationale || "Not specified")}</dd></div>
+        <div><dt>Affected users</dt><dd>${escapeHtml(finding.affectedUsers || "Not specified")}</dd></div>
         <div><dt>Recommendation</dt><dd>${escapeHtml(finding.recommendation)}</dd></div>
+        <div><dt>Evidence type</dt><dd>${escapeHtml(finding.evidenceType || "Not specified")}</dd></div>
+        <div><dt>Suggested priority</dt><dd>${escapeHtml(finding.suggestedPriority || "Not specified")}</dd></div>
         <div><dt>Confidence</dt><dd>${escapeHtml(finding.confidencePercent)}%</dd></div>
         <div><dt>Source</dt><dd>${escapeHtml(finding.source)}</dd></div>
       </dl>
       <section class="ticket-block">
         <h4>Ticket-ready version</h4>
         <p><strong>${escapeHtml(finding.ticket.title)}</strong></p>
+        <h4>Acceptance criteria</h4>
         <ul>${listItems(finding.ticket.acceptanceCriteria)}</ul>
       </section>
     </article>
+  `;
+}
+
+function visualAnalysisDetails(report) {
+  const analysis = report.sourceMetadata.visualAnalysis;
+  if (!analysis?.evidence) return "";
+  const evidence = analysis.evidence;
+  const palette = (evidence.colourPalette || []).map((colour) => `${colour.hex} (${Math.round(colour.coverage * 100)}%)`);
+  const contrastRisks = (evidence.lowContrastTextLikeRegions || []).map(
+    (region) => `${region.region}: ${region.contrastRatio}:1`
+  );
+  const ocrContrastRisks = (evidence.ocrContrastResults || [])
+    .filter((region) => Number(region.contrastRatio || 0) < 4.5)
+    .map((region) => `${region.region || region.textRegionId}: ${region.contrastRatio}:1`);
+  const hierarchy = evidence.visualHierarchy || {};
+  const ocr = evidence.ocr || {};
+  return `
+    <section class="section-card">
+      <h2>Local Visual Analysis</h2>
+      <p>This report includes local pixel-level analysis. The visual layer extracts measurable facts from the screenshot; AI, when used, reasons over that structured evidence.</p>
+      <p><strong>Dominant colours:</strong> ${escapeHtml(palette.join(", ") || "Not measured")}</p>
+      <p><strong>Local OCR:</strong> ${escapeHtml(
+        ocr.available ? `${ocr.provider || "available"}; ${ocr.textRegionCount || 0} text region(s)` : ocr.reason || "Unavailable"
+      )}</p>
+      <p><strong>Low-contrast text-like regions:</strong> ${escapeHtml(contrastRisks.join(", ") || "None detected")}</p>
+      <p><strong>OCR-measured contrast risks:</strong> ${escapeHtml(ocrContrastRisks.join(", ") || "None detected")}</p>
+      <p><strong>Primary action dominance:</strong> ${escapeHtml(hierarchy.primaryActionDominance || "unknown")}</p>
+      <p><strong>Competing focal point risk:</strong> ${hierarchy.competingFocalPointRisk ? "Yes" : "No"}</p>
+      <p><strong>Dense cluster count:</strong> ${escapeHtml(evidence.spacingDensity?.denseClusterCount || 0)}</p>
+    </section>
+  `;
+}
+
+function aiDesignDetails(report) {
+  const ai = report.sourceMetadata.aiStaticDesign;
+  if (!ai) return "";
+  const vision = ai.localVisionModel || null;
+  return `
+    <section class="section-card">
+      <h2>Ollama Static Design Review Details</h2>
+      <p><strong>Model:</strong> ${escapeHtml(ai.model || "Not specified")}</p>
+      <p><strong>Capability:</strong> ${escapeHtml(ai.capability || "Unknown")}</p>
+      <p><strong>Screenshot/crop used:</strong> ${ai.screenshotCropUsed ? "Yes" : "No"}</p>
+      <p><strong>Ignored areas:</strong> ${escapeHtml((ai.ignoredAreas || []).join(", ") || "None")}</p>
+      <p><strong>Vision Transformer runtime:</strong> ${escapeHtml(
+        ai.visionTransformerRuntime?.available
+          ? `${ai.visionTransformerRuntime.model || "local ViT"} available`
+          : ai.visionTransformerRuntime?.reason || "Not configured"
+      )}</p>
+      <h3>Local Vision Model Interpretation</h3>
+      <p><strong>Status:</strong> ${escapeHtml(vision ? (vision.available ? "Available" : "Unavailable") : "Not run")}</p>
+      <p><strong>Provider/model:</strong> ${escapeHtml(vision ? `${vision.provider || "ollama"} ${vision.model || ""}`.trim() : "None")}</p>
+      <p><strong>Architecture:</strong> ${escapeHtml(vision?.architecture || "unknown")}</p>
+      <p><strong>Observation count:</strong> ${escapeHtml(vision?.modelObservations?.length || 0)}</p>
+      <pre>${escapeHtml(JSON.stringify(vision?.structuralSummary || {}, null, 2))}</pre>
+      <h3>Screen Understanding</h3>
+      <pre>${escapeHtml(JSON.stringify(ai.screenUnderstanding || {}, null, 2))}</pre>
+      <h3>Final Synthesis</h3>
+      <pre>${escapeHtml(JSON.stringify(ai.finalSynthesis || {}, null, 2))}</pre>
+      <h3>AI Findings Quality Validation</h3>
+      <pre>${escapeHtml(JSON.stringify(ai.qualityValidationSummary || [], null, 2))}</pre>
+      <h3>AI Limitations</h3>
+      <ul>${listItems(ai.limitations || [])}</ul>
+    </section>
   `;
 }
 
@@ -91,6 +168,7 @@ export function buildHtmlReviewReport(session = {}) {
     .ticket-block { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
     ul { padding-left: 20px; }
     .privacy-note { border-left: 4px solid var(--accent); background: #eef8f6; padding: 12px 14px; border-radius: 8px; }
+    pre { white-space: pre-wrap; word-break: break-word; border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: #f8fafc; color: var(--text); font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; }
   </style>
 </head>
 <body>
@@ -102,10 +180,15 @@ export function buildHtmlReviewReport(session = {}) {
       <div class="meta-grid">
         <div class="meta-card"><strong>${escapeHtml(report.metadata.generatedAt)}</strong><span>Generated</span></div>
         <div class="meta-card"><strong>${escapeHtml(report.metadata.sourceType)}</strong><span>Source type</span></div>
+        <div class="meta-card"><strong>${escapeHtml(report.metadata.reviewMode)}</strong><span>Review mode</span></div>
+        <div class="meta-card"><strong>${escapeHtml(targetDescription(report.metadata))}</strong><span>Review target</span></div>
+        <div class="meta-card"><strong>${escapeHtml(report.metadata.reviewDepthLabel)}</strong><span>Review depth</span></div>
+        <div class="meta-card"><strong>${escapeHtml(report.metadata.reviewFocus)}</strong><span>Review focus</span></div>
         <div class="meta-card"><strong>${escapeHtml(dimensions)}</strong><span>Image dimensions</span></div>
         <div class="meta-card"><strong>${escapeHtml(report.metadata.reviewEngineVersion)}</strong><span>Engine version</span></div>
         <div class="meta-card"><strong>${report.metadata.aiUsed ? "Yes" : "No"}</strong><span>AI used</span></div>
         <div class="meta-card"><strong>${escapeHtml(report.metadata.aiProvider || "None")}</strong><span>AI provider</span></div>
+        <div class="meta-card"><strong>${report.metadata.localVisualAnalysisUsed ? "Yes" : "No"}</strong><span>Local visual analysis</span></div>
         <div class="meta-card"><strong>${
           report.metadata.aiScreenshotShared ? "Yes" : "No"
         }</strong><span>Screenshot shared with AI</span></div>
@@ -114,12 +197,26 @@ export function buildHtmlReviewReport(session = {}) {
 
     <section class="section-card">
       <h2>Executive Summary</h2>
+      <p>${escapeHtml(report.executiveSummary.synthesisSummary || "No synthesis summary available.")}</p>
       <div class="summary-grid">
         <div class="summary-card"><strong>${report.executiveSummary.totalFindings}</strong><span>Total findings</span></div>
         ${countCards(report.executiveSummary.bySeverity)}
       </div>
       <h3>Findings by Category</h3>
       <div class="summary-grid">${countCards(report.executiveSummary.byCategory)}</div>
+      <h3>Review Indicators</h3>
+      <div class="summary-grid">${countCards(report.executiveSummary.reviewIndicators || {})}</div>
+      ${
+        report.executiveSummary.screenComprehension
+          ? `<h3>Screen Comprehension</h3>
+      <p><strong>Screen type:</strong> ${escapeHtml(report.executiveSummary.screenComprehension.screenType)}</p>
+      <p><strong>Likely user goal:</strong> ${escapeHtml(report.executiveSummary.screenComprehension.likelyUserGoal)}</p>
+      <p><strong>Primary content:</strong> ${escapeHtml(report.executiveSummary.screenComprehension.primaryContent)}</p>
+      <p><strong>Primary action:</strong> ${escapeHtml(
+        report.executiveSummary.screenComprehension.primaryAction || "Not detected"
+      )}</p>`
+          : ""
+      }
     </section>
 
     <section class="section-card">
@@ -131,6 +228,10 @@ export function buildHtmlReviewReport(session = {}) {
       <h2>Evidence and Privacy Note</h2>
       <p>${escapeHtml(report.evidenceNote)}</p>
     </section>
+
+    ${visualAnalysisDetails(report)}
+
+    ${aiDesignDetails(report)}
 
     <section>
       <h2>Findings</h2>

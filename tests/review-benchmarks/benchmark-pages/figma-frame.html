@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Benchmark - Figma Frame</title>
+  <style>
+    body { margin: 0; font: 13px/1.35 Inter, system-ui, sans-serif; background: #2b2d30; color: #d9dee7; }
+    .figma { display: grid; grid-template-columns: 240px 1fr 280px; min-height: 100vh; }
+    aside { background: #202124; padding: 18px; }
+    .canvas { display: grid; place-items: center; }
+    .frame { width: 760px; height: 620px; background: #fff7ed; color: #1f2937; padding: 44px; border-radius: 4px; }
+    h1 { font-size: 34px; line-height: 1.1; max-width: 520px; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 46px; }
+    .card { background: white; border-radius: 8px; padding: 18px; box-shadow: 0 12px 36px rgba(0,0,0,.14); }
+    .card:nth-child(2) { border-radius: 24px; }
+  </style>
+</head>
+<body>
+  <div class="figma" data-benchmark-id="figma-frame" data-intentional-issues="frame-only, inconsistent-card-treatment">
+    <aside>Layers<br>Frame 1440<br>Components</aside>
+    <main class="canvas"><section class="frame" data-expected-region="figma-frame"><h1>Bring design review into the release workflow</h1><p>Connect designers, PMs, and engineers around visual evidence.</p><div class="cards"><article class="card">Capture</article><article class="card">Review</article><article class="card">Export</article></div></section></main>
+    <aside>Design<br>Prototype<br>Inspect</aside>
+  </div>
+</body>
+</html>

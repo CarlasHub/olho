@@ -32,6 +32,10 @@ Used for local persistence:
 - settings/preferences
 - small migration/session state in extension storage
 
+## `sidePanel`
+Used to open the local Olho Review side panel beside the current page after explicit user action.
+The side panel runs local visual review controls and does not upload screenshots.
+
 ## `desktopCapture`
 Used to start browser-native screen, window, or tab recording after user action.
 

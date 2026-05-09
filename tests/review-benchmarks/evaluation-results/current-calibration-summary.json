@@ -1,0 +1,93 @@
+{
+  "runType": "static-quality-calibration",
+  "generatedBy": "tests/review-quality/quality-harness.mjs",
+  "generatedAt": "2026-05-09T15:18:38.274Z",
+  "scoreLabels": [
+    "Strong",
+    "Mostly strong",
+    "Needs attention",
+    "Weak"
+  ],
+  "summary": {
+    "purpose": "Record current review-quality calibration against curated human-review benchmarks.",
+    "interpretation": "Weak and Needs attention scores are product-quality gaps, not test harness failures.",
+    "currentPattern": "Priority fixtures now match expected broad human-review findings, design-tool fixtures generate scoped artboard/frame findings, and marker accuracy is measured by pixel overlap rather than structure alone."
+  },
+  "calibratedFixtures": [
+    {
+      "id": "marketing-hero",
+      "topFindingCategory": "visual-hierarchy",
+      "relevance": "Strong",
+      "prioritisationQuality": "Mostly strong",
+      "missedExpectedIds": [],
+      "markerAverageOverlap": 1
+    },
+    {
+      "id": "saas-dashboard",
+      "topFindingCategory": "enterprise-polish",
+      "relevance": "Strong",
+      "prioritisationQuality": "Mostly strong",
+      "missedExpectedIds": [],
+      "markerAverageOverlap": 1
+    },
+    {
+      "id": "dense-admin-panel",
+      "topFindingCategory": "ux",
+      "relevance": "Strong",
+      "prioritisationQuality": "Mostly strong",
+      "missedExpectedIds": [],
+      "markerAverageOverlap": 1
+    },
+    {
+      "id": "pricing-page",
+      "topFindingCategory": "visual-hierarchy",
+      "relevance": "Strong",
+      "prioritisationQuality": "Mostly strong",
+      "missedExpectedIds": [],
+      "markerAverageOverlap": 1
+    },
+    {
+      "id": "zeplin-artboard",
+      "topFindingCategory": "visual-hierarchy",
+      "relevance": "Strong",
+      "prioritisationQuality": "Mostly strong",
+      "missedExpectedIds": [],
+      "markerAverageOverlap": 1
+    },
+    {
+      "id": "figma-frame",
+      "topFindingCategory": "design-system",
+      "relevance": "Strong",
+      "prioritisationQuality": "Mostly strong",
+      "missedExpectedIds": [],
+      "markerAverageOverlap": 1
+    },
+    {
+      "id": "typography-editorial",
+      "topFindingCategory": "accessibility-visible",
+      "relevance": "Strong",
+      "prioritisationQuality": "Mostly strong",
+      "missedExpectedIds": [],
+      "markerAverageOverlap": 1
+    },
+    {
+      "id": "inconsistent-design-system",
+      "topFindingCategory": "design-system",
+      "relevance": "Strong",
+      "prioritisationQuality": "Mostly strong",
+      "missedExpectedIds": [],
+      "markerAverageOverlap": 1
+    }
+  ],
+  "knownWeaknesses": [
+    "Onboarding and mobile benchmark priority ordering still need focused calibration after this pass.",
+    "Live Ollama deltas depend on a reachable local Ollama endpoint and installed model.",
+    "Marker pixel overlap is evaluated from benchmark geometry; browser screenshot pixel-diff proof remains a separate e2e concern."
+  ],
+  "acceptanceDirection": [
+    "Clean-good baseline should continue to produce few findings and no high-severity findings.",
+    "Design-tool fixtures should produce artboard/frame findings without critiquing editor chrome.",
+    "Top findings should align with expected human-review priority order for calibrated fixtures.",
+    "Findings should merge symptoms into broader root-cause critique where evidence overlaps."
+  ]
+}

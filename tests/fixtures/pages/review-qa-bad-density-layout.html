@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QA Bad Density Layout</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #111827;
+        color: #e5e7eb;
+        font: 13px/1.25 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-columns: 220px 1fr 280px;
+        gap: 8px;
+        min-height: 100vh;
+        padding: 8px;
+      }
+
+      aside,
+      main,
+      .right {
+        border: 1px solid #374151;
+        border-radius: 10px;
+        background: #1f2937;
+      }
+
+      aside,
+      .right {
+        display: grid;
+        align-content: start;
+        gap: 6px;
+        padding: 10px;
+      }
+
+      .nav-item,
+      .chip,
+      .row {
+        min-height: 24px;
+        border-radius: 6px;
+        padding: 5px 7px;
+        background: #273445;
+      }
+
+      main {
+        padding: 10px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 19px;
+      }
+
+      .top-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .card {
+        min-height: 96px;
+        padding: 8px;
+        border: 1px solid #3f4b5f;
+        border-radius: 8px;
+        background: #273445;
+      }
+
+      .card strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+      }
+
+      .number {
+        font-size: 26px;
+        font-weight: 900;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+        font-size: 11px;
+      }
+
+      th,
+      td {
+        border: 1px solid #374151;
+        padding: 4px;
+        text-align: left;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+      }
+
+      .toolbar button {
+        min-height: 26px;
+        border: 1px solid #4b5563;
+        border-radius: 6px;
+        background: #111827;
+        color: #e5e7eb;
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- QA expected: overcrowded dashboard, weak grouping, density, fragmented composition, enterprise polish issues. -->
+    <div class="dashboard" data-review-fixture="bad-density-layout">
+      <aside data-expected-issue="dense-navigation">
+        <strong>Navigation</strong>
+        <div class="nav-item">Overview</div>
+        <div class="nav-item">Invoices</div>
+        <div class="nav-item">Approvals</div>
+        <div class="nav-item">Vendors</div>
+        <div class="nav-item">Contracts</div>
+        <div class="nav-item">Risk</div>
+        <div class="nav-item">Budget</div>
+        <div class="nav-item">Teams</div>
+        <div class="nav-item">Settings</div>
+      </aside>
+      <main data-expected-region="overcrowded-dashboard">
+        <h1>Global operations dashboard</h1>
+        <section class="top-grid" data-expected-issue="too-many-equal-summary-cards">
+          <div class="card"><strong>Revenue</strong><span class="number">$2.4M</span><p>+4.2% from last period</p></div>
+          <div class="card"><strong>Risk</strong><span class="number">87</span><p>29 urgent exceptions</p></div>
+          <div class="card"><strong>Queue</strong><span class="number">412</span><p>118 due today</p></div>
+          <div class="card"><strong>Approvals</strong><span class="number">63</span><p>9 blocked</p></div>
+          <div class="card"><strong>Compliance</strong><span class="number">71%</span><p>Low confidence</p></div>
+        </section>
+        <section class="grid" data-expected-issue="weak-visual-grouping">
+          <div class="card">North America exceptions pending finance review and legal approval.</div>
+          <div class="card">Europe vendor onboarding stalled on missing tax forms.</div>
+          <div class="card">APAC renewals require pricing confirmation from three teams.</div>
+          <div class="card">Security follow-ups contain mixed owners and unclear dates.</div>
+          <div class="card">Manual review queue contains duplicate status and stale comments.</div>
+          <div class="card">Contract health cards use identical visual weight for all states.</div>
+          <div class="card">Budget warnings sit beside informational notes with no priority.</div>
+          <div class="card">Escalations, notes, and exceptions are visually merged.</div>
+        </section>
+        <div class="toolbar" data-expected-issue="cramped-controls">
+          <button>Approve</button><button>Assign</button><button>Export</button><button>Filter</button><button>Group</button><button>Refresh</button><button>Archive</button>
+        </div>
+        <table data-expected-issue="dense-table">
+          <tr><th>Owner</th><th>Status</th><th>Risk</th><th>Due</th><th>Notes</th><th>Action</th></tr>
+          <tr><td>Finance</td><td>Pending</td><td>High</td><td>Today</td><td>Multiple exceptions require review.</td><td>Assign</td></tr>
+          <tr><td>Legal</td><td>Blocked</td><td>High</td><td>Today</td><td>Contract text conflicts with vendor changes.</td><td>Review</td></tr>
+          <tr><td>Ops</td><td>Queued</td><td>Medium</td><td>Tomorrow</td><td>Manual routing not complete.</td><td>Route</td></tr>
+        </table>
+      </main>
+      <section class="right" data-expected-issue="fragmented-side-panel">
+        <strong>Activity</strong>
+        <div class="row">9 comments</div>
+        <div class="row">18 edits</div>
+        <div class="row">5 flags</div>
+        <div class="chip">urgent</div>
+        <div class="chip">blocked</div>
+        <div class="chip">owner missing</div>
+      </section>
+    </div>
+  </body>
+</html>

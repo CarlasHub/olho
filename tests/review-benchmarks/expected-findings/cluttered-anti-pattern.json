@@ -1,0 +1,29 @@
+{
+  "benchmarkId": "cluttered-anti-pattern",
+  "title": "Visually cluttered anti-pattern",
+  "intendedUserGoal": "Understand what matters first and avoid being distracted by decoration.",
+  "strongFindings": [
+    {
+      "id": "fragmented-composition",
+      "category": "enterprise-polish",
+      "severity": "high",
+      "region": "Whole screen composition",
+      "rootCause": "Decorative treatments, saturated colour, shadows, and repeated boxes fragment the screen.",
+      "evidenceKeywords": ["fragmented", "composition", "decorative", "visual", "polish"],
+      "priority": 1
+    },
+    {
+      "id": "competing-actions",
+      "category": "visual-hierarchy",
+      "severity": "medium",
+      "region": "Hero actions",
+      "rootCause": "Several same-weight actions compete with the primary message.",
+      "evidenceKeywords": ["actions", "compete", "primary", "hierarchy"],
+      "priority": 2
+    }
+  ],
+  "weakFindingsToAvoid": ["colourful page", "looks modern", "too many boxes"],
+  "rootCauseObservations": ["The important critique is visual maturity and composition, not isolated colour preference."],
+  "mergeGuidance": ["Merge visual noise symptoms into one enterprise polish finding when they share the same cause."],
+  "scannerSpamToAvoid": ["Avoid listing every decorative shadow as a separate issue."]
+}

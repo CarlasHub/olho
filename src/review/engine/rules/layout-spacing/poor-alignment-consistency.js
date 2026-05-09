@@ -7,9 +7,17 @@ export const poorAlignmentConsistencyRule = {
     return missingElements(context, 5);
   },
   run(context) {
-    const candidates = topElements(context.elements, 8);
+    const comparableElements = context.elements.filter(
+      (element) =>
+        !element.isInteractive &&
+        element.type !== "region" &&
+        !["nav", "header", "footer", "main", "section", "article", "aside"].includes(element.tagName)
+    );
+    const firstElements = topElements(comparableElements, 10);
+    const anchorTop = firstElements[0]?.bounds?.y ?? 0;
+    const candidates = firstElements.filter((element) => Math.abs(Number(element.bounds?.y || 0) - anchorTop) <= 84);
     const spread = alignmentSpread(candidates, "x");
-    if (candidates.length < 5 || spread <= 18) return null;
+    if (candidates.length < 3 || spread <= 18) return null;
 
     // Gestalt continuity and alignment make interfaces faster to scan and compare.
     return createFinding(context, {

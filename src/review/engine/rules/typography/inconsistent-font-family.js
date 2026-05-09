@@ -20,7 +20,7 @@ export const inconsistentFontFamilyRule = {
       severity: "low",
       region: "Typography system",
       issue: "Multiple font families weaken typographic consistency.",
-      evidence: `Detected ${unique.length} font-family treatments across visible text.`,
+      evidence: `Measured ${unique.length} font-family treatments across visible text.`,
       impact: "Uncontrolled font mixing makes the interface feel less governed and harder to maintain.",
       recommendation: "Consolidate visible text onto the approved product type families and reserve exceptions for explicit brand use.",
       confidence: 0.7

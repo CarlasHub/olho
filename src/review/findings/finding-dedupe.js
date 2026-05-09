@@ -14,6 +14,15 @@ function overlapRatio(a = {}, b = {}) {
 }
 
 function similarIssue(a, b) {
+  if (a.isSynthesisFinding || b.isSynthesisFinding) {
+    return (
+      a.isSynthesisFinding &&
+      b.isSynthesisFinding &&
+      a.category === b.category &&
+      String(a.synthesisType || "") === String(b.synthesisType || "") &&
+      overlapRatio(a.regionBounds, b.regionBounds) > 0.65
+    );
+  }
   const first = `${a.category} ${a.region} ${a.selector}`.toLowerCase();
   const second = `${b.category} ${b.region} ${b.selector}`.toLowerCase();
   if (first === second) return true;
@@ -31,9 +40,11 @@ export function dedupeFindings(findings = []) {
   const output = [];
   findings.forEach((finding) => {
     const matchIndex = output.findIndex(
-      (existing) =>
-        similarIssue(existing, finding) ||
-        (existing.category === finding.category && overlapRatio(existing.regionBounds, finding.regionBounds) > 0.65)
+      (existing) => {
+        if (similarIssue(existing, finding)) return true;
+        if (existing.isSynthesisFinding || finding.isSynthesisFinding) return false;
+        return existing.category === finding.category && overlapRatio(existing.regionBounds, finding.regionBounds) > 0.65;
+      }
     );
     if (matchIndex === -1) {
       output.push(finding);

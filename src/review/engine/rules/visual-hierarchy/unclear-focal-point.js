@@ -7,6 +7,16 @@ export const unclearFocalPointRule = {
     return missingElements(context, 5);
   },
   run(context) {
+    const leadingHeading = context.headings
+      .slice()
+      .sort((a, b) => a.bounds.y - b.bounds.y || a.bounds.x - b.bounds.x)[0];
+    if (
+      leadingHeading &&
+      Number(leadingHeading.style?.fontSize || 0) >= 32 &&
+      Number(leadingHeading.bounds?.y || 0) < Number(context.viewport?.height || 0) * 0.45
+    ) {
+      return null;
+    }
     const ranked = rankByVisualWeight(context.elements, context).slice(0, 5);
     if (ranked.length < 3) return null;
     const [first, second, third] = ranked;

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QA Clean Good UI</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #f5f7f8;
+        color: #17212b;
+        font: 16px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .page {
+        min-height: 100vh;
+        padding: 40px;
+      }
+
+      .shell {
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 42px;
+      }
+
+      .brand {
+        font-weight: 800;
+        color: #0f766e;
+      }
+
+      nav {
+        display: flex;
+        gap: 22px;
+      }
+
+      nav a {
+        color: #425466;
+        font-weight: 650;
+        text-decoration: none;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+        gap: 48px;
+        align-items: center;
+        padding: 48px;
+        border: 1px solid #dfe7ea;
+        border-radius: 20px;
+        background: #ffffff;
+        box-shadow: 0 18px 45px rgba(25, 36, 49, 0.08);
+      }
+
+      h1 {
+        max-width: 720px;
+        margin: 0 0 18px;
+        color: #111827;
+        font-size: 48px;
+        line-height: 1.08;
+        letter-spacing: 0;
+      }
+
+      .lede {
+        max-width: 620px;
+        margin: 0 0 28px;
+        color: #4b5c6b;
+        font-size: 18px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 46px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        padding: 0 18px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .primary {
+        background: #0f766e;
+        color: #ffffff;
+      }
+
+      .secondary {
+        border: 1px solid #cbd5df;
+        color: #243241;
+        background: #ffffff;
+      }
+
+      .panel {
+        display: grid;
+        gap: 16px;
+        padding: 24px;
+        border-radius: 18px;
+        background: #eef6f5;
+      }
+
+      .metric {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 14px;
+        align-items: start;
+        padding: 16px;
+        border-radius: 14px;
+        background: #ffffff;
+      }
+
+      .metric span {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border-radius: 10px;
+        background: #d6ece9;
+        color: #0f766e;
+        font-weight: 900;
+      }
+
+      .metric strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .metric p {
+        margin: 0;
+        color: #536273;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 28px;
+      }
+
+      .card {
+        min-height: 180px;
+        padding: 24px;
+        border: 1px solid #dfe7ea;
+        border-radius: 16px;
+        background: #ffffff;
+      }
+
+      .card h2 {
+        margin: 0 0 8px;
+        font-size: 20px;
+      }
+
+      .card p {
+        margin: 0;
+        color: #536273;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- QA expected: mostly clean baseline. Few or no high severity findings should be generated. -->
+    <main class="page" data-review-fixture="clean-good-ui">
+      <div class="shell">
+        <header>
+          <div class="brand">AtlasOps</div>
+          <nav aria-label="Primary">
+            <a href="#overview">Overview</a>
+            <a href="#workflow">Workflow</a>
+            <a href="#security">Security</a>
+          </nav>
+        </header>
+
+        <section class="hero" data-expected-region="strong-hierarchy-clean-spacing-clear-cta">
+          <div>
+            <h1>Run operational reviews with calm, structured confidence.</h1>
+            <p class="lede">
+              A focused workspace for teams that need traceable decisions, readable status, and clear next actions without dashboard noise.
+            </p>
+            <div class="actions">
+              <a class="button primary" href="#start">Start review</a>
+              <a class="button secondary" href="#learn">View workflow</a>
+            </div>
+          </div>
+          <aside class="panel" aria-label="Summary">
+            <div class="metric">
+              <span>1</span>
+              <div>
+                <strong>Prioritise the work</strong>
+                <p>Surface decisions, blockers, and status in a consistent review rhythm.</p>
+              </div>
+            </div>
+            <div class="metric">
+              <span>2</span>
+              <div>
+                <strong>Resolve exceptions</strong>
+                <p>Keep review notes close to the evidence without overwhelming the page.</p>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <section class="cards" aria-label="Product strengths">
+          <article class="card">
+            <h2>Readable by default</h2>
+            <p>Type scale, contrast, and spacing support quick scanning.</p>
+          </article>
+          <article class="card">
+            <h2>Consistent components</h2>
+            <p>Cards and actions use a clear shared treatment.</p>
+          </article>
+          <article class="card">
+            <h2>Action-led review</h2>
+            <p>The primary path remains visible and unambiguous.</p>
+          </article>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

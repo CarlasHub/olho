@@ -18,6 +18,9 @@ const requiredFiles = [
   "privacy.js",
   "privacy.css",
   "export-report.html",
+  "sidepanel.html",
+  "sidepanel.js",
+  "sidepanel.css",
   "service_worker.js",
   "offscreen.html",
   "offscreen.js",
@@ -49,6 +52,19 @@ test("capture and recording controls are wired in popup", async () => {
   assert.equal(html.includes("blockedScreenCaptureBtn"), true);
   assert.equal(html.includes("openEditorCopyBtn"), true);
   assert.equal(html.includes("annotate-local-image"), true);
+  assert.equal(html.includes("review-current-screen"), true);
+  assert.equal(html.includes("review-full-page"), true);
+  assert.equal(html.includes("review-current-design"), true);
+  assert.equal(html.includes("review-imported-screenshot"), true);
+  assert.equal(html.includes("open-review-panel"), true);
+  assert.equal(
+    html.includes("Review visually analyses the interface for UI, UX, accessibility-visible, design-system, and enterprise polish issues."),
+    true
+  );
+  assert.equal(html.includes("Review Current Screen"), true);
+  assert.equal(html.includes("Open Review Panel"), true);
+  assert.equal(html.includes("Review Imported Screenshot"), true);
+  assert.equal(html.includes('id="record-actions"'), true);
   assert.equal(html.includes("start-recording"), true);
   assert.equal(html.includes("recentList"), true);
   assert.equal(html.includes('id="recordMode"'), false);
@@ -58,6 +74,37 @@ test("capture and recording controls are wired in popup", async () => {
   assert.equal(html.includes('id="captureDestination"'), false);
   assert.equal(html.includes("downloadPdfBtn"), false);
   assert.equal(html.includes("downloadZipBtn"), false);
+});
+
+test("popup surface keeps a usable extension popup width", async () => {
+  const css = await fs.readFile(path.join(root, "popup.css"), "utf8");
+  const js = await fs.readFile(path.join(root, "popup.js"), "utf8");
+  assert.equal(css.includes("min-width: 420px"), true);
+  assert.equal(css.includes("width: 420px"), true);
+  assert.equal(js.includes('style.minWidth = "420px"'), true);
+});
+
+test("review mode communicates professional visual review scope and limits", async () => {
+  const html = await fs.readFile(path.join(root, "review.html"), "utf8");
+  const js = await fs.readFile(path.join(root, "src/review/ui/review-controller.js"), "utf8");
+  const overlay = await fs.readFile(path.join(root, "src/review/overlays/overlay-renderer.js"), "utf8");
+
+  assert.equal(html.includes("Professional Visual Review"), true);
+  assert.equal(html.includes("sourceReviewTypeValue"), true);
+  assert.equal(html.includes("accessibility-visible risk"), true);
+  assert.equal(html.includes("not a code accessibility audit"), true);
+  assert.equal(html.includes('id="aiSettingsDialog"'), true);
+  assert.equal(html.includes('id="reviewScopeControls"'), true);
+  assert.equal(html.includes("Review central design area only"), true);
+  assert.equal(html.includes('class="ai-review-panel" aria-labelledby="aiReviewSettingsTitle"'), false);
+  assert.equal(js.includes("Live webpage review from the captured screen"), true);
+  assert.equal(js.includes("Figma frame review from the current browser view"), true);
+  assert.equal(js.includes("Zeplin screen review from the current browser view"), true);
+  assert.equal(js.includes("rules skipped where evidence was unavailable"), true);
+  assert.equal(js.includes("detectCentralDesignArea"), true);
+  assert.equal(overlay.includes("overlay-marker-pin"), true);
+  assert.equal(overlay.includes("overlay-popover"), true);
+  assert.equal(overlay.includes("Open full details"), true);
 });
 
 test("export report includes local export actions", async () => {

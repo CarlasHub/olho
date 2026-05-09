@@ -1,5 +1,6 @@
 import { normalizeReviewMetrics } from "../utils/metrics-normalizer.js";
 import { VISUAL_REVIEW_PROFILE } from "./visual-review-profile.js";
+import { detectDesignSource } from "../design/design-source-detector.js";
 
 function initialVisualScore(metrics) {
   if (!metrics.elements.length) return 100;
@@ -8,11 +9,34 @@ function initialVisualScore(metrics) {
   return Math.max(0, Math.round(100 - densityPenalty - typePenalty));
 }
 
+function normalizeInputSourceType(value, detectedSource, hasDomMetrics) {
+  const sourceType = String(value || "").trim();
+  if (sourceType === "dom-metrics") return "webpage-capture";
+  if (sourceType === "image-only") return detectedSource.sourceType || "static-design";
+  return sourceType || detectedSource.sourceType || (hasDomMetrics ? "webpage-capture" : "static-design");
+}
+
 export function createReviewContext(input = {}) {
   const metrics = normalizeReviewMetrics(input);
   const hasDomMetrics = metrics.elements.length > 0;
-  const sourceType = input.sourceType || (hasDomMetrics ? "dom-metrics" : "image-only");
+  const detectedSource = detectDesignSource({
+    ...input,
+    hasDomMetrics
+  });
+  const sourceType = normalizeInputSourceType(input.sourceType, detectedSource, hasDomMetrics);
   const screenshotRef = String(input.screenshotRef || input.session?.screenshotRef || input.itemId || "screenshot").trim();
+  const hasTextMetrics = metrics.textBlocks.length > 0;
+  const hasInteractiveElements = metrics.actions.length > 0 || metrics.elements.some((element) => element.isInteractive);
+  const hasComputedStyles = metrics.elements.some((element) => Boolean(element.style));
+  const hasDesignMetadata = Boolean(
+    input.hasDesignMetadata ||
+      input.media?.metadata?.designReview ||
+      input.media?.metadata?.isDesignScreen ||
+      input.media?.metadata?.reviewSourceType
+  );
+  const isImageOnly = !hasDomMetrics;
+  const isDesignScreen = Boolean(detectedSource.isDesignScreen || hasDesignMetadata);
+  const visualAnalysis = input.visualAnalysis || input.domMetrics?.visualAnalysis || input.media?.metadata?.visualAnalysis || null;
 
   return {
     engineVersion: VISUAL_REVIEW_PROFILE.engineVersion,
@@ -21,6 +45,13 @@ export function createReviewContext(input = {}) {
     screenshotRef,
     sourceType,
     hasDomMetrics,
+    hasComputedStyles,
+    hasTextMetrics,
+    hasInteractiveElements,
+    hasDesignMetadata,
+    isImageOnly,
+    isDesignScreen,
+    designSource: detectedSource,
     media: input.media || null,
     raw: input,
     image: metrics.image,
@@ -33,6 +64,8 @@ export function createReviewContext(input = {}) {
     densityMetrics: input.densityMetrics || metrics.densityMetrics,
     typeScaleStats: input.typeScaleStats || metrics.typeScaleStats,
     detectedRegions: input.detectedRegions || metrics.detectedRegions,
+    visualAnalysis,
+    hasLocalVisualAnalysis: Boolean(visualAnalysis?.evidence),
     overallVisualScore: Number.isFinite(Number(input.overallVisualScore))
       ? Number(input.overallVisualScore)
       : initialVisualScore(metrics)

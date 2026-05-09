@@ -9,7 +9,8 @@ export const poorLineHeightRule = {
   run(context) {
     const cramped = context.textBlocks.find((block) => {
       const ratio = lineHeightRatio(block);
-      return ratio !== null && ratio < 1.25 && block.text.length > 40;
+      if (block.isHeading || block.type === "heading") return false;
+      return ratio !== null && ratio < 1.25 && block.text.length > 80;
     });
     if (!cramped) return null;
     const ratio = lineHeightRatio(cramped);

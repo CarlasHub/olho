@@ -1,0 +1,20 @@
+{
+  "benchmarkId": "figma-frame",
+  "title": "Figma frame",
+  "intendedUserGoal": "Review the selected Figma frame without critiquing Figma tool panels.",
+  "strongFindings": [
+    {
+      "id": "frame-card-consistency",
+      "category": "design-system",
+      "severity": "medium",
+      "region": "Figma frame cards",
+      "rootCause": "Repeated cards use inconsistent radius and elevation within the design frame.",
+      "evidenceKeywords": ["frame", "card", "consistent", "radius", "elevation"],
+      "priority": 1
+    }
+  ],
+  "weakFindingsToAvoid": ["figma layers panel", "properties panel", "toolbar"],
+  "rootCauseObservations": ["Frame scoping is more important than general browser or editor critique."],
+  "mergeGuidance": ["Merge repeated card style issues into one system consistency finding."],
+  "scannerSpamToAvoid": ["Do not review Figma chrome as product UI."]
+}

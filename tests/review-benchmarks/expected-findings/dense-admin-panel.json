@@ -1,0 +1,29 @@
+{
+  "benchmarkId": "dense-admin-panel",
+  "title": "Dense admin panel",
+  "intendedUserGoal": "Find administrative risk areas and complete management tasks without excessive scanning.",
+  "strongFindings": [
+    {
+      "id": "admin-density",
+      "category": "ux",
+      "severity": "high",
+      "region": "Admin workspace",
+      "rootCause": "Controls, cards, and side panels create high cognitive load before priority is established.",
+      "evidenceKeywords": ["dense", "crowded", "scan", "cognitive", "controls"],
+      "priority": 1
+    },
+    {
+      "id": "weak-grouping",
+      "category": "visual-hierarchy",
+      "severity": "medium",
+      "region": "Card matrix",
+      "rootCause": "Repeated tiles lack enough grouping and section hierarchy.",
+      "evidenceKeywords": ["group", "tiles", "related", "section"],
+      "priority": 2
+    }
+  ],
+  "weakFindingsToAvoid": ["too many buttons", "admin panel detected", "make spacing better"],
+  "rootCauseObservations": ["Density and weak information grouping are the primary release risks."],
+  "mergeGuidance": ["Merge tile crowding and filter clutter into a broader workflow clarity finding when appropriate."],
+  "scannerSpamToAvoid": ["Avoid treating every compact control as an independent defect."]
+}

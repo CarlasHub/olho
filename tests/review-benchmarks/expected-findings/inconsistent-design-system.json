@@ -1,0 +1,29 @@
+{
+  "benchmarkId": "inconsistent-design-system",
+  "title": "Inconsistent design system",
+  "intendedUserGoal": "Understand repeated components as belonging to one coherent product system.",
+  "strongFindings": [
+    {
+      "id": "button-drift",
+      "category": "design-system",
+      "severity": "medium",
+      "region": "Button set",
+      "rootCause": "Similar actions use inconsistent shape, shadow, and emphasis.",
+      "evidenceKeywords": ["button", "consistent", "treatment", "shape"],
+      "priority": 1
+    },
+    {
+      "id": "card-drift",
+      "category": "design-system",
+      "severity": "medium",
+      "region": "Card set",
+      "rootCause": "Repeated cards use inconsistent radius and elevation.",
+      "evidenceKeywords": ["card", "radius", "shadow", "consistent"],
+      "priority": 2
+    }
+  ],
+  "weakFindingsToAvoid": ["three cards detected", "different styles found"],
+  "rootCauseObservations": ["Component drift is the issue; avoid treating each individual component as a separate defect."],
+  "mergeGuidance": ["Merge all button treatment drift into one finding and all card drift into one finding."],
+  "scannerSpamToAvoid": ["Do not create one finding per component instance."]
+}

@@ -12,6 +12,8 @@ export const insufficientAboveFoldHierarchyRule = {
     const headings = aboveFold.filter((element) => element.isHeading);
     const actions = aboveFold.filter((element) => element.isButton);
     if (aboveFold.length < 5 || headings.length === 0 || actions.length === 0) return null;
+    const leadingHeading = headings.slice().sort((a, b) => a.bounds.y - b.bounds.y || a.bounds.x - b.bounds.x)[0];
+    if (leadingHeading && Number(leadingHeading.style?.fontSize || 0) >= 32) return null;
     const ranked = rankByVisualWeight(aboveFold, context);
     const topIsHeadingOrAction = ranked[0]?.element?.isHeading || ranked[0]?.element?.isButton;
 

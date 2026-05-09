@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Olho Memory</title>
+    <title>Olho Review Workspace</title>
     <link rel="stylesheet" href="src/shared/renaissance-theme.css" />
     <link rel="stylesheet" href="gallery.css" />
   </head>
@@ -14,10 +14,10 @@
           <div class="page-title-wrap">
             <p class="eyebrow"><img class="eyebrow-icon" src="icons/icon-32.png" alt="" aria-hidden="true" /> Olho</p>
             <div class="title-row">
-              <h1>Memory</h1>
+              <h1>Review Workspace</h1>
               <span id="itemCount" class="pill" aria-live="polite">0</span>
             </div>
-            <p class="page-subtitle">Local media library for captures, imports, edits, and recordings.</p>
+            <p class="page-subtitle">Local review sessions, screenshots, reports, and recordings.</p>
           </div>
           <nav class="olho-nav olho-header-nav" aria-label="Olho sections">
             <a class="olho-nav-link" href="popup.html">Capture</a>
@@ -32,16 +32,46 @@
         <main class="layout">
       <section class="panel content-panel" aria-labelledby="libraryTitle">
         <div class="section-head section-head-library">
-          <h2 id="libraryTitle">Library Workspace</h2>
-          <button id="refreshBtn" type="button" class="ghost icon-only-btn" aria-label="Refresh library">
-            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7H4v4M4 11a8 8 0 1 0 2.3-5.7" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
-          </button>
+          <h2 id="libraryTitle">Review Workspace</h2>
+          <div class="library-actions">
+            <input id="designReviewImportInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+            <button id="importDesignReviewBtn" type="button" class="ghost">Import Design for Review</button>
+            <button id="refreshBtn" type="button" class="ghost icon-only-btn" aria-label="Refresh library">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7H4v4M4 11a8 8 0 1 0 2.3-5.7" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+            </button>
+          </div>
         </div>
+
+        <section class="review-workspace-summary" aria-labelledby="reviewWorkspaceSummaryTitle">
+          <div>
+            <h3 id="reviewWorkspaceSummaryTitle">Workspace overview</h3>
+            <p>Review cards track findings, severity, source type, and report readiness locally.</p>
+          </div>
+          <div class="review-stat-grid">
+            <article class="review-stat-card">
+              <span>Review items</span>
+              <strong id="reviewWorkspaceItemCount">0</strong>
+            </article>
+            <article class="review-stat-card">
+              <span>Reviewed</span>
+              <strong id="reviewWorkspaceReviewedCount">0</strong>
+            </article>
+            <article class="review-stat-card">
+              <span>Findings</span>
+              <strong id="reviewWorkspaceFindingCount">0</strong>
+            </article>
+            <article class="review-stat-card">
+              <span>Reports</span>
+              <strong id="reviewWorkspaceReportCount">0</strong>
+            </article>
+          </div>
+        </section>
 
         <section class="memory-controls" aria-labelledby="viewsTitle">
           <h3 id="viewsTitle">Views</h3>
           <nav class="view-nav view-nav-row" aria-label="Memory views">
             <button type="button" class="view-btn active" data-view="all">All</button>
+            <button type="button" class="view-btn" data-view="reviews">Reviews</button>
             <button type="button" class="view-btn" data-view="screenshots">Screenshots</button>
             <button type="button" class="view-btn" data-view="imports">Imports</button>
             <button type="button" class="view-btn" data-view="edited">Edited</button>
@@ -202,6 +232,9 @@
             <div><dt>Type</dt><dd id="inspectorTypeValue">-</dd></div>
             <div><dt>Date</dt><dd id="inspectorDateValue">-</dd></div>
             <div><dt>Size</dt><dd id="inspectorSizeValue">-</dd></div>
+            <div><dt>Review type</dt><dd id="inspectorReviewTypeValue">-</dd></div>
+            <div><dt>Findings</dt><dd id="inspectorFindingsValue">-</dd></div>
+            <div><dt>Report</dt><dd id="inspectorReportValue">-</dd></div>
             <div><dt>Tags</dt><dd id="inspectorTagsValue">-</dd></div>
             <div><dt>Folder</dt><dd id="inspectorFolderValue">-</dd></div>
           </dl>

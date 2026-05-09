@@ -5,6 +5,12 @@ import { sortReviewFindings } from "../findings/finding-sort.js";
 import { severityRank } from "../findings/finding-severity.js";
 import { filterValidReviewFindings } from "../findings/finding-validator.js";
 import { VISUAL_REVIEW_PROFILE } from "./visual-review-profile.js";
+import { clampFindingsToDepth, resolveReviewDepth } from "./review-depth.js";
+import {
+  buildReviewIndicators,
+  buildScreenComprehension,
+  synthesizeReviewFindings
+} from "./review-synthesis.js";
 
 function nowMs() {
   if (typeof performance !== "undefined" && typeof performance.now === "function") {
@@ -23,6 +29,7 @@ function scoreFromFindings(context, findings) {
 export function runReviewEngine(input = {}) {
   const started = nowMs();
   const context = createReviewContext(input);
+  const reviewDepth = resolveReviewDepth(input.reviewDepth || input.reviewOptions?.reviewDepth || context.raw?.reviewDepth);
   const skippedRules = [];
   const rawFindings = [];
 
@@ -49,12 +56,22 @@ export function runReviewEngine(input = {}) {
     }
   }
 
-  const valid = filterValidReviewFindings(rawFindings, {
+  const validRuleFindings = filterValidReviewFindings(rawFindings, {
     warnInvalid: true,
     context: "Review engine"
   });
-  const findings = sortReviewFindings(dedupeFindings(valid));
+  const synthesis = synthesizeReviewFindings(context, validRuleFindings, reviewDepth);
+  const validSynthesisFindings = filterValidReviewFindings(synthesis.findings, {
+    warnInvalid: true,
+    context: "Review engine synthesis"
+  });
+  const findings = clampFindingsToDepth(
+    sortReviewFindings(dedupeFindings([...validSynthesisFindings, ...validRuleFindings])),
+    reviewDepth
+  );
   const visualScore = scoreFromFindings(context, findings);
+  const screenComprehension = buildScreenComprehension(context);
+  const reviewIndicators = buildReviewIndicators(findings);
 
   return {
     findings,
@@ -63,6 +80,21 @@ export function runReviewEngine(input = {}) {
       engineVersion: VISUAL_REVIEW_PROFILE.engineVersion,
       sourceType: context.sourceType,
       hasDomMetrics: context.hasDomMetrics,
+      hasComputedStyles: context.hasComputedStyles,
+      hasTextMetrics: context.hasTextMetrics,
+      hasInteractiveElements: context.hasInteractiveElements,
+      hasDesignMetadata: context.hasDesignMetadata,
+      hasLocalVisualAnalysis: context.hasLocalVisualAnalysis,
+      isImageOnly: context.isImageOnly,
+      isDesignScreen: context.isDesignScreen,
+      visualAnalysis: context.visualAnalysis || null,
+      reviewDepth: reviewDepth.id,
+      reviewDepthLabel: reviewDepth.label,
+      reviewDepthDescription: reviewDepth.description,
+      screenComprehension,
+      reviewIndicators,
+      reviewPasses: synthesis.passes,
+      synthesisSummary: synthesis.summary,
       ruleCount: REVIEW_RULES.length,
       findingCount: findings.length,
       executionTimeMs: Math.round(nowMs() - started),

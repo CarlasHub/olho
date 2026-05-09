@@ -18,6 +18,15 @@ export function buildFindingTicket(finding = {}) {
   const severity = titleCase(finding.severity || "unknown");
   const category = categoryLabel(finding.category || "review");
   const title = `[${severity}] [${category}] ${shortIssue(finding.issue)}`;
+  const acceptanceCriteria =
+    Array.isArray(finding.acceptanceCriteria) && finding.acceptanceCriteria.length
+      ? finding.acceptanceCriteria
+      : [
+          "The affected region has been reviewed visually.",
+          "The issue has been corrected or intentionally accepted.",
+          "The change has been checked for keyboard and readability impact where relevant.",
+          "The UI remains visually consistent with surrounding components."
+        ];
 
   const body = [
     `## ${title}`,
@@ -25,8 +34,13 @@ export function buildFindingTicket(finding = {}) {
     `- Region/component: ${finding.region || "Not specified"}`,
     `- Issue: ${finding.issue || "Not specified"}`,
     `- Evidence: ${finding.evidence || "Not specified"}`,
+    `- Evidence type: ${finding.evidenceType || finding.evidence_type || "Not specified"}`,
     `- User impact: ${finding.impact || "Not specified"}`,
+    `- Best practice: ${finding.bestPracticeReference || "Not specified"}`,
+    `- Reviewer rationale: ${finding.reviewRationale || "Not specified"}`,
+    `- Affected users: ${finding.affectedUsers || "Not specified"}`,
     `- Recommendation: ${finding.recommendation || "Not specified"}`,
+    `- Suggested priority: ${finding.suggestedPriority || "Not specified"}`,
     `- Confidence: ${Math.round(Number(finding.confidence || 0) * 100)}%`,
     `- Source: ${finding.source || "rule-engine"}`,
     `- Screenshot/reference note: ${finding.screenshotRef || "Review screenshot reference unavailable"}${
@@ -34,21 +48,13 @@ export function buildFindingTicket(finding = {}) {
     }`,
     "",
     "### Acceptance Criteria",
-    "- The affected region has been reviewed visually.",
-    "- The issue has been corrected or intentionally accepted.",
-    "- The change has been checked for keyboard and readability impact where relevant.",
-    "- The UI remains visually consistent with surrounding components."
+    ...acceptanceCriteria.map((item) => `- ${item}`)
   ].join("\n");
 
   return {
     title,
     body,
-    acceptanceCriteria: [
-      "The affected region has been reviewed visually.",
-      "The issue has been corrected or intentionally accepted.",
-      "The change has been checked for keyboard and readability impact where relevant.",
-      "The UI remains visually consistent with surrounding components."
-    ]
+    acceptanceCriteria
   };
 }
 

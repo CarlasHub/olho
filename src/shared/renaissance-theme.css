@@ -146,7 +146,6 @@ body {
 }
 
 .olho-main-shell {
-  min-width: 0;
   display: grid;
   gap: 14px;
 }

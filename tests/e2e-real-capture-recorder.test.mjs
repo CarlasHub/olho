@@ -644,6 +644,126 @@ test(
 );
 
 test(
+  "real side panel Review Visible View reviews fixture page and renders live markers",
+  { timeout: 120_000 },
+  async () => {
+    await withRealExtension("real-sidepanel-review-visible-view", async ({ browser, openPage }) => {
+      const fixtureServer = await startFixtureServer();
+      const fixture = await browser.newPage();
+      try {
+        await fixture.goto(fixtureServer.urlFor("normal-page.html"), {
+          waitUntil: "load",
+          timeout: 20_000
+        });
+        await fixture.waitForSelector("text/Primary Action", { timeout: 15_000 });
+        await fixture.bringToFront();
+
+        const sidepanel = await openPage("sidepanel.html", "sidepanel-review-visible-view");
+        await sidepanel.page.waitForSelector("#reviewVisibleViewBtn", { timeout: 15_000 });
+        await sidepanel.page.click("#reviewVisibleViewBtn");
+        try {
+          const deadline = Date.now() + 30_000;
+          while (Date.now() < deadline) {
+            const state = await sidepanel.page.evaluate(() => ({
+              complete: /Review complete/i.test(document.getElementById("statusText")?.textContent || ""),
+              findings: document.querySelectorAll(".sidepanel-finding").length
+            }));
+            const overlay = await fixture.evaluate(() => ({
+              markers: document.querySelectorAll("#olho-live-review-overlay-root .olho-live-marker").length
+            }));
+            if (state.complete && state.findings > 0 && overlay.markers > 0) {
+              break;
+            }
+            await new Promise((resolve) => setTimeout(resolve, 250));
+          }
+          const ready = await sidepanel.page.evaluate(() => ({
+            complete: /Review complete/i.test(document.getElementById("statusText")?.textContent || ""),
+            findings: document.querySelectorAll(".sidepanel-finding").length
+          }));
+          const overlayReady = await fixture.evaluate(() => ({
+            markers: document.querySelectorAll("#olho-live-review-overlay-root .olho-live-marker").length
+          }));
+          assert.equal(ready.complete, true);
+          assert.ok(ready.findings > 0);
+          assert.ok(overlayReady.markers > 0);
+        } catch (error) {
+          const debugState = await sidepanel.page.evaluate(() => ({
+            status: document.getElementById("statusText")?.textContent || "",
+            target: document.getElementById("targetLabel")?.textContent || "",
+            findingsText: document.getElementById("findingsList")?.textContent || "",
+            findingButtons: document.querySelectorAll(".sidepanel-finding").length
+          }));
+          const overlayState = await fixture.evaluate(() => ({
+            markers: document.querySelectorAll("#olho-live-review-overlay-root .olho-live-marker").length,
+            regions: document.querySelectorAll("#olho-live-review-overlay-root .olho-live-region").length
+          }));
+          throw new Error(`Side panel review did not render findings and markers: ${JSON.stringify({ debugState, overlayState })}`, {
+            cause: error
+          });
+        }
+
+        const proof = await sidepanel.page.evaluate(() => ({
+          target: document.getElementById("targetLabel")?.textContent || "",
+          targetMeta: document.getElementById("targetMeta")?.textContent || "",
+          status: document.getElementById("statusText")?.textContent || "",
+          findingButtons: document.querySelectorAll(".sidepanel-finding").length,
+          selected: document.querySelector(".sidepanel-finding[aria-current='true']")?.textContent || ""
+        }));
+        const overlayProof = await fixture.evaluate(() => ({
+          markerPins: document.querySelectorAll("#olho-live-review-overlay-root .olho-live-marker").length,
+          selectedMarkers: document.querySelectorAll("#olho-live-review-overlay-root .olho-live-marker.is-selected").length
+        }));
+
+        assert.match(proof.target, /Visible page|Normal Fixture/i);
+        assert.match(proof.targetMeta, /full-visible-page/i);
+        assert.match(proof.status, /Review complete/i);
+        assert.ok(proof.findingButtons > 0, "Side panel should render navigable findings.");
+        assert.ok(overlayProof.markerPins > 0, "Live page overlay should anchor findings as markers.");
+
+        await sidepanel.page.evaluate(() => document.querySelector(".sidepanel-finding")?.click());
+        const selectDeadline = Date.now() + 8_000;
+        while (Date.now() < selectDeadline) {
+          const selectedMarkerCount = await fixture.evaluate(
+            () => document.querySelectorAll("#olho-live-review-overlay-root .olho-live-marker.is-selected").length
+          );
+          if (selectedMarkerCount > 0) break;
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+        const selectedMarkerCount = await fixture.evaluate(
+          () => document.querySelectorAll("#olho-live-review-overlay-root .olho-live-marker.is-selected").length
+        );
+        assert.ok(selectedMarkerCount > 0, "Selecting a side-panel finding should highlight the live marker.");
+
+        await fixture.evaluate(() => document.querySelector("#olho-live-review-overlay-root .olho-live-marker")?.click());
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        const selectedFindingCount = await sidepanel.page.evaluate(
+          () => document.querySelectorAll(".sidepanel-finding[aria-current='true']").length
+        );
+        assert.ok(selectedFindingCount > 0, "Clicking a live marker should select a side-panel finding.");
+        const inspectorText = await sidepanel.page.$eval("#findingInspector", (node) => node.textContent || "");
+        assert.match(inspectorText, /Evidence/i);
+        assert.match(inspectorText, /Impact/i);
+        assert.match(inspectorText, /Recommendation/i);
+
+        await sidepanel.page.evaluate(() => document.getElementById("clearMarkersBtn")?.click());
+        const clearDeadline = Date.now() + 8_000;
+        while (Date.now() < clearDeadline) {
+          const markerRootPresent = await fixture.evaluate(() => Boolean(document.querySelector("#olho-live-review-overlay-root")));
+          if (!markerRootPresent) break;
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+        const markerRootPresent = await fixture.evaluate(() => Boolean(document.querySelector("#olho-live-review-overlay-root")));
+        assert.equal(markerRootPresent, false, "Clear Markers should remove the live overlay.");
+        assertNoPageErrors(sidepanel.telemetry, "sidepanel-review-visible-view");
+      } finally {
+        await fixture.close().catch(() => {});
+        await fixtureServer.close().catch(() => {});
+      }
+    });
+  }
+);
+
+test(
   "real capture-region from popup on fixture page creates cropped image and supports escape cancel",
   { timeout: 120_000 },
   async () => {
@@ -1143,6 +1263,10 @@ test(
     await withRealExtension("popup-annotate-local-image", async ({ browser, extensionId, openPage }) => {
       const popup = await openPage("popup.html", "popup-annotate-local-image");
       await popup.page.waitForSelector('button[data-action="annotate-local-image"]', { timeout: 15_000 });
+      await popup.page.click("#moreCaptureDisclosure summary");
+      await popup.page.waitForSelector('#moreCaptureDisclosure[open] button[data-action="annotate-local-image"]', {
+        timeout: 15_000
+      });
       await popup.page.click('button[data-action="annotate-local-image"]');
 
       let openedEditor = false;

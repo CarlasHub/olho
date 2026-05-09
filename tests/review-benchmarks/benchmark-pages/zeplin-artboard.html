@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Benchmark - Zeplin Artboard</title>
+  <style>
+    body { margin: 0; font: 13px/1.35 Inter, system-ui, sans-serif; background: #22333a; color: #d9e3e8; }
+    .zeplin { display: grid; grid-template-columns: 260px 1fr 300px; min-height: 100vh; }
+    .tool, .spec { padding: 18px; background: #2b4049; }
+    .stage { display: grid; place-items: center; background: radial-gradient(#3c535b 1px, transparent 1px); background-size: 16px 16px; }
+    .artboard { width: 860px; min-height: 720px; background: #eaf4f2; color: #0f2430; border-radius: 10px; overflow: hidden; }
+    .hero { height: 320px; padding: 48px; background: linear-gradient(135deg, rgba(4,68,102,.9), rgba(106,190,208,.45)); }
+    h1 { font-size: 38px; margin: 80px 0 14px; }
+    .cta { background: #d8233b; color: white; border: 0; border-radius: 999px; height: 44px; padding: 0 28px; font-weight: 800; }
+    .quote { margin: 40px; display: grid; grid-template-columns: 140px 1fr; gap: 22px; align-items: center; }
+    .mark { font-size: 96px; color: #c4d3d5; }
+  </style>
+</head>
+<body>
+  <div class="zeplin" data-benchmark-id="zeplin-artboard" data-intentional-issues="artboard-only, ignore-editor-ui">
+    <aside class="tool">Zeplin toolbar<br>Versions<br>Comments</aside>
+    <main class="stage"><section class="artboard" data-expected-region="central-artboard"><div class="hero"><h1>Vakgebieden</h1><p>Security Officer and transport roles for enterprise operations.</p><button class="cta">Find jobs</button></div><div class="quote"><div class="mark">"</div><p>Great place to work with real opportunities and supportive teams.</p></div></section></main>
+    <aside class="spec">Specs<br>Assets<br>Annotations</aside>
+  </div>
+</body>
+</html>

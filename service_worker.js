@@ -334,7 +334,7 @@ function resolveResponseErrorMessage(messageType, error) {
 
 function captureDestination(payload = {}) {
   const value = String(payload.destination || "editor").trim();
-  if (["editor", "library", "clipboard", "download"].includes(value)) {
+  if (["editor", "library", "clipboard", "download", "review"].includes(value)) {
     return value;
   }
   return "editor";
@@ -368,6 +368,10 @@ async function runCapture(type, tabId) {
 }
 
 async function performCaptureDestination(destination, tabId, result, type) {
+  if (destination === "review") {
+    return { message: "Capture ready for Review Mode." };
+  }
+
   if (destination === "library") {
     try {
       await openLibraryTab();

@@ -18,6 +18,9 @@ test(
       await popup.page.waitForSelector('button[data-action="capture-element"]', { timeout: 15_000 });
       await popup.page.waitForSelector('button[data-action="capture-screen-region"]', { timeout: 15_000 });
       await popup.page.waitForSelector('button[data-action="annotate-local-image"]', { timeout: 15_000 });
+      await popup.page.waitForSelector('button[data-action="review-current-screen"]', { timeout: 15_000 });
+      await popup.page.waitForSelector('button[data-action="review-full-page"]', { timeout: 15_000 });
+      await popup.page.waitForSelector('button[data-action="review-imported-screenshot"]', { timeout: 15_000 });
       assertNoPageErrors(popup.telemetry, "popup");
 
       const editor = await openPage("editor.html", "editor");

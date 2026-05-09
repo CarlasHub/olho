@@ -53,6 +53,8 @@ test("service worker capture routes support visible/region/full/element/retry/ca
   assert.equal(worker.includes("captureRegion"), true);
   assert.equal(worker.includes("captureFullPage"), true);
   assert.equal(worker.includes("captureElement"), true);
+  assert.equal(worker.includes('"review"'), true);
+  assert.equal(worker.includes("Capture ready for Review Mode."), true);
 
   assert.equal(worker.includes("clipboardPending"), true);
   assert.equal(worker.includes("copyCaptureToClipboard"), false);
@@ -99,6 +101,14 @@ test("popup clipboard flow runs in extension page with fallback", async () => {
   assert.equal(popup.includes("captureScreenWindowStill"), true);
   assert.equal(popup.includes("getDisplayMedia"), true);
   assert.equal(popup.includes("capture-screen-window"), true);
+  assert.equal(popup.includes("review-current-screen"), true);
+  assert.equal(popup.includes("openReviewSidePanel"), true);
+  assert.equal(popup.includes("chrome.sidePanel.open"), true);
+  assert.equal(popup.includes('destination: "review"'), true);
+  assert.equal(popup.includes("review.html?itemId="), true);
+  assert.equal(popup.includes("updateMediaMetadata"), true);
+  assert.equal(popup.includes("collectReviewMetricsForTab"), true);
+  assert.equal(popup.includes("popup-live-dom"), true);
   assert.equal(popup.includes("stream.getTracks().forEach"), true);
   assert.equal(popup.includes("captureDelaySeconds"), true);
   assert.equal(popup.includes("runCaptureDelayIfNeeded"), true);

@@ -1,0 +1,29 @@
+{
+  "benchmarkId": "mobile-app-mockup",
+  "title": "Mobile app mock-up",
+  "intendedUserGoal": "Understand the daily status and confidently use core mobile actions.",
+  "strongFindings": [
+    {
+      "id": "mobile-tap-targets",
+      "category": "accessibility-visible",
+      "severity": "medium",
+      "region": "Bottom navigation",
+      "rootCause": "Small circular controls may be hard to identify and activate confidently.",
+      "evidenceKeywords": ["small", "target", "mobile", "action"],
+      "priority": 1
+    },
+    {
+      "id": "mobile-density",
+      "category": "ux",
+      "severity": "medium",
+      "region": "Mobile stat cards",
+      "rootCause": "Repeated cards and decorative hero treatment compete in a constrained viewport.",
+      "evidenceKeywords": ["mobile", "density", "cards", "viewport"],
+      "priority": 2
+    }
+  ],
+  "weakFindingsToAvoid": ["phone mockup detected", "nice mobile design"],
+  "rootCauseObservations": ["Constrained viewport clarity and target confidence should drive the critique."],
+  "mergeGuidance": ["Merge decorative competition and dense cards when they affect the same scan path."],
+  "scannerSpamToAvoid": ["Do not overclaim touch target failures without reliable sizing evidence."]
+}

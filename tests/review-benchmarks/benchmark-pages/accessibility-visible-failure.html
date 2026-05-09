@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Benchmark - Accessibility Visible Failure</title>
+  <style>
+    body { margin: 0; font: 14px/1.35 Inter, system-ui, sans-serif; background: #ffffff; color: #1f2937; }
+    main { padding: 48px; }
+    .panel { width: 760px; background: #f8fafc; border-radius: 16px; padding: 28px; }
+    .muted { color: #c0c8d2; font-size: 12px; }
+    .status { display: flex; gap: 10px; margin-top: 18px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; background: #e11d48; }
+    .tiny { width: 28px; height: 28px; border: 0; border-radius: 50%; background: #e5e7eb; }
+    .error { color: #d4a3a3; font-size: 12px; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <main data-benchmark-id="accessibility-visible-failure" data-intentional-issues="low-contrast, color-only-status, small-targets">
+    <section class="panel" data-expected-region="accessibility-panel"><h1>Account verification</h1><p class="muted">Several items need your attention before this workspace can be activated.</p><div class="status"><span class="dot"></span><span>Status is shown by colour alone</span></div><button class="tiny">i</button><p class="error">Required field missing</p></section>
+  </main>
+</body>
+</html>

@@ -19,7 +19,7 @@ export const inconsistentRadiusShadowRule = {
       severity: "low",
       region: "Surface treatment",
       issue: "Radius and shadow treatments appear ungoverned.",
-      evidence: `Detected ${radiusSet.size} radius values and ${shadowSet.size} shadow treatments across components.`,
+      evidence: `Measured ${radiusSet.size} radius values and ${shadowSet.size} shadow treatments across components.`,
       impact: "Ungoverned surface treatment weakens hierarchy and makes components harder to classify at a glance.",
       recommendation: "Reduce radius and shadow usage to a small semantic token set for cards, modals, menus, and controls.",
       confidence: 0.7

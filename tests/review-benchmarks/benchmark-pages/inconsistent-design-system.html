@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Benchmark - Inconsistent Design System</title>
+  <style>
+    body { margin: 0; font: 15px/1.4 Inter, system-ui, sans-serif; background: #f7f9fc; color: #1f2937; }
+    main { padding: 48px; }
+    .toolbar button:nth-child(1) { border-radius: 4px; background: #0f766e; color: white; }
+    .toolbar button:nth-child(2) { border-radius: 18px; background: white; color: #1f2937; box-shadow: 0 8px 20px rgba(0,0,0,.12); }
+    .toolbar button:nth-child(3) { border-radius: 0; background: #edf2f7; color: #4b5563; }
+    button { height: 40px; border: 1px solid #cfd6e2; padding: 0 18px; font-weight: 800; margin-right: 8px; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 24px; }
+    .card { background: white; padding: 22px; }
+    .card:nth-child(1) { border-radius: 4px; box-shadow: none; }
+    .card:nth-child(2) { border-radius: 18px; box-shadow: 0 20px 40px rgba(0,0,0,.16); }
+    .card:nth-child(3) { border-radius: 30px; box-shadow: 0 4px 8px rgba(0,0,0,.08); }
+  </style>
+</head>
+<body>
+  <main data-benchmark-id="inconsistent-design-system" data-intentional-issues="button-drift, card-drift, radius-shadow-drift">
+    <h1>Component library preview</h1>
+    <div class="toolbar" data-expected-region="button-set"><button>Save</button><button>Publish</button><button>Archive</button></div>
+    <section class="cards" data-expected-region="card-set"><article class="card">User card</article><article class="card">Role card</article><article class="card">Policy card</article></section>
+  </main>
+</body>
+</html>

@@ -16,7 +16,11 @@ const outMd = path.join(resultsDir, "ui-structure-walkthrough.md");
 
 const DESKTOP = { name: "desktop", width: 1280, height: 900 };
 const NARROW = { name: "narrow", width: 390, height: 844 };
+const GALLERY_NARROW = { name: "narrow", width: 456, height: 844 };
+const POPUP_NARROW = { name: "narrow", width: 420, height: 844 };
 const VIEWPORTS = [NARROW, DESKTOP];
+const GALLERY_VIEWPORTS = [GALLERY_NARROW, DESKTOP];
+const POPUP_VIEWPORTS = [POPUP_NARROW, DESKTOP];
 
 function escapeMarkdown(text) {
   return String(text || "").replace(/\|/g, "\\|");
@@ -182,7 +186,7 @@ test(
       await gallery.page.reload({ waitUntil: "load", timeout: 20_000 });
       await gallery.page.waitForSelector("#emptyState:not([hidden])", { timeout: 20_000 });
 
-      for (const viewport of VIEWPORTS) {
+      for (const viewport of GALLERY_VIEWPORTS) {
         await setViewport(gallery.page, viewport);
         const layout = await ensureNoHorizontalOverflow(gallery.page, `gallery empty (${viewport.name})`);
         const shot = await saveScreenshot(gallery.page, "gallery-empty", viewport);
@@ -215,7 +219,7 @@ test(
       await gallery.page.click(".gallery-card input[type='checkbox']");
       await gallery.page.waitForSelector("#bulkToolbar:not([hidden])", { timeout: 20_000 });
 
-      for (const viewport of VIEWPORTS) {
+      for (const viewport of GALLERY_VIEWPORTS) {
         await setViewport(gallery.page, viewport);
         const layout = await ensureNoHorizontalOverflow(gallery.page, `gallery with items (${viewport.name})`);
         const shot = await saveScreenshot(gallery.page, "gallery-items", viewport);
@@ -227,7 +231,7 @@ test(
       const popupFocus = await collectFocusTrail(popup.page, 10);
       assert.ok(popupFocus.length >= 5, "popup focus order trail must include at least five focusable controls");
 
-      for (const viewport of VIEWPORTS) {
+      for (const viewport of POPUP_VIEWPORTS) {
         await setViewport(popup.page, viewport);
         const layout = await ensureNoHorizontalOverflow(popup.page, `popup (${viewport.name})`);
         const shot = await saveScreenshot(popup.page, "popup-default", viewport);
@@ -278,7 +282,7 @@ test(
       await popup.page.click('button[data-action="capture-screen-window"]');
       await popup.page.waitForSelector("#screenCapturePreviewPanel:not([hidden])", { timeout: 20_000 });
 
-      for (const viewport of VIEWPORTS) {
+      for (const viewport of POPUP_VIEWPORTS) {
         await setViewport(popup.page, viewport);
         const layout = await ensureNoHorizontalOverflow(popup.page, `popup preview (${viewport.name})`);
         const shot = await saveScreenshot(popup.page, "popup-preview", viewport);

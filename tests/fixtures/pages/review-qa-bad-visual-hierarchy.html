@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QA Bad Visual Hierarchy</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #fff7ed;
+        color: #1f2937;
+        font: 16px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .page {
+        min-height: 100vh;
+        padding: 28px;
+      }
+
+      .hero {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        max-width: 1240px;
+        min-height: 660px;
+        margin: 0 auto;
+        padding: 24px;
+        border: 6px solid #f97316;
+        border-radius: 28px;
+        background:
+          radial-gradient(circle at 18% 25%, rgba(239, 68, 68, 0.38), transparent 26%),
+          radial-gradient(circle at 75% 18%, rgba(59, 130, 246, 0.36), transparent 28%),
+          linear-gradient(135deg, #fff7ed, #fef3c7 48%, #fee2e2);
+      }
+
+      .headline-block,
+      .promo-card,
+      .image-card,
+      .deal-strip {
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.78);
+        box-shadow: 0 18px 32px rgba(185, 75, 25, 0.2);
+      }
+
+      .headline-block {
+        padding: 26px;
+      }
+
+      .eyebrow {
+        margin: 0 0 16px;
+        color: #dc2626;
+        font-size: 24px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0 0 14px;
+        color: #92400e;
+        font-size: 30px;
+        line-height: 1.15;
+      }
+
+      .lede {
+        max-width: 580px;
+        margin: 0;
+        color: #6b7280;
+        font-size: 17px;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      .button {
+        display: grid;
+        min-height: 54px;
+        place-items: center;
+        border-radius: 999px;
+        text-decoration: none;
+        font-weight: 900;
+      }
+
+      .button.primary,
+      .button.secondary,
+      .button.tertiary {
+        border: 3px solid #dc2626;
+        background: #ef4444;
+        color: #ffffff;
+      }
+
+      .promo-card {
+        padding: 22px;
+      }
+
+      .promo-card h2,
+      .deal-strip h2 {
+        margin: 0 0 10px;
+        color: #dc2626;
+        font-size: 34px;
+      }
+
+      .promo-card p,
+      .deal-strip p {
+        margin: 0;
+        color: #4b5563;
+      }
+
+      .image-card {
+        min-height: 270px;
+        background:
+          linear-gradient(135deg, rgba(17, 24, 39, 0.16), transparent),
+          repeating-linear-gradient(45deg, #fbbf24 0 12px, #f87171 12px 24px);
+      }
+
+      .deal-strip {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 14px;
+        align-items: center;
+        padding: 24px;
+      }
+
+      .badge {
+        display: inline-flex;
+        min-height: 52px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #2563eb;
+        color: #fff;
+        font-weight: 900;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- QA expected: competing CTAs, weak primary reading path, noisy hero, unclear focal point. -->
+    <main class="page" data-review-fixture="bad-visual-hierarchy">
+      <section class="hero" data-expected-region="noisy-hero-competing-primary-actions">
+        <div class="headline-block" data-expected-issue="weak-heading-emphasis">
+          <p class="eyebrow">Limited Launch</p>
+          <h1>Everything you need to transform the operating system for modern teams</h1>
+          <p class="lede">
+            A very important offer sits beside several equally loud modules, making it hard to understand which part of the screen should be read first.
+          </p>
+          <div class="actions" data-expected-issue="competing-primary-actions">
+            <a class="button primary" href="#start">Start now</a>
+            <a class="button secondary" href="#demo">Book demo</a>
+            <a class="button tertiary" href="#pricing">See pricing</a>
+          </div>
+        </div>
+        <article class="promo-card" data-expected-issue="competing-focal-point">
+          <h2>Save 40%</h2>
+          <p>This promo card has stronger visual weight than the headline and competes with the intended action path.</p>
+        </article>
+        <div class="image-card" aria-label="Decorative image block" data-expected-issue="decorative-weight-competes"></div>
+        <section class="deal-strip" data-expected-issue="unclear-section-priority">
+          <h2>New bundle</h2>
+          <p>Secondary messaging is styled almost as strongly as the main offer.</p>
+          <span class="badge">Try the suite</span>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

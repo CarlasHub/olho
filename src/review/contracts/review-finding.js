@@ -35,6 +35,31 @@ export const REVIEW_FINDING_REQUIRED_FIELDS = Object.freeze([
   "source"
 ]);
 
+export const REVIEW_FINDING_DEEP_FIELDS = Object.freeze([
+  "bestPracticeReference",
+  "reviewRationale",
+  "affectedUsers",
+  "suggestedPriority",
+  "markerSummary",
+  "acceptanceCriteria"
+]);
+
+export const REVIEW_FINDING_MARKER_TYPES = Object.freeze([
+  "section",
+  "component-group",
+  "text-region",
+  "action",
+  "accessibility-risk",
+  "composition"
+]);
+
+export const REVIEW_FINDING_EVIDENCE_TYPES = Object.freeze([
+  "measured",
+  "inferred",
+  "model_observation",
+  "human_review_needed"
+]);
+
 export function isReviewFindingCategory(value) {
   return REVIEW_FINDING_CATEGORIES.includes(value);
 }
@@ -45,4 +70,12 @@ export function isReviewFindingSeverity(value) {
 
 export function isReviewFindingSource(value) {
   return REVIEW_FINDING_SOURCES.includes(value);
+}
+
+export function isReviewFindingMarkerType(value) {
+  return REVIEW_FINDING_MARKER_TYPES.includes(value);
+}
+
+export function isReviewFindingEvidenceType(value) {
+  return REVIEW_FINDING_EVIDENCE_TYPES.includes(value);
 }

@@ -320,16 +320,11 @@ summary:focus-visible,
     gap: 6px;
   }
 
-  .field > span:first-child {
-    min-width: 0;
-  }
-
   .settings-nav {
     grid-template-columns: 1fr;
   }
 
   select {
-    min-width: 0;
     width: 100%;
   }
 }

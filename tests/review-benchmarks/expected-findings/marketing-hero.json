@@ -1,0 +1,29 @@
+{
+  "benchmarkId": "marketing-hero",
+  "title": "Marketing hero",
+  "intendedUserGoal": "Understand the offer quickly and choose the primary next action.",
+  "strongFindings": [
+    {
+      "id": "hero-reading-path",
+      "category": "visual-hierarchy",
+      "severity": "high",
+      "region": "Hero section",
+      "rootCause": "The content card, image block, and CTA group compete instead of creating one reading path.",
+      "evidenceKeywords": ["hero", "heading", "cta", "action", "visual"],
+      "priority": 1
+    },
+    {
+      "id": "cta-dominance",
+      "category": "ux",
+      "severity": "medium",
+      "region": "CTA group",
+      "rootCause": "The primary and secondary actions are too close in emphasis for a conversion-led hero.",
+      "evidenceKeywords": ["primary", "secondary", "action", "weight"],
+      "priority": 2
+    }
+  ],
+  "weakFindingsToAvoid": ["make it modern", "button inconsistency detected", "this looks good"],
+  "rootCauseObservations": ["Unclear hierarchy between message, image, and action is more important than isolated spacing nits."],
+  "mergeGuidance": ["Merge heading, image, and CTA symptoms into one hero reading-path finding when evidence overlaps."],
+  "scannerSpamToAvoid": ["Do not produce separate low-value findings for every rounded corner or decorative shadow."]
+}

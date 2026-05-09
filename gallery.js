@@ -30,7 +30,13 @@ import {
   sanitizeText
 } from "./src/gallery/format-utils.js";
 import { createGalleryCardView } from "./src/gallery/card-view.js";
+import {
+  isReviewWorkspaceItem,
+  reviewWorkspaceStats,
+  reviewWorkspaceSummaryForItem
+} from "./src/gallery/review-workspace-summary.js";
 import { installRuntimeGuard } from "./src/shared/runtime-guard.js";
+import { importDesignScreenshotForReview } from "./src/review/design/design-import-controller.js";
 
 const viewButtons = Array.from(document.querySelectorAll(".view-btn[data-view]"));
 
@@ -40,6 +46,10 @@ const folderList = document.getElementById("folderList");
 const tagList = document.getElementById("tagList");
 
 const itemCount = document.getElementById("itemCount");
+const reviewWorkspaceItemCount = document.getElementById("reviewWorkspaceItemCount");
+const reviewWorkspaceReviewedCount = document.getElementById("reviewWorkspaceReviewedCount");
+const reviewWorkspaceFindingCount = document.getElementById("reviewWorkspaceFindingCount");
+const reviewWorkspaceReportCount = document.getElementById("reviewWorkspaceReportCount");
 const filterToolbar = document.getElementById("filterToolbar");
 const searchInput = document.getElementById("searchInput");
 const typeFilter = document.getElementById("typeFilter");
@@ -48,6 +58,8 @@ const tagFilter = document.getElementById("tagFilter");
 const favouriteFilter = document.getElementById("favouriteFilter");
 const sortSelect = document.getElementById("sortSelect");
 const refreshBtn = document.getElementById("refreshBtn");
+const importDesignReviewBtn = document.getElementById("importDesignReviewBtn");
+const designReviewImportInput = document.getElementById("designReviewImportInput");
 
 const bulkToolbar = document.getElementById("bulkToolbar");
 const selectAllToggle = document.getElementById("selectAllToggle");
@@ -87,6 +99,9 @@ const inspectorTitleValue = document.getElementById("inspectorTitleValue");
 const inspectorTypeValue = document.getElementById("inspectorTypeValue");
 const inspectorDateValue = document.getElementById("inspectorDateValue");
 const inspectorSizeValue = document.getElementById("inspectorSizeValue");
+const inspectorReviewTypeValue = document.getElementById("inspectorReviewTypeValue");
+const inspectorFindingsValue = document.getElementById("inspectorFindingsValue");
+const inspectorReportValue = document.getElementById("inspectorReportValue");
 const inspectorTagsValue = document.getElementById("inspectorTagsValue");
 const inspectorFolderValue = document.getElementById("inspectorFolderValue");
 const inspectorOpenBtn = document.getElementById("inspectorOpenBtn");
@@ -120,6 +135,7 @@ const toast = document.getElementById("toast");
 
 const VIEW_MODES = [
   "all",
+  "reviews",
   "screenshots",
   "imports",
   "edited",
@@ -289,6 +305,10 @@ function filteredMediaItems() {
 
   if (state.view === "screenshots") {
     list = list.filter((item) => itemType(item) === "image");
+  }
+
+  if (state.view === "reviews") {
+    list = list.filter((item) => isReviewWorkspaceItem(item));
   }
 
   if (state.view === "imports") {
@@ -473,6 +493,9 @@ function updateInspectorPanel() {
   if (!selected) {
     inspectorBody.hidden = true;
     inspectorEmpty.hidden = false;
+    if (inspectorReviewTypeValue) inspectorReviewTypeValue.textContent = "-";
+    if (inspectorFindingsValue) inspectorFindingsValue.textContent = "-";
+    if (inspectorReportValue) inspectorReportValue.textContent = "-";
     if (inspectorPreviewImage) {
       inspectorPreviewImage.hidden = true;
       inspectorPreviewImage.removeAttribute("src");
@@ -499,24 +522,37 @@ function updateInspectorPanel() {
 
   inspectorBody.hidden = false;
   inspectorEmpty.hidden = true;
+  const trashView = isTrashView();
 
-  const title = isTrashView() ? sanitizeText(selected.title || "Untitled") : itemTitle(selected);
-  const type = isTrashView()
+  const title = trashView ? sanitizeText(selected.title || "Untitled") : itemTitle(selected);
+  const type = trashView
     ? selected.kind === "recording"
       ? "Recording (trash)"
       : "Screenshot (trash)"
     : itemType(selected) === "video"
       ? "Recording"
       : "Screenshot";
-  const created = isTrashView() ? selected.deletedAt || selected.createdAt : selected.createdAt;
-  const size = isTrashView() ? Number(selected.sizeBytes || 0) : itemSize(selected);
-  const tags = isTrashView() ? selected.tags || [] : itemTags(selected);
+  const created = trashView ? selected.deletedAt || selected.createdAt : selected.createdAt;
+  const size = trashView ? Number(selected.sizeBytes || 0) : itemSize(selected);
+  const tags = trashView ? selected.tags || [] : itemTags(selected);
   const folder = folderName(selected.folderId);
 
   inspectorTitleValue.textContent = title || "-";
   inspectorTypeValue.textContent = type;
   inspectorDateValue.textContent = created ? formatDate(created) : "-";
   inspectorSizeValue.textContent = formatBytes(size);
+  const reviewSummary = !trashView && selected.type === "image" ? reviewWorkspaceSummaryForItem(selected) : null;
+  if (inspectorReviewTypeValue) {
+    inspectorReviewTypeValue.textContent = reviewSummary ? reviewSummary.reviewType : "-";
+  }
+  if (inspectorFindingsValue) {
+    inspectorFindingsValue.textContent = reviewSummary
+      ? `${reviewSummary.findingCountLabel} | ${reviewSummary.severityText}`
+      : "-";
+  }
+  if (inspectorReportValue) {
+    inspectorReportValue.textContent = reviewSummary ? reviewSummary.reportStatus : "-";
+  }
   inspectorTagsValue.textContent = tags.length ? tags.join(", ") : "No tags";
   inspectorFolderValue.textContent = folder;
 
@@ -536,8 +572,6 @@ function updateInspectorPanel() {
       inspectorPreviewImage.removeAttribute("src");
     }
   }
-
-  const trashView = isTrashView();
   if (inspectorOpenBtn) {
     inspectorOpenBtn.hidden = trashView;
     inspectorOpenBtn.disabled = trashView;
@@ -829,6 +863,14 @@ function renderStorageStats() {
   });
 }
 
+function renderReviewWorkspaceSummary() {
+  const stats = reviewWorkspaceStats(state.items);
+  if (reviewWorkspaceItemCount) reviewWorkspaceItemCount.textContent = String(stats.reviewableCount);
+  if (reviewWorkspaceReviewedCount) reviewWorkspaceReviewedCount.textContent = String(stats.reviewedCount);
+  if (reviewWorkspaceFindingCount) reviewWorkspaceFindingCount.textContent = String(stats.findingTotal);
+  if (reviewWorkspaceReportCount) reviewWorkspaceReportCount.textContent = String(stats.exportedReports);
+}
+
 function renderLargestFiles() {
   largestList.innerHTML = "";
 
@@ -890,6 +932,12 @@ function cardAriaLabel(item) {
   if (item.metadata?.durationMs) {
     parts.push(`Duration ${formatDuration(item.metadata.durationMs)}`);
   }
+  if (itemType(item) === "image") {
+    const reviewSummary = reviewWorkspaceSummaryForItem(item);
+    parts.push(reviewSummary.reviewType);
+    parts.push(reviewSummary.findingCountLabel);
+    parts.push(reviewSummary.reportStatus);
+  }
   parts.push(`Created ${formatDate(item.createdAt)}`);
   return parts.join(". ");
 }
@@ -939,11 +987,32 @@ async function openItemInEditor(item) {
 
 async function openItemInReview(item) {
   if (itemType(item) !== "image") {
-    showToast("Review Mode supports saved screenshots only.", true);
+    showToast("Review Mode supports saved image items only.", true);
     return;
   }
   const url = chrome.runtime.getURL(`review.html?itemId=${encodeURIComponent(item.id)}`);
   await chrome.tabs.create({ url });
+}
+
+async function handleDesignReviewImport() {
+  const file = designReviewImportInput?.files?.[0] || null;
+  if (!file) return;
+
+  try {
+    const item = await importDesignScreenshotForReview({
+      file,
+      createItem,
+      openReview: openItemInReview
+    });
+    showToast(`Imported ${itemTitle(item)} for Design Review.`);
+    await refresh();
+    setView("reviews");
+  } catch (error) {
+    console.error(error);
+    showToast(String(error?.message || error || "Design import failed."), true);
+  } finally {
+    if (designReviewImportInput) designReviewImportInput.value = "";
+  }
 }
 
 async function toggleFavouriteItem(item) {
@@ -1713,6 +1782,7 @@ function writeFilterInputs() {
 function render() {
   writeFilterInputs();
 
+  renderReviewWorkspaceSummary();
   renderFolderFilters();
   renderTagFilter();
   renderFolderList();
@@ -1796,6 +1866,15 @@ function bindEvents() {
     refresh().catch((error) => {
       console.error(error);
       showToast("Refresh failed.", true);
+    });
+  });
+  importDesignReviewBtn?.addEventListener("click", () => {
+    designReviewImportInput?.click();
+  });
+  designReviewImportInput?.addEventListener("change", () => {
+    handleDesignReviewImport().catch((error) => {
+      console.error(error);
+      showToast("Design import failed.", true);
     });
   });
 
